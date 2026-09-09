@@ -15,8 +15,7 @@ export default function RelationshipTypeScreen() {
   const [selected, setSelected] = useState<RelationshipType>("long_distance");
 
   const handleContinue = () => {
-    // Navigate to next screen (or signup for now)
-    router.push("/signup");
+    router.push("/date-ideas");
   };
 
   return (

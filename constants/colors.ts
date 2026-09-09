@@ -21,10 +21,10 @@ export const GRADIENTS = {
   backgroundLocations: [0, 0.5, 1] as const,
 
   /**
-   * Warm Romantic Coral & Sunset Gradient (Main CTA / Continue)
+   * Main Continue / Action Button Gradient (Unique glowing coral-amber)
    */
-  primary: ["#FF4D6D", "#FFA45C"] as const,
-  primaryLocations: [0, 1] as const,
+  primary: ["#FF4D6D", "#FF758C", "#FFA07A"] as const,
+  primaryLocations: [0, 0.5, 1] as const,
 
   /**
    * Soft Pink to Rose Gradient
@@ -32,17 +32,32 @@ export const GRADIENTS = {
   welcomeButton: ["#FF4D6D", "#FF8FA3"] as const,
 
   /**
-   * Fluid Purple to Sky-Blue Gradient (From reference image for organic fluid buttons)
+   * Fluid Purple Gradient for Login & Highlights
    */
-  fluidBluePurple: ["#e475eaff", "#f163efff", "#e238f8ff"] as const,
+  fluidBluePurple: ["#E475EA", "#F163EF", "#E238F8"] as const,
 
   /**
-   * Selected Option Card Glow (Violet to Electric Teal)
+   * Selected Option Card Glow (Amber to Emerald)
    */
-  optionSelected: ["#e0c343ff", "#00a94cff"] as const,
+  optionSelected: ["#E0C343", "#00A94C"] as const,
 
   /**
-   * Progress Bar Gradient
+   * Progress Bar Gradient (Glowing Neon Rose to Peach)
    */
   progressBar: ["#FF4D6D", "#FFA45C"] as const,
+
+  /**
+   * Date Ideas Card Neon Glow Borders
+   */
+  cardGreen: ["#10B981", "#34D399", "#86EFAC"] as const,
+  cardOrange: ["#F97316", "#FB923C", "#FDE047"] as const,
+  cardPurpleCyan: ["#8B5CF6", "#6366F1", "#38BDF8"] as const,
+
+  /**
+   * Game Mode Card Gradients (Play & Compare Screen)
+   */
+  gameIck: ["#A3E635", "#22C55E"] as const,
+  gameWouldYouRather: ["#FBBF24", "#EF4444"] as const,
+  gameGuessMyAnswer: ["#F59E0B", "#EC4899"] as const,
+  gameAgreeOrDisagree: ["#A855F7", "#6366F1"] as const,
 };

@@ -49,11 +49,27 @@ export default function RootLayout() {
             options={{ animation: "slide_from_right" }}
           />
           <Stack.Screen
-            name="signup"
+            name="onboarding"
             options={{ animation: "slide_from_right" }}
           />
           <Stack.Screen
-            name="onboarding"
+            name="date-ideas"
+            options={{ animation: "slide_from_right" }}
+          />
+          <Stack.Screen
+            name="play-compare"
+            options={{ animation: "slide_from_right" }}
+          />
+          <Stack.Screen
+            name="memories"
+            options={{ animation: "slide_from_right" }}
+          />
+          <Stack.Screen
+            name="ready"
+            options={{ animation: "slide_from_right" }}
+          />
+          <Stack.Screen
+            name="signup"
             options={{ animation: "slide_from_right" }}
           />
         </Stack>

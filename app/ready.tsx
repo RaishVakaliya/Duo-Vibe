@@ -5,8 +5,9 @@ import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { MotiView } from "moti";
 import Svg, { Path } from "react-native-svg";
-import { loginStyles } from "@/styles/login.styles";
+import { readyStyles } from "@/styles/ready.styles";
 import { GRADIENTS } from "@/constants/colors";
 
 function GoogleIcon() {
@@ -32,7 +33,7 @@ function GoogleIcon() {
   );
 }
 
-export default function LoginScreen() {
+export default function ReadyScreen() {
   const router = useRouter();
 
   const handleGoogleSignIn = () => {
@@ -40,22 +41,19 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={loginStyles.container}>
+    <View style={readyStyles.container}>
       <StatusBar style="light" />
 
       <LinearGradient
         colors={[...GRADIENTS.background]}
         locations={[...GRADIENTS.backgroundLocations]}
-        style={loginStyles.gradientBackground}
+        style={readyStyles.gradientBackground}
       />
 
-      <View style={loginStyles.ambientBlobTop} pointerEvents="none" />
-      <View style={loginStyles.ambientBlobBottom} pointerEvents="none" />
-
-      <SafeAreaView style={loginStyles.safeArea}>
-        <View style={loginStyles.header}>
+      <SafeAreaView style={readyStyles.safeArea}>
+        <View style={readyStyles.headerRow}>
           <Pressable
-            style={loginStyles.backButton}
+            style={readyStyles.backButton}
             onPress={() => router.back()}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             accessibilityRole="button"
@@ -63,44 +61,58 @@ export default function LoginScreen() {
           >
             <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
           </Pressable>
+
+          <View style={readyStyles.progressBarTrack}>
+            <LinearGradient
+              colors={[...GRADIENTS.progressBar]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={[readyStyles.progressBarFill, { width: "100%" }]}
+            />
+          </View>
         </View>
 
-        <View style={loginStyles.content}>
-          <Image
-            source={require("@/assets/icon-nobg.png")}
-            style={loginStyles.logo}
-            resizeMode="contain"
-          />
+        <View style={readyStyles.content}>
+          <View style={readyStyles.headerTextContainer}>
+            <Text style={readyStyles.title}>Your space is almost ready</Text>
+            <Text style={readyStyles.subtitle}>
+              Secure your account to keep your shared space safe
+            </Text>
+          </View>
 
-          <Text style={loginStyles.title}>Duo Vibe</Text>
-          <Text style={loginStyles.subtitle}>
-            Stay close, wherever you are.
-          </Text>
+          <MotiView
+            from={{ scale: 0.97, translateY: -4 }}
+            animate={{ scale: 1.02, translateY: 4 }}
+            transition={{
+              type: "timing",
+              duration: 2500,
+              loop: true,
+              repeatReverse: true,
+            }}
+            style={readyStyles.illustrationContainer}
+          >
+            <Image
+              source={require("@/assets/heart_in_cloud.png")}
+              style={readyStyles.illustration}
+              resizeMode="contain"
+            />
+          </MotiView>
+        </View>
 
+        <View style={readyStyles.footer}>
           <Pressable
-            style={loginStyles.googleButton}
+            style={readyStyles.googleButton}
             onPress={handleGoogleSignIn}
             accessibilityRole="button"
             accessibilityLabel="Sign in with Google"
           >
-            <View style={loginStyles.googleIconContainer}>
+            <View style={readyStyles.googleIconContainer}>
               <GoogleIcon />
             </View>
-            <Text style={loginStyles.googleButtonText}>
+            <Text style={readyStyles.googleButtonText}>
               Sign in with Google
             </Text>
           </Pressable>
-        </View>
-
-        <View style={loginStyles.footer}>
-          <Text style={loginStyles.footerText}>
-            By signing in, I agree to the
-          </Text>
-          <View style={loginStyles.linksRow}>
-            <Text style={loginStyles.linkText}>Terms of Service</Text>
-            <Text style={loginStyles.andText}> and </Text>
-            <Text style={loginStyles.linkText}>Privacy Policy</Text>
-          </View>
         </View>
       </SafeAreaView>
     </View>
