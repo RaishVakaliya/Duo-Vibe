@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
-import { View, Text, Image, Dimensions, StyleSheet } from "react-native";
+import { View, Text, Image, Dimensions } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import Svg, { Path, Defs, LinearGradient, Stop, Line } from "react-native-svg";
 import { MotiView } from "moti";
+import { splashStyles } from "@/styles/splash.styles";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -107,36 +108,36 @@ export default function SplashScreen() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.replace("/onboarding");
+      router.replace("/welcome");
     }, 2400);
 
     return () => clearTimeout(timer);
   }, [router]);
 
   return (
-    <View style={styles.container}>
+    <View style={splashStyles.container}>
       <StatusBar style="light" />
 
-      <View style={styles.sparkleTopLeft}>
+      <View style={splashStyles.sparkleTopLeft}>
         <Sparkle size={14} color="#FF6B81" />
       </View>
-      <View style={styles.sparkleMidLeft}>
+      <View style={splashStyles.sparkleMidLeft}>
         <Sparkle size={18} color="#FF8FA3" />
       </View>
-      <View style={styles.sparkleRight}>
+      <View style={splashStyles.sparkleRight}>
         <Sparkle size={12} color="#FF8FA3" />
       </View>
 
-      <View style={styles.content}>
+      <View style={splashStyles.content}>
         <MotiView
           from={{ opacity: 0, scale: 0.85 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: "timing", duration: 600, delay: 50 }}
-          style={styles.logoContainer}
+          style={splashStyles.logoContainer}
         >
           <Image
-            source={require("@/assets/images/icon-nobg.png")}
-            style={styles.logo}
+            source={require("@/assets/icon-nobg.png")}
+            style={splashStyles.logo}
             resizeMode="contain"
           />
         </MotiView>
@@ -146,7 +147,7 @@ export default function SplashScreen() {
           animate={{ opacity: 1, translateY: 0 }}
           transition={{ type: "timing", duration: 600, delay: 200 }}
         >
-          <Text style={styles.wordmark}>Duo Vibe</Text>
+          <Text style={splashStyles.wordmark}>Duo Vibe</Text>
         </MotiView>
 
         <MotiView
@@ -154,24 +155,24 @@ export default function SplashScreen() {
           animate={{ opacity: 1, translateY: 0 }}
           transition={{ type: "timing", duration: 600, delay: 350 }}
         >
-          <Text style={styles.subtitle}>Love · Crush · Couple Games</Text>
+          <Text style={splashStyles.subtitle}>Love · Crush · Couple Games</Text>
         </MotiView>
 
         <MotiView
           from={{ opacity: 0, scale: 0.92, translateY: 15 }}
           animate={{ opacity: 1, scale: 1, translateY: 0 }}
           transition={{ type: "timing", duration: 600, delay: 500 }}
-          style={styles.taglineContainer}
+          style={splashStyles.taglineContainer}
         >
-          <Text style={styles.tagline}>Better</Text>
-          <Text style={styles.tagline}>Connections,</Text>
-          <Text style={styles.tagline}>Bigger Smiles</Text>
+          <Text style={splashStyles.tagline}>Better</Text>
+          <Text style={splashStyles.tagline}>Connections,</Text>
+          <Text style={splashStyles.tagline}>Bigger Smiles</Text>
 
-          <View style={styles.accentRow}>
-            <View style={styles.accentHeart}>
+          <View style={splashStyles.accentRow}>
+            <View style={splashStyles.accentHeart}>
               <OutlinedHeart size={30} color="#FF8FA3" strokeWidth={2.5} />
             </View>
-            <View style={styles.diagonalAccent}>
+            <View style={splashStyles.diagonalAccent}>
               <DiagonalLine />
             </View>
           </View>
@@ -182,23 +183,23 @@ export default function SplashScreen() {
         from={{ opacity: 0, translateY: 40 }}
         animate={{ opacity: 1, translateY: 0 }}
         transition={{ type: "timing", duration: 700, delay: 600 }}
-        style={styles.bottomSection}
+        style={splashStyles.bottomSection}
       >
-        <View style={styles.bottomSparkle1}>
+        <View style={splashStyles.bottomSparkle1}>
           <Sparkle size={15} color="#FF8FA3" />
         </View>
-        <View style={styles.bottomSparkle2}>
+        <View style={splashStyles.bottomSparkle2}>
           <Sparkle size={12} color="#FF4D6D" />
         </View>
 
-        <View style={styles.heartsContainer}>
-          <View style={styles.filledHeartWrapper}>
+        <View style={splashStyles.heartsContainer}>
+          <View style={splashStyles.filledHeartWrapper}>
             <FilledHeart size={68} color="#FF6B81" />
           </View>
-          <View style={styles.outlinedHeartWrapper}>
+          <View style={splashStyles.outlinedHeartWrapper}>
             <OutlinedHeart size={54} color="#0D0B1A" strokeWidth={4} />
           </View>
-          <View style={[styles.outlinedHeartWrapper, { zIndex: 3 }]}>
+          <View style={[splashStyles.outlinedHeartWrapper, { zIndex: 3 }]}>
             <OutlinedHeart size={54} color="#FF8FA3" strokeWidth={3} />
           </View>
         </View>
@@ -208,126 +209,3 @@ export default function SplashScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0D0B1A",
-    justifyContent: "space-between",
-  },
-  sparkleTopLeft: {
-    position: "absolute",
-    top: "18%",
-    left: "8%",
-    opacity: 0.8,
-  },
-  sparkleMidLeft: {
-    position: "absolute",
-    top: "55%",
-    left: "10%",
-    opacity: 0.9,
-  },
-  sparkleRight: {
-    position: "absolute",
-    top: "38%",
-    right: "10%",
-    opacity: 0.7,
-  },
-  content: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 24,
-    paddingTop: 40,
-  },
-  logoContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 8,
-  },
-  logo: {
-    width: 120,
-    height: 120,
-  },
-  wordmark: {
-    fontFamily: "Fredoka_700Bold",
-    fontSize: 48,
-    color: "#FFFFFF",
-    textAlign: "center",
-    letterSpacing: 0.5,
-  },
-  subtitle: {
-    fontFamily: "Fredoka_600SemiBold",
-    fontSize: 14,
-    color: "#FF6B81",
-    textAlign: "center",
-    marginTop: 8,
-    marginBottom: 36,
-    letterSpacing: 1.2,
-  },
-  taglineContainer: {
-    alignItems: "center",
-    marginTop: 8,
-  },
-  tagline: {
-    fontFamily: "Caveat_700Bold",
-    fontSize: 28,
-    lineHeight: 34,
-    color: "#FFFFFF",
-    textAlign: "center",
-  },
-  accentRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 10,
-    width: 140,
-    position: "relative",
-  },
-  accentHeart: {
-    transform: [{ rotate: "-8deg" }],
-  },
-  diagonalAccent: {
-    position: "absolute",
-    right: 0,
-    top: -4,
-    transform: [{ rotate: "15deg" }],
-  },
-  bottomSection: {
-    width: "100%",
-    position: "relative",
-    alignItems: "center",
-  },
-  bottomSparkle1: {
-    position: "absolute",
-    top: -24,
-    right: "18%",
-    zIndex: 4,
-  },
-  bottomSparkle2: {
-    position: "absolute",
-    top: 6,
-    right: "25%",
-    zIndex: 4,
-  },
-  heartsContainer: {
-    position: "absolute",
-    top: -45,
-    alignSelf: "center",
-    width: 130,
-    height: 80,
-    zIndex: 2,
-  },
-  filledHeartWrapper: {
-    position: "absolute",
-    right: 12,
-    top: 0,
-    transform: [{ rotate: "14deg" }],
-  },
-  outlinedHeartWrapper: {
-    position: "absolute",
-    left: 8,
-    top: 14,
-    transform: [{ rotate: "-16deg" }],
-  },
-});
