@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -28,12 +28,34 @@ export default function InvitePartnerScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ source?: string }>();
   const isFromHome = params.source === "home";
-
-  const { inviteCode, connectPartnerCode } = useAuth();
+  const {
+    inviteCode,
+    codeExpiresInSeconds,
+    refreshInviteCode,
+    connectPartnerCode,
+  } = useAuth();
   const { showAlert } = useAlert();
   const [partnerCode, setPartnerCode] = useState<string>("");
-  const { timeLeft, formatMinutesSeconds } = useCountdown(28 * 60 + 20); // 28:20
+  const { timeLeft, reset, formatMinutesSeconds, isFinished } =
+    useCountdown(codeExpiresInSeconds);
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
+  useEffect(() => {
+    reset(codeExpiresInSeconds);
+  }, [codeExpiresInSeconds, reset]);
+
+  const handleRefreshCode = async (): Promise<void> => {
+    setIsRefreshing(true);
+    try {
+      await refreshInviteCode();
+      reset(3600);
+    } catch (err: unknown) {
+      console.warn("Error refreshing code:", err);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -183,9 +205,40 @@ export default function InvitePartnerScreen() {
               style={styles.codeCard}
             >
               <Text style={styles.codeText}>{inviteCode}</Text>
-              <Text style={styles.expiryText}>
-                Expires in {formatMinutesSeconds(timeLeft)}
-              </Text>
+              {isFinished ? (
+                <Pressable
+                  style={styles.refreshRow}
+                  onPress={handleRefreshCode}
+                  disabled={isRefreshing}
+                  accessibilityRole="button"
+                  accessibilityLabel="Refresh expired code"
+                >
+                  <Ionicons name="refresh" size={14} color="#FF8FA3" />
+                  <Text style={styles.refreshText}>
+                    {isRefreshing
+                      ? "Refreshing..."
+                      : "Code expired • Tap to generate new code"}
+                  </Text>
+                </Pressable>
+              ) : (
+                <View style={{ alignItems: "center" }}>
+                  <Text style={styles.expiryText}>
+                    Expires in {formatMinutesSeconds(timeLeft)}
+                  </Text>
+                  <Pressable
+                    style={[styles.refreshRow, { marginTop: 10 }]}
+                    onPress={handleRefreshCode}
+                    disabled={isRefreshing}
+                    accessibilityRole="button"
+                    accessibilityLabel="Refresh invite code"
+                  >
+                    <Ionicons name="refresh" size={12} color="#FF8FA3" />
+                    <Text style={[styles.refreshText, { fontSize: 12 }]}>
+                      {isRefreshing ? "Refreshing..." : "Generate fresh code"}
+                    </Text>
+                  </Pressable>
+                </View>
+              )}
             </MotiView>
 
             <MotiView

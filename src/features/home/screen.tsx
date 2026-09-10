@@ -19,15 +19,21 @@ import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
 import { useAuth } from "@/src/context/auth";
 import { useAlert } from "@/src/components/ui/alert-dialog";
+import {
+  BottomTabBar,
+  TabItem,
+} from "@/src/components/navigation/bottom-tab-bar";
 
 export default function HomeScreen() {
   const router = useRouter();
   const { hasPartner, signOut } = useAuth();
   const { showAlert } = useAlert();
   const [isSigningOut, setIsSigningOut] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<number>(0);
 
   useFocusEffect(
     useCallback(() => {
+      setActiveTab(0);
       const onBackPress = () => {
         BackHandler.exitApp();
         return true;
@@ -59,6 +65,10 @@ export default function HomeScreen() {
     }
   };
 
+  const handleTabPress = (index: number, item: TabItem): void => {
+    setActiveTab(index);
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -72,14 +82,7 @@ export default function HomeScreen() {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
           <View style={styles.greetingContainer}>
-            <View style={styles.titleRow}>
-              <Image
-                source={require("@/assets/icon-nobg.png")}
-                style={styles.headerLogo}
-                resizeMode="contain"
-              />
-              <Text style={styles.appName}>Duo Vibe</Text>
-            </View>
+            <Text style={styles.appName}>Duo Vibe</Text>
             <View style={styles.statusBadge}>
               <Ionicons
                 name={hasPartner ? "heart" : "time-outline"}
@@ -92,14 +95,12 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          <View style={styles.avatarPair}>
-            <View
-              style={styles.avatarCircle}
-              accessibilityLabel="User Profile Avatar"
-            >
-              <Text style={styles.avatarLetter}>U</Text>
-            </View>
-          </View>
+          <Image
+            source={require("@/assets/icon-nobg.png")}
+            style={styles.headerLogo}
+            resizeMode="contain"
+            accessibilityLabel="Duo Vibe Logo"
+          />
         </View>
 
         <ScrollView
@@ -131,103 +132,11 @@ export default function HomeScreen() {
                 style={styles.sparkButton}
                 accessibilityRole="button"
                 accessibilityLabel="Answer daily spark prompt"
-                onPress={() => router.push(ROUTES.PLAY_COMPARE)}
               >
                 <Text style={styles.sparkButtonText}>Answer Daily Prompt</Text>
               </Pressable>
             </LinearGradient>
           </MotiView>
-
-          <Text style={styles.sectionTitle}>Explore Together</Text>
-
-          <View style={styles.gridRow}>
-            <Pressable
-              style={styles.menuCard}
-              onPress={() => router.push(ROUTES.DATE_IDEAS)}
-              accessibilityRole="button"
-              accessibilityLabel="Explore Date Ideas"
-            >
-              <View
-                style={[
-                  styles.iconBox,
-                  { backgroundColor: "rgba(249, 115, 22, 0.15)" },
-                ]}
-              >
-                <Ionicons name="flame" size={22} color="#F97316" />
-              </View>
-              <Text style={styles.menuCardTitle}>Date Ideas</Text>
-              <Text style={styles.menuCardSubtitle}>
-                Swipe & pick your next date adventure
-              </Text>
-            </Pressable>
-
-            <Pressable
-              style={styles.menuCard}
-              onPress={() => router.push(ROUTES.PLAY_COMPARE)}
-              accessibilityRole="button"
-              accessibilityLabel="Explore Couple Games"
-            >
-              <View
-                style={[
-                  styles.iconBox,
-                  { backgroundColor: "rgba(139, 92, 246, 0.15)" },
-                ]}
-              >
-                <Ionicons name="game-controller" size={22} color="#8B5CF6" />
-              </View>
-              <Text style={styles.menuCardTitle}>Couple Games</Text>
-              <Text style={styles.menuCardSubtitle}>
-                Compare answers & play quizzes
-              </Text>
-            </Pressable>
-          </View>
-
-          <View style={styles.gridRow}>
-            <Pressable
-              style={styles.menuCard}
-              onPress={() => router.push(ROUTES.MEMORIES)}
-              accessibilityRole="button"
-              accessibilityLabel="View Memories Scrapbook"
-            >
-              <View
-                style={[
-                  styles.iconBox,
-                  { backgroundColor: "rgba(236, 72, 153, 0.15)" },
-                ]}
-              >
-                <Ionicons name="images" size={22} color="#EC4899" />
-              </View>
-              <Text style={styles.menuCardTitle}>Memories</Text>
-              <Text style={styles.menuCardSubtitle}>
-                Your shared scrapbook of love moments
-              </Text>
-            </Pressable>
-
-            <Pressable
-              style={styles.menuCard}
-              onPress={() =>
-                router.push({
-                  pathname: ROUTES.INVITE_PARTNER,
-                  params: { source: "home" },
-                })
-              }
-              accessibilityRole="button"
-              accessibilityLabel="Open Partner Code screen"
-            >
-              <View
-                style={[
-                  styles.iconBox,
-                  { backgroundColor: "rgba(56, 189, 248, 0.15)" },
-                ]}
-              >
-                <Ionicons name="people" size={22} color="#38BDF8" />
-              </View>
-              <Text style={styles.menuCardTitle}>Partner Code</Text>
-              <Text style={styles.menuCardSubtitle}>
-                Share or enter invite code
-              </Text>
-            </Pressable>
-          </View>
 
           {!hasPartner && (
             <MotiView
@@ -275,6 +184,8 @@ export default function HomeScreen() {
             )}
           </Pressable>
         </ScrollView>
+
+        <BottomTabBar activeTab={activeTab} onTabPress={handleTabPress} />
       </SafeAreaView>
     </View>
   );

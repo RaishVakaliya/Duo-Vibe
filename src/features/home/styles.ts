@@ -22,14 +22,9 @@ export const styles = StyleSheet.create({
   greetingContainer: {
     gap: 4,
   },
-  titleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
   headerLogo: {
-    width: 28,
-    height: 28,
+    width: 42,
+    height: 42,
   },
   appName: {
     fontFamily: "Fredoka_700Bold",
@@ -51,31 +46,13 @@ export const styles = StyleSheet.create({
     color: "#FF8FA3",
     fontWeight: "600",
   },
-  avatarPair: {
-    flexDirection: "row",
-  },
-  avatarCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "rgba(255, 255, 255, 0.15)",
-    borderWidth: 2,
-    borderColor: "#FF4D6D",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  avatarLetter: {
-    fontFamily: "Fredoka_700Bold",
-    fontSize: 18,
-    color: "#FFFFFF",
-  },
   scrollContent: {
-    paddingBottom: 32,
+    paddingBottom: 100, // Extra padding for floating bottom tab bar
   },
   sparkCard: {
     borderRadius: 24,
     overflow: "hidden",
-    marginBottom: 28,
+    marginBottom: 24,
     shadowColor: "#FF4D6D",
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
@@ -116,44 +93,6 @@ export const styles = StyleSheet.create({
     fontFamily: "Fredoka_700Bold",
     fontSize: 14,
     color: "#E11D48",
-  },
-  sectionTitle: {
-    fontFamily: "Fredoka_700Bold",
-    fontSize: 20,
-    color: "#FFFFFF",
-    marginBottom: 16,
-  },
-  gridRow: {
-    flexDirection: "row",
-    gap: 14,
-    marginBottom: 14,
-  },
-  menuCard: {
-    flex: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.07)",
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.1)",
-    borderRadius: 20,
-    padding: 18,
-  },
-  iconBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  menuCardTitle: {
-    fontFamily: "Fredoka_700Bold",
-    fontSize: 16,
-    color: "#FFFFFF",
-    marginBottom: 4,
-  },
-  menuCardSubtitle: {
-    fontSize: 12,
-    lineHeight: 16,
-    color: COLORS.textMuted,
   },
   inviteBanner: {
     backgroundColor: "rgba(255, 255, 255, 0.06)",

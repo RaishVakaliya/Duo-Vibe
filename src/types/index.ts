@@ -72,6 +72,8 @@ export interface AuthContextType {
   hasPartner: boolean;
   relationshipType: RelationshipType | null;
   inviteCode: string;
+  codeExpiresInSeconds: number;
+  refreshInviteCode: () => Promise<string>;
   signInWithGoogle: () => Promise<AuthSignInResult>;
   signInWithEmail: (
     email: string,

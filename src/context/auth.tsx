@@ -64,7 +64,86 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [hasPartner, setHasPartnerState] = useState<boolean>(false);
   const [relationshipType, setRelationshipTypeState] =
     useState<RelationshipType | null>(null);
-  const [inviteCode] = useState<string>(generateInviteCode());
+  const [inviteCode, setInviteCode] = useState<string>(generateInviteCode());
+  const [codeExpiresInSeconds, setCodeExpiresInSeconds] =
+    useState<number>(3600);
+
+  const syncUserProfile = async (currentUser: User): Promise<void> => {
+    try {
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+      if (error) {
+        console.warn("Error fetching profile from Supabase:", error);
+        return;
+      }
+
+      const now = new Date();
+      if (!profile) {
+        // First login -> insert initial profile with 1-hour valid invite code
+        const newCode = generateInviteCode();
+        const nowIso = now.toISOString();
+        await supabase.from("profiles").insert({
+          id: currentUser.id,
+          email: currentUser.email ?? null,
+          full_name: currentUser.user_metadata?.full_name ?? null,
+          avatar_url: currentUser.user_metadata?.avatar_url ?? null,
+          invite_code: newCode,
+          created_at: nowIso,
+          updated_at: nowIso,
+        });
+        setInviteCode(newCode);
+        setCodeExpiresInSeconds(3600);
+        setHasPartnerState(false);
+      } else {
+        // Check partner status
+        if (profile.partner_id) {
+          setHasPartnerState(true);
+          await AsyncStorage.setItem(HAS_PARTNER_KEY, "true");
+        } else {
+          // Check couples table
+          const { data: couple } = await supabase
+            .from("couples")
+            .select("*")
+            .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
+            .eq("status", "connected")
+            .maybeSingle();
+
+          if (couple) {
+            setHasPartnerState(true);
+            await AsyncStorage.setItem(HAS_PARTNER_KEY, "true");
+          }
+        }
+
+        // Check invite_code and expiration (1 hour = 3600s)
+        const lastUpdated = profile.updated_at
+          ? new Date(profile.updated_at).getTime()
+          : 0;
+        const ageSeconds = Math.floor((now.getTime() - lastUpdated) / 1000);
+        const remaining = 3600 - ageSeconds;
+
+        if (profile.invite_code && remaining > 0) {
+          setInviteCode(profile.invite_code);
+          setCodeExpiresInSeconds(remaining);
+        } else {
+          // Code expired or empty -> generate fresh code
+          const newCode = generateInviteCode();
+          const nowIso = now.toISOString();
+          await supabase
+            .from("profiles")
+            .update({ invite_code: newCode, updated_at: nowIso })
+            .eq("id", currentUser.id);
+          setInviteCode(newCode);
+          setCodeExpiresInSeconds(3600);
+        }
+      }
+    } catch (err: unknown) {
+      console.warn("Failed to sync profile:", err);
+    }
+  };
 
   useEffect(() => {
     const initAuth = async (): Promise<void> => {
@@ -88,6 +167,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (data?.session) {
           setSession(data.session);
           setUser(data.session.user);
+          await syncUserProfile(data.session.user);
         }
       } catch (err: unknown) {
         console.warn("Error initializing auth:", err);
@@ -104,6 +184,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async (_event, currentSession: Session | null): Promise<void> => {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
+        if (currentSession?.user) {
+          await syncUserProfile(currentSession.user);
+        }
       },
     );
 
@@ -111,6 +194,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       subscription.unsubscribe();
     };
   }, []);
+
+  const refreshInviteCode = async (): Promise<string> => {
+    const newCode = generateInviteCode();
+    const nowIso = new Date().toISOString();
+    setInviteCode(newCode);
+    setCodeExpiresInSeconds(3600);
+    if (user) {
+      try {
+        await supabase
+          .from("profiles")
+          .update({ invite_code: newCode, updated_at: nowIso })
+          .eq("id", user.id);
+      } catch (err: unknown) {
+        console.warn("Failed to refresh invite code in Supabase:", err);
+      }
+    }
+    return newCode;
+  };
 
   const setHasPartner = async (status: boolean): Promise<void> => {
     setHasPartnerState(status);
@@ -130,7 +231,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         showPlayServicesUpdateDialog: true,
       });
 
-      // Clear any prior cached session so Google always shows all accounts to choose
       try {
         await GoogleSignin.signOut();
       } catch {}
@@ -151,6 +251,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setUser(idTokenData.user);
       setSession(idTokenData.session);
+
+      await syncUserProfile(idTokenData.user);
 
       const storedPartner = await AsyncStorage.getItem(HAS_PARTNER_KEY);
       const partnerStatus = storedPartner === "true";
@@ -209,6 +311,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) throw error;
       setUser(data.user);
       setSession(data.session);
+      await syncUserProfile(data.user);
       const storedPartner = await AsyncStorage.getItem(HAS_PARTNER_KEY);
       return { hasPartner: storedPartner === "true" };
     } catch (err: unknown) {
@@ -231,6 +334,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await supabase.auth.signOut();
       setUser(null);
       setSession(null);
+      setHasPartnerState(false);
+      await AsyncStorage.removeItem(HAS_PARTNER_KEY);
     } catch (err: unknown) {
       console.warn("Error signing out:", err);
     }
@@ -239,11 +344,125 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const connectPartnerCode = async (
     code: string,
   ): Promise<AuthPartnerConnectResult> => {
-    if (!code || code.trim().length < 4) {
-      return { success: false, message: "Please enter a valid partner code." };
+    const cleanCode = code.trim().toUpperCase();
+    if (!cleanCode || cleanCode.length < 4) {
+      return {
+        success: false,
+        message: "Please enter a valid 6-character partner code.",
+      };
     }
-    await setHasPartner(true);
-    return { success: true, message: "Connected with partner!" };
+
+    if (!user) {
+      return {
+        success: false,
+        message: "You must be signed in to connect with a partner.",
+      };
+    }
+
+    if (cleanCode === inviteCode) {
+      return {
+        success: false,
+        message:
+          "You cannot connect using your own invite code. Please enter your partner's code.",
+      };
+    }
+
+    try {
+      // Query Supabase for profile matching this invite code
+      const { data: partnerProfiles, error: fetchErr } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("invite_code", cleanCode)
+        .neq("id", user.id);
+
+      if (fetchErr) {
+        console.error("Supabase query error for partner code:", fetchErr);
+        return {
+          success: false,
+          message: "Failed to verify partner code. Please try again.",
+        };
+      }
+
+      if (!partnerProfiles || partnerProfiles.length === 0) {
+        return {
+          success: false,
+          message: "Invalid partner code. No partner found with this code.",
+        };
+      }
+
+      const partnerProfile = partnerProfiles[0];
+      if (!partnerProfile) {
+        return {
+          success: false,
+          message: "Invalid partner code.",
+        };
+      }
+
+      // Check if partner's code is expired (1 hour = 3600 seconds)
+      const lastUpdated = partnerProfile.updated_at
+        ? new Date(partnerProfile.updated_at).getTime()
+        : 0;
+      const ageSeconds = Math.floor((Date.now() - lastUpdated) / 1000);
+      if (ageSeconds > 3600) {
+        return {
+          success: false,
+          message:
+            "This invite code has expired (valid for 1 hour). Please ask your partner to generate a new code.",
+        };
+      }
+
+      // Check if partner is already linked to another user
+      if (partnerProfile.partner_id && partnerProfile.partner_id !== user.id) {
+        return {
+          success: false,
+          message: "This partner is already connected to another space.",
+        };
+      }
+
+      const nowIso = new Date().toISOString();
+
+      // 1. Update current user's profile
+      const { error: updateSelfErr } = await supabase
+        .from("profiles")
+        .update({ partner_id: partnerProfile.id, updated_at: nowIso })
+        .eq("id", user.id);
+
+      if (updateSelfErr) {
+        console.error("Error updating user profile:", updateSelfErr);
+      }
+
+      // 2. Update partner's profile
+      const { error: updatePartnerErr } = await supabase
+        .from("profiles")
+        .update({ partner_id: user.id, updated_at: nowIso })
+        .eq("id", partnerProfile.id);
+
+      if (updatePartnerErr) {
+        console.error("Error updating partner profile:", updatePartnerErr);
+      }
+
+      // 3. Upsert couples record
+      try {
+        await supabase.from("couples").upsert({
+          user1_id: user.id,
+          user2_id: partnerProfile.id,
+          status: "connected",
+          connected_at: nowIso,
+        });
+      } catch (coupleErr) {
+        console.warn("Couples upsert note:", coupleErr);
+      }
+
+      await setHasPartner(true);
+      return {
+        success: true,
+        message: "Successfully connected with your partner! 💕",
+      };
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : "An unexpected error occurred.";
+      return { success: false, message: msg };
+    }
   };
 
   return (
@@ -255,6 +474,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         hasPartner,
         relationshipType,
         inviteCode,
+        codeExpiresInSeconds,
+        refreshInviteCode,
         signInWithGoogle,
         signInWithEmail,
         signOut,

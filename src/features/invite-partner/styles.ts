@@ -72,6 +72,21 @@ export const styles = StyleSheet.create({
     color: "#CBD5E1",
     fontWeight: "500",
   },
+  refreshRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+  },
+  refreshText: {
+    fontSize: 13,
+    color: "#FF8FA3",
+    fontWeight: "600",
+  },
   inviteButton: {
     height: 56,
     borderRadius: 28,
