@@ -1,6 +1,14 @@
-import React, { useState } from "react";
-import { View, Text, ScrollView, Pressable, Alert, ActivityIndicator } from "react-native";
-import { useRouter } from "expo-router";
+import React, { useState, useCallback } from "react";
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  Pressable,
+  ActivityIndicator,
+  BackHandler,
+} from "react-native";
+import { useRouter, useFocusEffect } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -10,11 +18,29 @@ import { styles } from "./styles";
 import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
 import { useAuth } from "@/src/context/auth";
+import { useAlert } from "@/src/components/ui/alert-dialog";
 
 export default function HomeScreen() {
   const router = useRouter();
   const { hasPartner, signOut } = useAuth();
+  const { showAlert } = useAlert();
   const [isSigningOut, setIsSigningOut] = useState<boolean>(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        BackHandler.exitApp();
+        return true;
+      };
+
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress,
+      );
+
+      return () => subscription.remove();
+    }, []),
+  );
 
   const handleSignOut = async (): Promise<void> => {
     setIsSigningOut(true);
@@ -22,8 +48,12 @@ export default function HomeScreen() {
       await signOut();
       router.replace(ROUTES.WELCOME);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Failed to sign out.";
-      Alert.alert("Sign Out Error", message);
+      const message =
+        err instanceof Error ? err.message : "Failed to sign out.";
+      showAlert({
+        title: "Sign Out Error",
+        message,
+      });
     } finally {
       setIsSigningOut(false);
     }
@@ -42,7 +72,14 @@ export default function HomeScreen() {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
           <View style={styles.greetingContainer}>
-            <Text style={styles.appName}>Duo Vibe</Text>
+            <View style={styles.titleRow}>
+              <Image
+                source={require("@/assets/icon-nobg.png")}
+                style={styles.headerLogo}
+                resizeMode="contain"
+              />
+              <Text style={styles.appName}>Duo Vibe</Text>
+            </View>
             <View style={styles.statusBadge}>
               <Ionicons
                 name={hasPartner ? "heart" : "time-outline"}
@@ -56,7 +93,10 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.avatarPair}>
-            <View style={styles.avatarCircle} accessibilityLabel="User Profile Avatar">
+            <View
+              style={styles.avatarCircle}
+              accessibilityLabel="User Profile Avatar"
+            >
               <Text style={styles.avatarLetter}>U</Text>
             </View>
           </View>
@@ -83,7 +123,9 @@ export default function HomeScreen() {
                 <Ionicons name="sparkles" size={18} color="#FFE4E6" />
               </View>
               <Text style={styles.sparkQuestion}>
-                {"\"What's one small moment from this week that made you smile thinking of me?\""}
+                {
+                  '"What\'s one small moment from this week that made you smile thinking of me?"'
+                }
               </Text>
               <Pressable
                 style={styles.sparkButton}
@@ -163,7 +205,12 @@ export default function HomeScreen() {
 
             <Pressable
               style={styles.menuCard}
-              onPress={() => router.push(ROUTES.INVITE_PARTNER)}
+              onPress={() =>
+                router.push({
+                  pathname: ROUTES.INVITE_PARTNER,
+                  params: { source: "home" },
+                })
+              }
               accessibilityRole="button"
               accessibilityLabel="Open Partner Code screen"
             >
@@ -199,7 +246,12 @@ export default function HomeScreen() {
               </View>
               <Pressable
                 style={styles.inviteBannerButton}
-                onPress={() => router.push(ROUTES.INVITE_PARTNER)}
+                onPress={() =>
+                  router.push({
+                    pathname: ROUTES.INVITE_PARTNER,
+                    params: { source: "home" },
+                  })
+                }
                 accessibilityRole="button"
                 accessibilityLabel="Invite Partner"
               >

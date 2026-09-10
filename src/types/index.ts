@@ -70,6 +70,7 @@ export interface AuthContextType {
   session: Session | null;
   isLoading: boolean;
   hasPartner: boolean;
+  relationshipType: RelationshipType | null;
   inviteCode: string;
   signInWithGoogle: () => Promise<AuthSignInResult>;
   signInWithEmail: (
@@ -78,6 +79,7 @@ export interface AuthContextType {
   ) => Promise<{ error?: string; hasPartner: boolean }>;
   signOut: () => Promise<void>;
   setHasPartner: (status: boolean) => Promise<void>;
+  setRelationshipType: (type: RelationshipType) => Promise<void>;
   connectPartnerCode: (code: string) => Promise<AuthPartnerConnectResult>;
 }
 

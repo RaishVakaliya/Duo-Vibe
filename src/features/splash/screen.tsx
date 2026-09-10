@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { View, Text, Image, Dimensions } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -6,6 +6,7 @@ import Svg, { Path, Defs, LinearGradient, Stop, Line } from "react-native-svg";
 import { MotiView } from "moti";
 import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
+import { useAuth } from "@/src/context/auth";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -106,14 +107,57 @@ function BottomWave({ width }: { width: number }) {
 
 export default function SplashScreen() {
   const router = useRouter();
+  const { user, hasPartner, isLoading } = useAuth();
+  const hasNavigatedRef = useRef<boolean>(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.replace(ROUTES.WELCOME);
+      if (hasNavigatedRef.current) return;
+      if (isLoading) return; // Wait until auth check is done
+
+      hasNavigatedRef.current = true;
+      if (user) {
+        if (hasPartner) {
+          router.replace(ROUTES.HOME);
+        } else {
+          router.replace({
+            pathname: ROUTES.INVITE_PARTNER,
+            params: { source: "auth" },
+          });
+        }
+      } else {
+        router.replace(ROUTES.WELCOME);
+      }
     }, 2400);
 
     return () => clearTimeout(timer);
-  }, [router]);
+  }, [router, user, hasPartner, isLoading]);
+
+  useEffect(() => {
+    if (!isLoading && !hasNavigatedRef.current) {
+      const fallbackTimer = setTimeout(() => {
+        if (hasNavigatedRef.current) return;
+        hasNavigatedRef.current = true;
+        if (user) {
+          if (hasPartner) {
+            router.replace(ROUTES.HOME);
+          } else {
+            router.replace({
+              pathname: ROUTES.INVITE_PARTNER,
+              params: { source: "auth" },
+            });
+          }
+        } else {
+          router.replace(ROUTES.WELCOME);
+        }
+      }, 2500);
+
+      return () => {
+        clearTimeout(fallbackTimer);
+      };
+    }
+    return () => {};
+  }, [isLoading, user, hasPartner, router]);
 
   return (
     <View style={styles.container}>

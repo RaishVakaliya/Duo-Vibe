@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,9 +8,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert,
+  BackHandler,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -21,14 +21,35 @@ import { styles } from "./styles";
 import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
 import { useAuth } from "@/src/context/auth";
+import { useAlert } from "@/src/components/ui/alert-dialog";
 import { useCountdown } from "@/src/hooks/use-countdown";
 
 export default function InvitePartnerScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ source?: string }>();
+  const isFromHome = params.source === "home";
+
   const { inviteCode, connectPartnerCode } = useAuth();
+  const { showAlert } = useAlert();
   const [partnerCode, setPartnerCode] = useState<string>("");
   const { timeLeft, formatMinutesSeconds } = useCountdown(28 * 60 + 20); // 28:20
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        router.replace(ROUTES.HOME);
+        return true;
+      };
+
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress,
+      );
+
+      return () => subscription.remove();
+    }, [router]),
+  );
 
   const handleShareInvite = async (): Promise<void> => {
     try {
@@ -48,23 +69,32 @@ export default function InvitePartnerScreen() {
         if (cleaned.length > 0) {
           setPartnerCode(cleaned);
         } else {
-          Alert.alert("Clipboard Empty", "No code found in clipboard.");
+          showAlert({
+            title: "Clipboard Empty",
+            message: "No code found in clipboard.",
+          });
         }
       } else {
-        Alert.alert("Clipboard Empty", "No code found in clipboard.");
+        showAlert({
+          title: "Clipboard Empty",
+          message: "No code found in clipboard.",
+        });
       }
     } catch (err: unknown) {
-      Alert.alert("Clipboard Error", "Unable to access clipboard. Please type code manually.");
+      showAlert({
+        title: "Clipboard Error",
+        message: "Unable to access clipboard. Please type code manually.",
+      });
       console.warn("Clipboard read error:", err);
     }
   };
 
   const handleConnect = async (): Promise<void> => {
     if (!partnerCode.trim()) {
-      Alert.alert(
-        "Partner Code Required",
-        "Please enter your partner's 6-character code.",
-      );
+      showAlert({
+        title: "Partner Code Required",
+        message: "Please enter your partner's 6-character code.",
+      });
       return;
     }
     setIsConnecting(true);
@@ -73,14 +103,20 @@ export default function InvitePartnerScreen() {
       if (result.success) {
         router.replace(ROUTES.HOME);
       } else {
-        Alert.alert(
-          "Connection Failed",
-          result.message || "Could not connect with partner. Please try again.",
-        );
+        showAlert({
+          title: "Connection Failed",
+          message:
+            result.message ||
+            "Could not connect with partner. Please try again.",
+        });
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "An unexpected error occurred.";
-      Alert.alert("Connection Error", msg);
+      const msg =
+        err instanceof Error ? err.message : "An unexpected error occurred.";
+      showAlert({
+        title: "Connection Error",
+        message: msg,
+      });
     } finally {
       setIsConnecting(false);
     }
@@ -101,17 +137,21 @@ export default function InvitePartnerScreen() {
       />
 
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.headerRow}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => router.back()}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-          >
-            <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
-          </Pressable>
-        </View>
+        {isFromHome ? (
+          <View style={styles.headerRow}>
+            <Pressable
+              style={styles.backButton}
+              onPress={() => router.replace(ROUTES.HOME)}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+            >
+              <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+            </Pressable>
+          </View>
+        ) : (
+          <View style={{ height: 16 }} />
+        )}
 
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -171,9 +211,7 @@ export default function InvitePartnerScreen() {
                     color="#FFFFFF"
                     style={styles.inviteButtonIcon}
                   />
-                  <Text style={styles.inviteButtonText}>
-                    Invite my partner
-                  </Text>
+                  <Text style={styles.inviteButtonText}>Invite my partner</Text>
                 </LinearGradient>
               </Pressable>
             </MotiView>
@@ -201,9 +239,7 @@ export default function InvitePartnerScreen() {
                     size={14}
                     color="#FFFFFF"
                   />
-                  <Text style={styles.pasteButtonText}>
-                    Paste code
-                  </Text>
+                  <Text style={styles.pasteButtonText}>Paste code</Text>
                 </Pressable>
               </View>
 
@@ -234,7 +270,11 @@ export default function InvitePartnerScreen() {
                     onPress={handleConnect}
                     disabled={isConnecting}
                     accessibilityRole="button"
-                    accessibilityLabel={isConnecting ? "Connecting partner code" : "Connect partner space"}
+                    accessibilityLabel={
+                      isConnecting
+                        ? "Connecting partner code"
+                        : "Connect partner space"
+                    }
                   >
                     <LinearGradient
                       colors={[...GRADIENTS.progressBar]}
@@ -253,19 +293,19 @@ export default function InvitePartnerScreen() {
           </ScrollView>
         </KeyboardAvoidingView>
 
-        <View style={styles.footer}>
-          <Pressable
-            style={styles.laterButton}
-            onPress={handleDoItLater}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            accessibilityRole="button"
-            accessibilityLabel="I will do it later"
-          >
-            <Text style={styles.laterButtonText}>
-              I will do it later!
-            </Text>
-          </Pressable>
-        </View>
+        {!isFromHome && (
+          <View style={styles.footer}>
+            <Pressable
+              style={styles.laterButton}
+              onPress={handleDoItLater}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              accessibilityRole="button"
+              accessibilityLabel="I will do it later"
+            >
+              <Text style={styles.laterButtonText}>I will do it later!</Text>
+            </Pressable>
+          </View>
+        )}
       </SafeAreaView>
     </View>
   );

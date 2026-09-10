@@ -22,6 +22,15 @@ export const styles = StyleSheet.create({
   greetingContainer: {
     gap: 4,
   },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  headerLogo: {
+    width: 28,
+    height: 28,
+  },
   appName: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 26,

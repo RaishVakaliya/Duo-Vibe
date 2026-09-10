@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  Image,
-  Pressable,
-  ActivityIndicator,
-  Alert,
-} from "react-native";
+import { View, Text, Image, Pressable, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
@@ -16,22 +9,30 @@ import { loginStyles } from "./login-styles";
 import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
 import { useAuth } from "@/src/context/auth";
+import { useAlert } from "@/src/components/ui/alert-dialog";
 import { GoogleIcon } from "@/src/components/ui/google-icon";
 
 export default function LoginScreen() {
   const router = useRouter();
   const { signInWithGoogle, isLoading } = useAuth();
+  const { showAlert } = useAlert();
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = async (): Promise<void> => {
     const res = await signInWithGoogle();
     if (res.error) {
       if (!res.error.toLowerCase().includes("cancelled")) {
-        Alert.alert("Sign In Error", res.error);
+        showAlert({
+          title: "Sign In Error",
+          message: res.error,
+        });
       }
       return;
     }
     if (!res.hasPartner) {
-      router.push(ROUTES.INVITE_PARTNER);
+      router.replace({
+        pathname: ROUTES.INVITE_PARTNER,
+        params: { source: "auth" },
+      });
     } else {
       router.replace(ROUTES.HOME);
     }

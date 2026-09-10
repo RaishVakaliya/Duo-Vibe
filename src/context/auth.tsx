@@ -10,6 +10,7 @@ import {
   AuthContextType,
   AuthSignInResult,
   AuthPartnerConnectResult,
+  RelationshipType,
 } from "@/src/types";
 
 const GOOGLE_WEB_CLIENT_ID: string =
@@ -32,6 +33,7 @@ try {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const HAS_PARTNER_KEY = "@duo_has_partner";
+const RELATIONSHIP_TYPE_KEY = "@duo_relationship_type";
 
 function generateInviteCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -60,6 +62,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hasPartner, setHasPartnerState] = useState<boolean>(false);
+  const [relationshipType, setRelationshipTypeState] =
+    useState<RelationshipType | null>(null);
   const [inviteCode] = useState<string>(generateInviteCode());
 
   useEffect(() => {
@@ -68,6 +72,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const storedPartner = await AsyncStorage.getItem(HAS_PARTNER_KEY);
         if (storedPartner !== null) {
           setHasPartnerState(storedPartner === "true");
+        }
+
+        const storedRelationship = await AsyncStorage.getItem(
+          RELATIONSHIP_TYPE_KEY,
+        );
+        if (
+          storedRelationship === "local" ||
+          storedRelationship === "long_distance"
+        ) {
+          setRelationshipTypeState(storedRelationship);
         }
 
         const { data } = await supabase.auth.getSession();
@@ -103,6 +117,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await AsyncStorage.setItem(HAS_PARTNER_KEY, status ? "true" : "false");
   };
 
+  const setRelationshipType = async (type: RelationshipType): Promise<void> => {
+    setRelationshipTypeState(type);
+    await AsyncStorage.setItem(RELATIONSHIP_TYPE_KEY, type);
+  };
+
   const signInWithGoogle = async (): Promise<AuthSignInResult> => {
     try {
       setIsLoading(true);
@@ -110,6 +129,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await GoogleSignin.hasPlayServices({
         showPlayServicesUpdateDialog: true,
       });
+
+      // Clear any prior cached session so Google always shows all accounts to choose
+      try {
+        await GoogleSignin.signOut();
+      } catch {}
 
       const userInfo = await GoogleSignin.signIn();
 
@@ -199,6 +223,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async (): Promise<void> => {
     try {
       try {
+        await GoogleSignin.revokeAccess();
+      } catch {}
+      try {
         await GoogleSignin.signOut();
       } catch {}
       await supabase.auth.signOut();
@@ -226,11 +253,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         session,
         isLoading,
         hasPartner,
+        relationshipType,
         inviteCode,
         signInWithGoogle,
         signInWithEmail,
         signOut,
         setHasPartner,
+        setRelationshipType,
         connectPartnerCode,
       }}
     >

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -9,12 +9,23 @@ import { styles } from "./styles";
 import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
 import { RelationshipType } from "@/src/types";
+import { useAuth } from "@/src/context/auth";
 
 export default function RelationshipTypeScreen() {
   const router = useRouter();
-  const [selected, setSelected] = useState<RelationshipType>("long_distance");
+  const { relationshipType, setRelationshipType } = useAuth();
+  const [selected, setSelected] = useState<RelationshipType>(
+    relationshipType ?? "long_distance",
+  );
 
-  const handleContinue = () => {
+  useEffect(() => {
+    if (relationshipType) {
+      setSelected(relationshipType);
+    }
+  }, [relationshipType]);
+
+  const handleContinue = async (): Promise<void> => {
+    await setRelationshipType(selected);
     router.push(ROUTES.DATE_IDEAS);
   };
 
