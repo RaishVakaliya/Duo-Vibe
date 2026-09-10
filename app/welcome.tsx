@@ -5,7 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { welcomeStyles } from "@/styles/welcome.styles";
-import { GRADIENTS } from "@/constants/colors";
+import { GRADIENTS, COLORS } from "@/constants/colors";
 
 export default function WelcomeScreen() {
   const router = useRouter();
@@ -25,8 +25,8 @@ export default function WelcomeScreen() {
           "transparent",
           "rgba(13, 11, 26, 0.4)",
           "rgba(13, 11, 26, 0.85)",
-          "#0D0B1A",
-          "#0D0B1A",
+          COLORS.darkOverlay,
+          COLORS.darkOverlay,
         ]}
         locations={[0, 0.25, 0.55, 0.75, 1]}
         style={welcomeStyles.gradientOverlay}

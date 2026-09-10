@@ -14,9 +14,11 @@
       "backgroundColor": "#0D0B1A"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.duovibe.app"
     },
     "android": {
+      "package": "com.duovibe.app",
       "adaptiveIcon": {
         "backgroundColor": "#0D0B1A",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -32,6 +34,7 @@
     },
     "plugins": [
       "expo-router",
+      "@react-native-google-signin/google-signin",
       [
         "expo-splash-screen",
         {

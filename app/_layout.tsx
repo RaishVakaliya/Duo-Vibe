@@ -4,6 +4,8 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
+import { AuthProvider } from "@/context/auth";
+import { COLORS } from "@/constants/colors";
 import {
   useFonts,
   Fredoka_400Regular,
@@ -34,45 +36,50 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#0D0B1A" }}>
+    <GestureHandlerRootView
+      style={{ flex: 1, backgroundColor: COLORS.darkOverlay }}
+    >
       <GluestackUIProvider mode="dark">
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: "#0D0B1A" },
-          }}
-        >
-          <Stack.Screen name="index" options={{ animation: "fade" }} />
-          <Stack.Screen name="welcome" options={{ animation: "fade" }} />
-          <Stack.Screen
-            name="login"
-            options={{ animation: "slide_from_right" }}
-          />
-          <Stack.Screen
-            name="onboarding"
-            options={{ animation: "slide_from_right" }}
-          />
-          <Stack.Screen
-            name="date-ideas"
-            options={{ animation: "slide_from_right" }}
-          />
-          <Stack.Screen
-            name="play-compare"
-            options={{ animation: "slide_from_right" }}
-          />
-          <Stack.Screen
-            name="memories"
-            options={{ animation: "slide_from_right" }}
-          />
-          <Stack.Screen
-            name="ready"
-            options={{ animation: "slide_from_right" }}
-          />
-          <Stack.Screen
-            name="signup"
-            options={{ animation: "slide_from_right" }}
-          />
-        </Stack>
+        <AuthProvider>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: COLORS.darkOverlay },
+            }}
+          >
+            <Stack.Screen name="index" options={{ animation: "fade" }} />
+            <Stack.Screen name="welcome" options={{ animation: "fade" }} />
+            <Stack.Screen
+              name="login"
+              options={{ animation: "slide_from_right" }}
+            />
+            <Stack.Screen
+              name="onboarding"
+              options={{ animation: "slide_from_right" }}
+            />
+            <Stack.Screen
+              name="date-ideas"
+              options={{ animation: "slide_from_right" }}
+            />
+            <Stack.Screen
+              name="play-compare"
+              options={{ animation: "slide_from_right" }}
+            />
+            <Stack.Screen
+              name="memories"
+              options={{ animation: "slide_from_right" }}
+            />
+            <Stack.Screen
+              name="ready"
+              options={{ animation: "slide_from_right" }}
+            />
+            <Stack.Screen
+              name="invite-partner"
+              options={{ animation: "slide_from_right" }}
+            />
+            <Stack.Screen name="home" options={{ animation: "fade" }} />
+          </Stack>
+        </AuthProvider>
       </GluestackUIProvider>
     </GestureHandlerRootView>
   );

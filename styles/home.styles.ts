@@ -1,0 +1,198 @@
+import { StyleSheet } from "react-native";
+import { COLORS } from "@/constants/colors";
+
+export const homeStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  gradientBackground: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  safeArea: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: 12,
+    marginBottom: 20,
+  },
+  greetingContainer: {
+    flex: 1,
+  },
+  appName: {
+    fontFamily: "Fredoka_700Bold",
+    fontSize: 24,
+    color: "#FFFFFF",
+  },
+  statusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 77, 109, 0.15)",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: "flex-start",
+    marginTop: 4,
+  },
+  statusText: {
+    fontFamily: "Fredoka_600SemiBold",
+    fontSize: 12,
+    color: "#FF8FA3",
+    marginLeft: 4,
+  },
+  avatarPair: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  avatarCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#FF4D6D",
+  },
+  avatarLetter: {
+    fontFamily: "Fredoka_700Bold",
+    fontSize: 16,
+    color: "#FFFFFF",
+  },
+  scrollContent: {
+    paddingBottom: 40,
+  },
+  sparkCard: {
+    borderRadius: 24,
+    overflow: "hidden",
+    marginBottom: 20,
+    shadowColor: "#FF4D6D",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 6,
+  },
+  sparkGradient: {
+    padding: 22,
+    borderRadius: 24,
+  },
+  sparkHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  sparkTag: {
+    fontFamily: "Fredoka_700Bold",
+    fontSize: 12,
+    color: "#FFE4E6",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+  },
+  sparkQuestion: {
+    fontFamily: "Fredoka_700Bold",
+    fontSize: 20,
+    lineHeight: 26,
+    color: "#FFFFFF",
+    marginBottom: 16,
+  },
+  sparkButton: {
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    borderRadius: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    alignSelf: "flex-start",
+  },
+  sparkButtonText: {
+    fontFamily: "Fredoka_600SemiBold",
+    fontSize: 14,
+    color: "#FFFFFF",
+  },
+  sectionTitle: {
+    fontFamily: "Fredoka_700Bold",
+    fontSize: 18,
+    color: "#FFFFFF",
+    marginBottom: 14,
+  },
+  gridRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  menuCard: {
+    flex: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    borderRadius: 20,
+    padding: 18,
+    marginHorizontal: 4,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+  },
+  iconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  menuCardTitle: {
+    fontFamily: "Fredoka_700Bold",
+    fontSize: 16,
+    color: "#FFFFFF",
+    marginBottom: 4,
+  },
+  menuCardSubtitle: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+    lineHeight: 16,
+  },
+  inviteBanner: {
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "rgba(255, 77, 109, 0.3)",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 8,
+  },
+  inviteBannerTextContainer: {
+    flex: 1,
+    marginRight: 12,
+  },
+  inviteBannerTitle: {
+    fontFamily: "Fredoka_700Bold",
+    fontSize: 15,
+    color: "#FFFFFF",
+  },
+  inviteBannerSubtitle: {
+    fontSize: 12,
+    color: COLORS.textDim,
+    marginTop: 2,
+  },
+  inviteBannerButton: {
+    backgroundColor: "#FF4D6D",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 14,
+  },
+  inviteBannerButtonText: {
+    fontFamily: "Fredoka_600SemiBold",
+    fontSize: 12,
+    color: "#FFFFFF",
+  },
+  signOutRow: {
+    marginTop: 28,
+    alignItems: "center",
+  },
+  signOutText: {
+    fontFamily: "Fredoka_600SemiBold",
+    fontSize: 14,
+    color: "#94A3B8",
+  },
+});
