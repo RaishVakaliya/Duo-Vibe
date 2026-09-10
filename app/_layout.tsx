@@ -82,6 +82,14 @@ export default function RootLayout() {
                   options={{ animation: "slide_from_right" }}
                 />
                 <Stack.Screen name="home" options={{ animation: "fade" }} />
+                <Stack.Screen
+                  name="love-match"
+                  options={{ animation: "slide_from_right" }}
+                />
+                <Stack.Screen
+                  name="love-match-result"
+                  options={{ animation: "slide_from_right" }}
+                />
               </Stack>
             </AlertProvider>
           </AuthProvider>

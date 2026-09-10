@@ -73,6 +73,7 @@ export interface AuthContextType {
   relationshipType: RelationshipType | null;
   inviteCode: string;
   codeExpiresInSeconds: number;
+  codeExpiresAt: number;
   refreshInviteCode: () => Promise<string>;
   signInWithGoogle: () => Promise<AuthSignInResult>;
   signInWithEmail: (
@@ -93,4 +94,15 @@ export interface InvitePartnerScreenParams {
 
 export interface HomeScreenParams {
   partnerConnected?: string;
+}
+
+export interface LoveMatchResultScreenParams {
+  name1?: string;
+  name2?: string;
+  overall?: string;
+  communication?: string;
+  chemistry?: string;
+  trust?: string;
+  longTerm?: string;
+  [key: string]: string | string[] | undefined;
 }

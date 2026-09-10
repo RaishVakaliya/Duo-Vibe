@@ -10,6 +10,14 @@ export const COLORS = {
   textMuted: "#94A3B8",
   textDim: "#BFA8BC",
   darkOverlay: "#0D0B1A",
+  // Love Match progress bar & theme tokens
+  matchCommunication: "#0D9488",
+  matchChemistry: "#059669",
+  matchTrust: "#4F46E5",
+  matchLongTerm: "#F43F5E",
+  matchPinkLight: "#FFF0F3",
+  matchPinkCard: "rgba(255, 255, 255, 0.92)",
+  matchTrackBg: "rgba(0, 0, 0, 0.06)",
 };
 
 export const GRADIENTS = {

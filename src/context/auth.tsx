@@ -65,6 +65,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [relationshipType, setRelationshipTypeState] =
     useState<RelationshipType | null>(null);
   const [inviteCode, setInviteCode] = useState<string>(generateInviteCode());
+  const [codeExpiresAt, setCodeExpiresAt] = useState<number>(
+    Date.now() + 3600 * 1000,
+  );
   const [codeExpiresInSeconds, setCodeExpiresInSeconds] =
     useState<number>(3600);
 
@@ -86,6 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // First login -> insert initial profile with 1-hour valid invite code
         const newCode = generateInviteCode();
         const nowIso = now.toISOString();
+        const expiresTime = now.getTime() + 3600 * 1000;
         await supabase.from("profiles").insert({
           id: currentUser.id,
           email: currentUser.email ?? null,
@@ -96,6 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           updated_at: nowIso,
         });
         setInviteCode(newCode);
+        setCodeExpiresAt(expiresTime);
         setCodeExpiresInSeconds(3600);
         setHasPartnerState(false);
       } else {
@@ -121,22 +126,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Check invite_code and expiration (1 hour = 3600s)
         const lastUpdated = profile.updated_at
           ? new Date(profile.updated_at).getTime()
-          : 0;
-        const ageSeconds = Math.floor((now.getTime() - lastUpdated) / 1000);
-        const remaining = 3600 - ageSeconds;
+          : now.getTime();
+        const expiresTime = lastUpdated + 3600 * 1000;
+        const remaining = Math.floor((expiresTime - now.getTime()) / 1000);
 
         if (profile.invite_code && remaining > 0) {
           setInviteCode(profile.invite_code);
+          setCodeExpiresAt(expiresTime);
           setCodeExpiresInSeconds(remaining);
         } else {
           // Code expired or empty -> generate fresh code
           const newCode = generateInviteCode();
           const nowIso = now.toISOString();
+          const freshExpires = now.getTime() + 3600 * 1000;
           await supabase
             .from("profiles")
             .update({ invite_code: newCode, updated_at: nowIso })
             .eq("id", currentUser.id);
           setInviteCode(newCode);
+          setCodeExpiresAt(freshExpires);
           setCodeExpiresInSeconds(3600);
         }
       }
@@ -197,8 +205,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshInviteCode = async (): Promise<string> => {
     const newCode = generateInviteCode();
-    const nowIso = new Date().toISOString();
+    const now = new Date();
+    const nowIso = now.toISOString();
+    const freshExpires = now.getTime() + 3600 * 1000;
     setInviteCode(newCode);
+    setCodeExpiresAt(freshExpires);
     setCodeExpiresInSeconds(3600);
     if (user) {
       try {
@@ -475,6 +486,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         relationshipType,
         inviteCode,
         codeExpiresInSeconds,
+        codeExpiresAt,
         refreshInviteCode,
         signInWithGoogle,
         signInWithEmail,

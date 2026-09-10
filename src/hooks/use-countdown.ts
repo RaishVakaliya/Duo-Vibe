@@ -1,14 +1,34 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
-export function useCountdown(initialSeconds: number) {
-  const [timeLeft, setTimeLeft] = useState<number>(initialSeconds);
+export function useCountdown(targetTimestampOrSeconds: number) {
+  const calculateRemaining = useCallback((): number => {
+    if (targetTimestampOrSeconds > 1000000000) {
+      // It's a timestamp (epoch ms)
+      const diff = Math.floor((targetTimestampOrSeconds - Date.now()) / 1000);
+      return Math.max(0, diff);
+    }
+    return Math.max(0, targetTimestampOrSeconds);
+  }, [targetTimestampOrSeconds]);
+
+  const [timeLeft, setTimeLeft] = useState<number>(calculateRemaining);
   const isMountedRef = useRef<boolean>(true);
+  const targetRef = useRef<number>(targetTimestampOrSeconds);
+
+  useEffect(() => {
+    targetRef.current = targetTimestampOrSeconds;
+    setTimeLeft(calculateRemaining());
+  }, [targetTimestampOrSeconds, calculateRemaining]);
 
   useEffect(() => {
     isMountedRef.current = true;
     const timer = setInterval(() => {
       if (isMountedRef.current) {
-        setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+        if (targetRef.current > 1000000000) {
+          const diff = Math.floor((targetRef.current - Date.now()) / 1000);
+          setTimeLeft(Math.max(0, diff));
+        } else {
+          setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+        }
       }
     }, 1000);
 
@@ -19,12 +39,20 @@ export function useCountdown(initialSeconds: number) {
   }, []);
 
   const reset = useCallback(
-    (newSeconds?: number) => {
-      if (isMountedRef.current) {
-        setTimeLeft(newSeconds !== undefined ? newSeconds : initialSeconds);
+    (newTarget?: number) => {
+      if (newTarget !== undefined) {
+        targetRef.current = newTarget;
+        if (newTarget > 1000000000) {
+          const diff = Math.floor((newTarget - Date.now()) / 1000);
+          setTimeLeft(Math.max(0, diff));
+        } else {
+          setTimeLeft(newTarget);
+        }
+      } else {
+        setTimeLeft(calculateRemaining());
       }
     },
-    [initialSeconds],
+    [calculateRemaining],
   );
 
   const formatMinutesSeconds = useCallback(

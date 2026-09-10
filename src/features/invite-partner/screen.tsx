@@ -28,28 +28,23 @@ export default function InvitePartnerScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ source?: string }>();
   const isFromHome = params.source === "home";
-  const {
-    inviteCode,
-    codeExpiresInSeconds,
-    refreshInviteCode,
-    connectPartnerCode,
-  } = useAuth();
+  const { inviteCode, codeExpiresAt, refreshInviteCode, connectPartnerCode } =
+    useAuth();
   const { showAlert } = useAlert();
   const [partnerCode, setPartnerCode] = useState<string>("");
   const { timeLeft, reset, formatMinutesSeconds, isFinished } =
-    useCountdown(codeExpiresInSeconds);
+    useCountdown(codeExpiresAt);
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
   useEffect(() => {
-    reset(codeExpiresInSeconds);
-  }, [codeExpiresInSeconds, reset]);
+    reset(codeExpiresAt);
+  }, [codeExpiresAt, reset]);
 
   const handleRefreshCode = async (): Promise<void> => {
     setIsRefreshing(true);
     try {
       await refreshInviteCode();
-      reset(3600);
     } catch (err: unknown) {
       console.warn("Error refreshing code:", err);
     } finally {
