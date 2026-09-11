@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,8 +8,9 @@ import {
   Platform,
   KeyboardAvoidingView,
   Modal,
+  BackHandler,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -62,12 +63,30 @@ export default function LoveMatchScreen() {
   const [name2, setName2] = useState<string>("");
   const [dob2, setDob2] = useState<string>("2002-11-08");
 
+  const [isFocused1, setIsFocused1] = useState<boolean>(false);
+  const [isFocused2, setIsFocused2] = useState<boolean>(false);
+
   const [activePicker, setActivePicker] = useState<ActiveDatePicker>(null);
 
-  // Modal Picker Working State
   const [selectedDay, setSelectedDay] = useState<number>(12);
   const [selectedMonth, setSelectedMonth] = useState<number>(3); // 0-indexed (April)
   const [selectedYear, setSelectedYear] = useState<number>(2001);
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        router.replace(ROUTES.HOME);
+        return true;
+      };
+
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress,
+      );
+
+      return () => subscription.remove();
+    }, [router]),
+  );
 
   const isFormValid =
     name1.trim().length > 0 &&
@@ -123,7 +142,6 @@ export default function LoveMatchScreen() {
     });
   };
 
-  // Generate Year, Month, Day lists
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 70 }, (_, i) => currentYear - i);
   const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
@@ -140,11 +158,10 @@ export default function LoveMatchScreen() {
       />
 
       <SafeAreaView style={styles.safeArea}>
-        {/* Header */}
         <View style={styles.headerRow}>
           <Pressable
             style={styles.backButton}
-            onPress={() => router.back()}
+            onPress={() => router.replace(ROUTES.HOME)}
             accessibilityRole="button"
             accessibilityLabel="Go back"
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
@@ -174,7 +191,6 @@ export default function LoveMatchScreen() {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
-            {/* Subtitle */}
             <MotiView
               from={{ opacity: 0, translateY: 6 }}
               animate={{ opacity: 1, translateY: 0 }}
@@ -186,9 +202,7 @@ export default function LoveMatchScreen() {
               </Text>
             </MotiView>
 
-            {/* Circular Avatars Row */}
             <View style={styles.avatarsRow}>
-              {/* User Avatar & Name */}
               <MotiView
                 from={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -199,20 +213,26 @@ export default function LoveMatchScreen() {
                   <Ionicons name="person" size={22} color="#334155" />
                 </View>
                 <Text style={styles.avatarLabel}>Your Name</Text>
-                <TextInput
-                  style={styles.nameInput}
-                  placeholder="Rahul"
-                  placeholderTextColor="#CBD5E1"
-                  value={name1}
-                  onChangeText={setName1}
-                  autoCapitalize="words"
-                  autoCorrect={false}
-                  maxLength={20}
-                  accessibilityLabel="Enter your name"
-                />
+                <View style={styles.nameInputContainer}>
+                  <TextInput
+                    style={styles.nameInput}
+                    placeholder={isFocused1 ? "" : "Rahul"}
+                    placeholderTextColor="#CBD5E1"
+                    value={name1}
+                    onChangeText={setName1}
+                    onFocus={() => setIsFocused1(true)}
+                    onBlur={() => setIsFocused1(false)}
+                    autoCapitalize="words"
+                    autoCorrect={false}
+                    maxLength={20}
+                    cursorColor="#FF4D6D"
+                    selectionColor="rgba(255, 77, 109, 0.35)"
+                    underlineColorAndroid="transparent"
+                    accessibilityLabel="Enter your name"
+                  />
+                </View>
               </MotiView>
 
-              {/* Partner Avatar & Name */}
               <MotiView
                 from={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -223,23 +243,28 @@ export default function LoveMatchScreen() {
                   <Ionicons name="person" size={22} color="#334155" />
                 </View>
                 <Text style={styles.avatarLabel}>Partner Name</Text>
-                <TextInput
-                  style={styles.nameInput}
-                  placeholder="Priya"
-                  placeholderTextColor="#CBD5E1"
-                  value={name2}
-                  onChangeText={setName2}
-                  autoCapitalize="words"
-                  autoCorrect={false}
-                  maxLength={20}
-                  accessibilityLabel="Enter partner name"
-                />
+                <View style={styles.nameInputContainer}>
+                  <TextInput
+                    style={styles.nameInput}
+                    placeholder={isFocused2 ? "" : "Priya"}
+                    placeholderTextColor="#CBD5E1"
+                    value={name2}
+                    onChangeText={setName2}
+                    onFocus={() => setIsFocused2(true)}
+                    onBlur={() => setIsFocused2(false)}
+                    autoCapitalize="words"
+                    autoCorrect={false}
+                    maxLength={20}
+                    cursorColor="#FF4D6D"
+                    selectionColor="rgba(255, 77, 109, 0.35)"
+                    underlineColorAndroid="transparent"
+                    accessibilityLabel="Enter partner name"
+                  />
+                </View>
               </MotiView>
             </View>
 
-            {/* Dates Row */}
             <View style={styles.datesRow}>
-              {/* User DOB */}
               <Pressable
                 style={styles.dateCard}
                 onPress={() => handleOpenDatePicker("user")}
@@ -257,7 +282,6 @@ export default function LoveMatchScreen() {
                 </View>
               </Pressable>
 
-              {/* Partner DOB */}
               <Pressable
                 style={styles.dateCard}
                 onPress={() => handleOpenDatePicker("partner")}
@@ -276,7 +300,6 @@ export default function LoveMatchScreen() {
               </Pressable>
             </View>
 
-            {/* Calculate Button */}
             <Pressable
               style={[
                 styles.calculateButton,
@@ -303,7 +326,6 @@ export default function LoveMatchScreen() {
           </ScrollView>
         </KeyboardAvoidingView>
 
-        {/* Date Picker Modal */}
         <Modal
           visible={activePicker !== null}
           transparent
@@ -328,7 +350,6 @@ export default function LoveMatchScreen() {
               </View>
 
               <View style={styles.modalColumnsRow}>
-                {/* Day Column */}
                 <ScrollView
                   style={styles.pickerColumn}
                   showsVerticalScrollIndicator={false}
@@ -357,7 +378,6 @@ export default function LoveMatchScreen() {
                   })}
                 </ScrollView>
 
-                {/* Month Column */}
                 <ScrollView
                   style={styles.pickerColumn}
                   showsVerticalScrollIndicator={false}
@@ -386,7 +406,6 @@ export default function LoveMatchScreen() {
                   })}
                 </ScrollView>
 
-                {/* Year Column */}
                 <ScrollView
                   style={styles.pickerColumn}
                   showsVerticalScrollIndicator={false}

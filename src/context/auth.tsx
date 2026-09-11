@@ -86,7 +86,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const now = new Date();
       if (!profile) {
-        // First login -> insert initial profile with 1-hour valid invite code
         const newCode = generateInviteCode();
         const nowIso = now.toISOString();
         const expiresTime = now.getTime() + 3600 * 1000;
@@ -104,12 +103,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setCodeExpiresInSeconds(3600);
         setHasPartnerState(false);
       } else {
-        // Check partner status
         if (profile.partner_id) {
           setHasPartnerState(true);
           await AsyncStorage.setItem(HAS_PARTNER_KEY, "true");
         } else {
-          // Check couples table
           const { data: couple } = await supabase
             .from("couples")
             .select("*")
@@ -123,7 +120,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
 
-        // Check invite_code and expiration (1 hour = 3600s)
         const lastUpdated = profile.updated_at
           ? new Date(profile.updated_at).getTime()
           : now.getTime();
@@ -135,7 +131,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setCodeExpiresAt(expiresTime);
           setCodeExpiresInSeconds(remaining);
         } else {
-          // Code expired or empty -> generate fresh code
           const newCode = generateInviteCode();
           const nowIso = now.toISOString();
           const freshExpires = now.getTime() + 3600 * 1000;
@@ -379,7 +374,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      // Query Supabase for profile matching this invite code
       const { data: partnerProfiles, error: fetchErr } = await supabase
         .from("profiles")
         .select("*")
@@ -409,7 +403,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
       }
 
-      // Check if partner's code is expired (1 hour = 3600 seconds)
       const lastUpdated = partnerProfile.updated_at
         ? new Date(partnerProfile.updated_at).getTime()
         : 0;
@@ -422,7 +415,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
       }
 
-      // Check if partner is already linked to another user
       if (partnerProfile.partner_id && partnerProfile.partner_id !== user.id) {
         return {
           success: false,
@@ -432,7 +424,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const nowIso = new Date().toISOString();
 
-      // 1. Update current user's profile
       const { error: updateSelfErr } = await supabase
         .from("profiles")
         .update({ partner_id: partnerProfile.id, updated_at: nowIso })
@@ -442,7 +433,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error("Error updating user profile:", updateSelfErr);
       }
 
-      // 2. Update partner's profile
       const { error: updatePartnerErr } = await supabase
         .from("profiles")
         .update({ partner_id: user.id, updated_at: nowIso })
@@ -452,7 +442,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error("Error updating partner profile:", updatePartnerErr);
       }
 
-      // 3. Upsert couples record
       try {
         await supabase.from("couples").upsert({
           user1_id: user.id,

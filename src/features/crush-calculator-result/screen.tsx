@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -15,13 +15,10 @@ import { Ionicons } from "@expo/vector-icons";
 import Svg, { Path } from "react-native-svg";
 import { MotiView } from "moti";
 import { styles } from "./styles";
-import { MatchBarRow } from "./types";
-import { COLORS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
-import { LoveMatchResultScreenParams } from "@/src/types";
 
-function HeartSvg({
-  size = 88,
+function HeartIconSvg({
+  size = 48,
   color = "#FF2D55",
 }: {
   size?: number;
@@ -37,16 +34,14 @@ function HeartSvg({
   );
 }
 
-export default function LoveMatchResultScreen() {
+export default function CrushCalculatorResultScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{
-    name1?: string;
-    name2?: string;
-    overall?: string;
-    communication?: string;
-    chemistry?: string;
-    trust?: string;
-    longTerm?: string;
+    yourName?: string;
+    crushName?: string;
+    percentage?: string;
+    headline?: string;
+    message?: string;
   }>();
 
   useFocusEffect(
@@ -65,45 +60,40 @@ export default function LoveMatchResultScreen() {
     }, [router]),
   );
 
-  const name1 = params.name1 || "Partner 1";
-  const name2 = params.name2 || "Partner 2";
-  const overall = parseInt(params.overall || "87", 10);
-  const communication = parseInt(params.communication || "91", 10);
-  const chemistry = parseInt(params.chemistry || "94", 10);
-  const trust = parseInt(params.trust || "82", 10);
-  const longTerm = parseInt(params.longTerm || "79", 10);
+  const yourName = params.yourName || "You";
+  const crushName = params.crushName || "Crush";
+  const targetPercentage = parseInt(params.percentage || "78", 10);
+  const headline = params.headline || "They definitely notice you!";
+  const message =
+    params.message ||
+    "Your energy is impossible to ignore. They light up a little when you're around.";
 
-  const barRows: readonly MatchBarRow[] = [
-    {
-      label: "Communication",
-      percentage: communication,
-      color: COLORS.matchCommunication,
-      delay: 100,
-    },
-    {
-      label: "Chemistry",
-      percentage: chemistry,
-      color: COLORS.matchChemistry,
-      delay: 250,
-    },
-    {
-      label: "Trust",
-      percentage: trust,
-      color: COLORS.matchTrust,
-      delay: 400,
-    },
-    {
-      label: "Long-term",
-      percentage: longTerm,
-      color: COLORS.matchLongTerm,
-      delay: 550,
-    },
-  ];
+  const [displayPercentage, setDisplayPercentage] = useState<number>(0);
+
+  useEffect(() => {
+    let startTimestamp: number | null = null;
+    const duration = 850;
+    let frameId: number;
+
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplayPercentage(Math.round(eased * targetPercentage));
+
+      if (progress < 1) {
+        frameId = requestAnimationFrame(step);
+      }
+    };
+
+    frameId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frameId);
+  }, [targetPercentage]);
 
   const handleShare = async (): Promise<void> => {
     try {
       await Share.share({
-        message: `Our love compatibility score is ${overall}%! 💕 (${name1} & ${name2})\nTested on Duo Vibe app ✨`,
+        message: `My crush score with ${crushName} is ${targetPercentage}%! 💕 "${headline}"\nTested on Duo Vibe! ✨`,
       });
     } catch (err: unknown) {
       console.warn("Share result error:", err);
@@ -111,7 +101,7 @@ export default function LoveMatchResultScreen() {
   };
 
   const handleTryAgain = (): void => {
-    router.replace(ROUTES.LOVE_MATCH);
+    router.replace(ROUTES.CRUSH_CALCULATOR);
   };
 
   return (
@@ -138,12 +128,12 @@ export default function LoveMatchResultScreen() {
 
           <View style={styles.headerTitleContainer}>
             <Ionicons
-              name="heart"
-              size={24}
-              color="#FF2D55"
+              name="flame"
+              size={22}
+              color="#FF7A00"
               style={styles.headerHeartIcon}
             />
-            <Text style={styles.headerTitle}>Love Match</Text>
+            <Text style={styles.headerTitle}>Crush Calculator</Text>
           </View>
 
           <View style={styles.headerSpacer} />
@@ -172,52 +162,48 @@ export default function LoveMatchResultScreen() {
               <Ionicons name="heart" size={16} color="#FFB6C1" />
             </View>
 
-            <View style={styles.scoreCenterSection}>
-              <MotiView
-                from={{ scale: 0.7, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", damping: 12, delay: 150 }}
-                style={styles.heartScoreContainer}
-              >
-                <HeartSvg size={92} color="#FF2D55" />
-                <View
-                  style={[
-                    styles.gradientBackground,
-                    { justifyContent: "center", alignItems: "center" },
-                  ]}
-                >
-                  <Text style={styles.scoreTextInsideHeart}>{overall}</Text>
-                </View>
-              </MotiView>
+            <MotiView
+              from={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", damping: 12, delay: 100 }}
+              style={styles.doubleHeartContainer}
+            >
+              <View style={styles.doubleHeartBack}>
+                <HeartIconSvg size={56} color="#FFA45C" />
+              </View>
+              <View style={styles.doubleHeartFront}>
+                <HeartIconSvg size={54} color="#FF2D55" />
+              </View>
+            </MotiView>
 
-              <Text style={styles.compatibilityTitle}>Love Compatibility</Text>
-              <Text style={styles.coupleNamesSubtitle}>
-                {name1} & {name2}
-              </Text>
-            </View>
+            <Text style={styles.percentageLabel}>Your Crush Percentage</Text>
+            <Text style={styles.namesSubtitle}>
+              {yourName} & {crushName}
+            </Text>
 
-            <View style={styles.barsContainer}>
-              {barRows.map((bar) => (
-                <View key={bar.label} style={styles.barRow}>
-                  <View style={styles.barLabelRow}>
-                    <Text style={styles.barLabel}>{bar.label}</Text>
-                    <Text style={styles.barPercentage}>{bar.percentage}%</Text>
-                  </View>
-                  <View style={styles.barTrack}>
-                    <MotiView
-                      from={{ width: "0%" }}
-                      animate={{ width: `${bar.percentage}%` }}
-                      transition={{
-                        type: "timing",
-                        duration: 800,
-                        delay: bar.delay,
-                      }}
-                      style={[styles.barFill, { backgroundColor: bar.color }]}
-                    />
-                  </View>
-                </View>
-              ))}
-            </View>
+            <MotiView
+              from={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", damping: 14, delay: 150 }}
+            >
+              <Text style={styles.percentageValue}>{displayPercentage}%</Text>
+            </MotiView>
+
+            <MotiView
+              from={{ opacity: 0, translateY: 10 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ type: "timing", duration: 400, delay: 300 }}
+            >
+              <Text style={styles.headlineText}>{headline}</Text>
+            </MotiView>
+
+            <MotiView
+              from={{ opacity: 0, translateY: 10 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ type: "timing", duration: 400, delay: 450 }}
+            >
+              <Text style={styles.messageText}>"{message}"</Text>
+            </MotiView>
           </MotiView>
         </ScrollView>
 
@@ -226,7 +212,7 @@ export default function LoveMatchResultScreen() {
             style={styles.shareButton}
             onPress={handleShare}
             accessibilityRole="button"
-            accessibilityLabel="Share Love Match Result"
+            accessibilityLabel="Share Crush Result"
           >
             <Text style={styles.shareButtonText}>Share Result</Text>
           </Pressable>

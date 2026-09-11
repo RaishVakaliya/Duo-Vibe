@@ -86,7 +86,6 @@ export interface AuthContextType {
   connectPartnerCode: (code: string) => Promise<AuthPartnerConnectResult>;
 }
 
-// Route navigation params
 export interface InvitePartnerScreenParams {
   source?: string;
   code?: string;
@@ -104,5 +103,14 @@ export interface LoveMatchResultScreenParams {
   chemistry?: string;
   trust?: string;
   longTerm?: string;
+  [key: string]: string | string[] | undefined;
+}
+
+export interface CrushCalculatorResultScreenParams {
+  yourName?: string;
+  crushName?: string;
+  percentage?: string;
+  headline?: string;
+  message?: string;
   [key: string]: string | string[] | undefined;
 }

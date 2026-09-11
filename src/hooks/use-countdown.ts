@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback, useRef } from "react";
 export function useCountdown(targetTimestampOrSeconds: number) {
   const calculateRemaining = useCallback((): number => {
     if (targetTimestampOrSeconds > 1000000000) {
-      // It's a timestamp (epoch ms)
       const diff = Math.floor((targetTimestampOrSeconds - Date.now()) / 1000);
       return Math.max(0, diff);
     }

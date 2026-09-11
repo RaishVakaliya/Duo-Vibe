@@ -42,7 +42,7 @@ const LOVE_TOOLS: readonly LoveToolItem[] = [
     iconColor: "#FF7A00",
     backgroundColor: "rgba(255, 122, 0, 0.12)",
     borderColor: "rgba(255, 122, 0, 0.25)",
-    route: ROUTES.PLAY_COMPARE,
+    route: ROUTES.CRUSH_CALCULATOR,
   },
   {
     id: "couple-quiz",
@@ -218,7 +218,6 @@ export default function HomeScreen() {
             </Text>
           </MotiView>
 
-          {/* Red Flag or Green Flag Hero Card */}
           <MotiView
             from={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}

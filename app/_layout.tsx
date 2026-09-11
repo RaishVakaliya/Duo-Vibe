@@ -90,6 +90,14 @@ export default function RootLayout() {
                   name="love-match-result"
                   options={{ animation: "slide_from_right" }}
                 />
+                <Stack.Screen
+                  name="crush-calculator"
+                  options={{ animation: "slide_from_right" }}
+                />
+                <Stack.Screen
+                  name="crush-calculator-result"
+                  options={{ animation: "slide_from_right" }}
+                />
               </Stack>
             </AlertProvider>
           </AuthProvider>

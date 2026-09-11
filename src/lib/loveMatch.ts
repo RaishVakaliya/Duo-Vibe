@@ -55,7 +55,6 @@ export function calculateLoveMatch(
   return { overall, communication, chemistry, trust, longTerm };
 }
 
-// Dev-only verification tests
 if (__DEV__) {
   try {
     const res1 = calculateLoveMatch(
@@ -70,10 +69,8 @@ if (__DEV__) {
       "Priya",
       "2002-11-08",
     );
-    // (a) Identical inputs give identical outputs
     const testA = JSON.stringify(res1) === JSON.stringify(res2);
 
-    // (b) Swapping DOBs gives different result
     const resSwappedDob = calculateLoveMatch(
       "Rahul",
       "2002-11-08",
@@ -82,7 +79,6 @@ if (__DEV__) {
     );
     const testB = JSON.stringify(res1) !== JSON.stringify(resSwappedDob);
 
-    // (c) Swapping person order gives identical result
     const resSwappedOrder = calculateLoveMatch(
       "Priya",
       "2002-11-08",

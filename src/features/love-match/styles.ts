@@ -106,13 +106,21 @@ export const styles = StyleSheet.create({
     color: "#94A3B8",
     marginBottom: 4,
   },
+  nameInputContainer: {
+    width: "100%",
+    minHeight: 32,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   nameInput: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 16,
     color: "#0F172A",
     textAlign: "center",
     width: "100%",
-    paddingVertical: 2,
+    paddingVertical: 0,
+    paddingHorizontal: 6,
+    includeFontPadding: false,
   },
   datesRow: {
     flexDirection: "row",

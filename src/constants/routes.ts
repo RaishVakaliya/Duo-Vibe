@@ -11,6 +11,8 @@ export const ROUTES = {
   HOME: "/home",
   LOVE_MATCH: "/love-match",
   LOVE_MATCH_RESULT: "/love-match-result",
+  CRUSH_CALCULATOR: "/crush-calculator",
+  CRUSH_CALCULATOR_RESULT: "/crush-calculator-result",
 } as const;
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];
