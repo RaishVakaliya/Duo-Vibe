@@ -60,7 +60,7 @@ const LOVE_TOOLS: readonly LoveToolItem[] = [
     iconColor: "#0EA5E9",
     backgroundColor: "rgba(14, 165, 233, 0.12)",
     borderColor: "rgba(14, 165, 233, 0.25)",
-    route: ROUTES.DATE_IDEAS,
+    route: ROUTES.TWENTY_ONE_QUESTIONS,
   },
   {
     id: "secret-crush",

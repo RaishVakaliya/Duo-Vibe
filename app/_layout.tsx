@@ -98,6 +98,10 @@ export default function RootLayout() {
                   name="crush-calculator-result"
                   options={{ animation: "slide_from_right" }}
                 />
+                <Stack.Screen
+                  name="twenty-one-questions"
+                  options={{ animation: "slide_from_right" }}
+                />
               </Stack>
             </AlertProvider>
           </AuthProvider>

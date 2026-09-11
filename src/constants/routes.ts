@@ -13,6 +13,7 @@ export const ROUTES = {
   LOVE_MATCH_RESULT: "/love-match-result",
   CRUSH_CALCULATOR: "/crush-calculator",
   CRUSH_CALCULATOR_RESULT: "/crush-calculator-result",
+  TWENTY_ONE_QUESTIONS: "/twenty-one-questions",
 } as const;
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];
