@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, Image, Pressable } from "react-native";
+import { View, Text, Pressable } from "react-native";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,7 +19,8 @@ export default function WelcomeScreen() {
       <Image
         source={require("@/assets/images/welcome_bg.png")}
         style={styles.backgroundImage}
-        resizeMode="cover"
+        contentFit="cover"
+        cachePolicy="disk"
       />
 
       <LinearGradient

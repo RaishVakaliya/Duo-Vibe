@@ -229,15 +229,6 @@ export default function ProfileScreen() {
       case "home":
         router.replace(ROUTES.HOME);
         break;
-      case "games":
-        router.push(ROUTES.PLAY_COMPARE);
-        break;
-      case "chat":
-        router.push(ROUTES.DATE_IDEAS);
-        break;
-      case "memories":
-        router.push(ROUTES.MEMORIES);
-        break;
       case "profile":
         break;
     }

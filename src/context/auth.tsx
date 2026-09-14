@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User, Session } from "@supabase/supabase-js";
 import {
@@ -621,32 +621,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const contextValue = useMemo(
+    () => ({
+      user,
+      session,
+      isLoading,
+      hasPartner,
+      relationshipType,
+      inviteCode,
+      codeExpiresInSeconds,
+      codeExpiresAt,
+      refreshInviteCode,
+      signInWithGoogle,
+      signInWithEmail,
+      signOut,
+      deleteAccount,
+      setHasPartner,
+      setRelationshipType,
+      userName,
+      setUserName,
+      avatarUrl,
+      setAvatarUrl,
+      updateProfile,
+      connectPartnerCode,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      user,
+      session,
+      isLoading,
+      hasPartner,
+      relationshipType,
+      inviteCode,
+      codeExpiresInSeconds,
+      codeExpiresAt,
+      userName,
+      avatarUrl,
+    ],
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        session,
-        isLoading,
-        hasPartner,
-        relationshipType,
-        inviteCode,
-        codeExpiresInSeconds,
-        codeExpiresAt,
-        refreshInviteCode,
-        signInWithGoogle,
-        signInWithEmail,
-        signOut,
-        deleteAccount,
-        setHasPartner,
-        setRelationshipType,
-        userName,
-        setUserName,
-        avatarUrl,
-        setAvatarUrl,
-        updateProfile,
-        connectPartnerCode,
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

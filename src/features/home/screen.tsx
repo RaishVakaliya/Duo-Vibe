@@ -145,16 +145,19 @@ export default function HomeScreen() {
     }
   };
 
-  const handleTabPress = (index: number, item: TabItem): void => {
-    setActiveTab(index);
-    switch (item.id) {
-      case "home":
-        break;
-      case "profile":
-        router.push(ROUTES.PROFILE);
-        break;
-    }
-  };
+  const handleTabPress = useCallback(
+    (index: number, item: TabItem): void => {
+      setActiveTab(index);
+      switch (item.id) {
+        case "home":
+          break;
+        case "profile":
+          router.push(ROUTES.PROFILE);
+          break;
+      }
+    },
+    [router],
+  );
 
   const handleToolPress = (tool: LoveToolItem): void => {
     if (tool.route) {

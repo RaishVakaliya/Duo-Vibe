@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { View, Text, Pressable, Share } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -48,13 +48,15 @@ export default function DateIdeasScreen() {
   const router = useRouter();
   const [topIndex, setTopIndex] = useState<number>(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTopIndex((prev) => (prev + 1) % DATE_CARDS.length);
-    }, 2500);
+  useFocusEffect(
+    useCallback(() => {
+      const interval = setInterval(() => {
+        setTopIndex((prev) => (prev + 1) % DATE_CARDS.length);
+      }, 2500);
 
-    return () => clearInterval(interval);
-  }, []);
+      return () => clearInterval(interval);
+    }, []),
+  );
 
   const handleManualSwipe = (): void => {
     setTopIndex((prev) => (prev + 1) % DATE_CARDS.length);

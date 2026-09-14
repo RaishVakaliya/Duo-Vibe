@@ -109,13 +109,22 @@ export default function SplashScreen() {
   const router = useRouter();
   const { user, hasPartner, isLoading } = useAuth();
   const hasNavigatedRef = useRef<boolean>(false);
+  const mountTimeRef = useRef<number>(Date.now());
 
   useEffect(() => {
+    if (hasNavigatedRef.current) return;
+
+    // If auth is still loading, do nothing — re-runs when isLoading flips.
+    if (isLoading) return;
+
+    const MIN_DISPLAY_MS = 1200;
+    const elapsed = Date.now() - mountTimeRef.current;
+    const remaining = Math.max(0, MIN_DISPLAY_MS - elapsed);
+
     const timer = setTimeout(() => {
       if (hasNavigatedRef.current) return;
-      if (isLoading) return; // Wait until auth check is done
-
       hasNavigatedRef.current = true;
+
       if (user) {
         if (hasPartner) {
           router.replace(ROUTES.HOME);
@@ -128,35 +137,9 @@ export default function SplashScreen() {
       } else {
         router.replace(ROUTES.WELCOME);
       }
-    }, 2400);
+    }, remaining);
 
     return () => clearTimeout(timer);
-  }, [router, user, hasPartner, isLoading]);
-
-  useEffect(() => {
-    if (!isLoading && !hasNavigatedRef.current) {
-      const fallbackTimer = setTimeout(() => {
-        if (hasNavigatedRef.current) return;
-        hasNavigatedRef.current = true;
-        if (user) {
-          if (hasPartner) {
-            router.replace(ROUTES.HOME);
-          } else {
-            router.replace({
-              pathname: ROUTES.INVITE_PARTNER,
-              params: { source: "auth" },
-            });
-          }
-        } else {
-          router.replace(ROUTES.WELCOME);
-        }
-      }, 2500);
-
-      return () => {
-        clearTimeout(fallbackTimer);
-      };
-    }
-    return () => {};
   }, [isLoading, user, hasPartner, router]);
 
   return (
