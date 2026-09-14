@@ -189,7 +189,7 @@ export default function HomeScreen() {
           </View>
 
           <Image
-            source={require("@/assets/icon-nobg.png")}
+            source={require("@/assets/images/icon-nobg.png")}
             style={styles.headerLogo}
             resizeMode="contain"
             accessibilityLabel="Duo Vibe Logo"

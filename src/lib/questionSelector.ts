@@ -1,4 +1,4 @@
-import { QUESTION_BANK, Question, QuestionCategory } from "@/data/questions";
+import { QUESTION_BANK, Question, QuestionCategory } from "@/src/data/questions";
 
 function shuffleArray<T>(array: T[]): T[] {
   const arr = [...array];

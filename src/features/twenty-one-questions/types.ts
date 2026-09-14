@@ -1,4 +1,4 @@
-import { QuestionCategory } from "@/data/questions";
+import { QuestionCategory } from "@/src/data/questions";
 
 export interface TwentyOneQuestionsState {
   currentIndex: number;

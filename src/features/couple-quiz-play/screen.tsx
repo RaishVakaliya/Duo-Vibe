@@ -18,7 +18,7 @@ import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
 import { CoupleIllustration } from "@/src/components/couple-illustration";
 import { submitAnswers, selectQuizQuestions } from "@/src/lib/quizSession";
-import { QuizQuestion } from "@/data/quizQuestions";
+import { QuizQuestion } from "@/src/data/quizQuestions";
 
 export default function CoupleQuizPlayScreen() {
   const router = useRouter();

@@ -66,7 +66,7 @@ export default function LoginScreen() {
 
         <View style={loginStyles.content}>
           <Image
-            source={require("@/assets/icon-nobg.png")}
+            source={require("@/assets/images/icon-nobg.png")}
             style={loginStyles.logo}
             resizeMode="contain"
           />

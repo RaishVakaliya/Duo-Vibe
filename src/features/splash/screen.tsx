@@ -181,7 +181,7 @@ export default function SplashScreen() {
           style={styles.logoContainer}
         >
           <Image
-            source={require("@/assets/icon-nobg.png")}
+            source={require("@/assets/images/icon-nobg.png")}
             style={styles.logo}
             resizeMode="contain"
           />

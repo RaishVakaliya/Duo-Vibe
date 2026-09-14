@@ -50,7 +50,7 @@ export default function AboutScreen() {
         >
           <View style={styles.hero}>
             <Image
-              source={require("@/assets/icon-nobg.png")}
+              source={require("@/assets/images/icon-nobg.png")}
               style={styles.logo}
               resizeMode="contain"
             />

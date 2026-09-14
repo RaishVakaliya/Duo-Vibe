@@ -16,7 +16,7 @@ import { MotiView } from "moti";
 import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
 import { selectSessionQuestions } from "@/src/lib/questionSelector";
-import { Question } from "@/data/questions";
+import { Question } from "@/src/data/questions";
 
 const TOTAL = 21;
 

@@ -3,7 +3,7 @@ import {
   QUIZ_QUESTION_BANK,
   QuizCategory,
   QuizQuestion,
-} from "@/data/quizQuestions";
+} from "@/src/data/quizQuestions";
 import { QuizAnswer, QuizSession } from "@/src/types";
 import { Database } from "@/src/types/database";
 import { sendExpoPushNotification } from "@/src/lib/notifications";

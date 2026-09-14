@@ -91,7 +91,7 @@ export default function ReadyScreen() {
             style={readyStyles.illustrationContainer}
           >
             <Image
-              source={require("@/assets/heart_in_cloud.png")}
+              source={require("@/assets/images/heart_in_cloud.png")}
               style={readyStyles.illustration}
               resizeMode="contain"
             />
