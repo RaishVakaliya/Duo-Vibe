@@ -58,6 +58,10 @@ export default function RootLayout() {
                   options={{ animation: "slide_from_right" }}
                 />
                 <Stack.Screen
+                  name="onboarding-name"
+                  options={{ animation: "slide_from_right" }}
+                />
+                <Stack.Screen
                   name="onboarding"
                   options={{ animation: "slide_from_right" }}
                 />
@@ -82,6 +86,27 @@ export default function RootLayout() {
                   options={{ animation: "slide_from_right" }}
                 />
                 <Stack.Screen name="home" options={{ animation: "fade" }} />
+                <Stack.Screen name="profile" options={{ animation: "fade" }} />
+                <Stack.Screen
+                  name="edit-profile"
+                  options={{ animation: "slide_from_right" }}
+                />
+                <Stack.Screen
+                  name="about"
+                  options={{ animation: "slide_from_right" }}
+                />
+                <Stack.Screen
+                  name="feedback"
+                  options={{ animation: "slide_from_right" }}
+                />
+                <Stack.Screen
+                  name="terms"
+                  options={{ animation: "slide_from_right" }}
+                />
+                <Stack.Screen
+                  name="privacy"
+                  options={{ animation: "slide_from_right" }}
+                />
                 <Stack.Screen
                   name="love-match"
                   options={{ animation: "slide_from_right" }}
@@ -100,6 +125,22 @@ export default function RootLayout() {
                 />
                 <Stack.Screen
                   name="twenty-one-questions"
+                  options={{ animation: "slide_from_right" }}
+                />
+                <Stack.Screen
+                  name="couple-quiz"
+                  options={{ animation: "slide_from_right" }}
+                />
+                <Stack.Screen
+                  name="couple-quiz-play"
+                  options={{ animation: "slide_from_right" }}
+                />
+                <Stack.Screen
+                  name="couple-quiz-review"
+                  options={{ animation: "slide_from_right" }}
+                />
+                <Stack.Screen
+                  name="couple-quiz-result"
                   options={{ animation: "slide_from_right" }}
                 />
               </Stack>

@@ -3,7 +3,6 @@ import { StyleSheet, Platform } from "react-native";
 export const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: Platform.OS === "ios" ? 24 : 16,
     left: 16,
     right: 16,
     alignItems: "center",

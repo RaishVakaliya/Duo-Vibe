@@ -80,7 +80,16 @@ export interface AuthContextType {
     email: string,
     password: string,
   ) => Promise<{ error?: string; hasPartner: boolean }>;
+  userName: string | null;
+  setUserName: (name: string) => Promise<void>;
+  avatarUrl: string | null;
+  setAvatarUrl: (url: string) => Promise<void>;
+  updateProfile: (updates: {
+    fullName?: string;
+    avatarUrl?: string;
+  }) => Promise<void>;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   setHasPartner: (status: boolean) => Promise<void>;
   setRelationshipType: (type: RelationshipType) => Promise<void>;
   connectPartnerCode: (code: string) => Promise<AuthPartnerConnectResult>;
@@ -113,4 +122,37 @@ export interface CrushCalculatorResultScreenParams {
   headline?: string;
   message?: string;
   [key: string]: string | string[] | undefined;
+}
+
+export type QuizCategory = "preferences" | "habits" | "memories" | "future";
+
+export interface QuizOption {
+  label: string;
+  emoji: string;
+}
+
+export interface QuizQuestion {
+  id: string;
+  category: QuizCategory;
+  question: string;
+  options: QuizOption[];
+}
+
+export interface QuizSession {
+  id: string;
+  answerer_id: string;
+  reviewer_id: string;
+  question_ids: string[];
+  status: "awaiting_review" | "completed";
+  score: number | null;
+  created_at: string;
+  completed_at: string | null;
+}
+
+export interface QuizAnswer {
+  id: string;
+  session_id: string;
+  question_id: string;
+  guessed_option: string;
+  is_correct: boolean | null;
 }

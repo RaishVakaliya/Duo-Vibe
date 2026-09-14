@@ -20,6 +20,8 @@ import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
 import { useAuth } from "@/src/context/auth";
 import { useAlert } from "@/src/components/ui/alert-dialog";
+import { getPendingReviewSessions } from "@/src/lib/quizSession";
+import { QuizSession } from "@/src/types";
 import {
   BottomTabBar,
   TabItem,
@@ -51,7 +53,7 @@ const LOVE_TOOLS: readonly LoveToolItem[] = [
     iconColor: "#A855F7",
     backgroundColor: "rgba(168, 85, 247, 0.12)",
     borderColor: "rgba(168, 85, 247, 0.25)",
-    route: ROUTES.PLAY_COMPARE,
+    route: ROUTES.COUPLE_QUIZ,
   },
   {
     id: "21-questions",
@@ -84,10 +86,11 @@ const LOVE_TOOLS: readonly LoveToolItem[] = [
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { hasPartner, signOut } = useAuth();
+  const { user, hasPartner, signOut } = useAuth();
   const { showAlert } = useAlert();
   const [isSigningOut, setIsSigningOut] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<number>(0);
+  const [pendingReviews, setPendingReviews] = useState<QuizSession[]>([]);
 
   const greetingData = useMemo(() => {
     const hour = new Date().getHours();
@@ -105,6 +108,12 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       setActiveTab(0);
+      if (user) {
+        getPendingReviewSessions(user.id)
+          .then((sessions) => setPendingReviews(sessions))
+          .catch((err) => console.warn("Pending reviews note:", err));
+      }
+
       const onBackPress = () => {
         BackHandler.exitApp();
         return true;
@@ -116,7 +125,7 @@ export default function HomeScreen() {
       );
 
       return () => subscription.remove();
-    }, []),
+    }, [user]),
   );
 
   const handleSignOut = async (): Promise<void> => {
@@ -141,20 +150,8 @@ export default function HomeScreen() {
     switch (item.id) {
       case "home":
         break;
-      case "games":
-        router.push(ROUTES.PLAY_COMPARE);
-        break;
-      case "chat":
-        router.push(ROUTES.DATE_IDEAS);
-        break;
-      case "memories":
-        router.push(ROUTES.MEMORIES);
-        break;
       case "profile":
-        router.push({
-          pathname: ROUTES.INVITE_PARTNER,
-          params: { source: "home" },
-        });
+        router.push(ROUTES.PROFILE);
         break;
     }
   };
@@ -217,6 +214,46 @@ export default function HomeScreen() {
               {"Let's find out what your heart is trying to say today..."}
             </Text>
           </MotiView>
+
+          {pendingReviews.length > 0 && (
+            <MotiView
+              from={{ opacity: 0, translateY: -8 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ type: "timing", duration: 350 }}
+              style={styles.pendingReviewCard}
+            >
+              <View style={styles.pendingReviewLeft}>
+                <View style={styles.pendingReviewIconWrap}>
+                  <Ionicons name="clipboard" size={22} color="#FFFFFF" />
+                </View>
+                <View style={styles.pendingReviewTextWrap}>
+                  <Text style={styles.pendingReviewTitle}>
+                    Partner Quiz Ready!
+                  </Text>
+                  <Text style={styles.pendingReviewSubtitle}>
+                    Your partner finished a Couple Quiz! Tap to review 💕
+                  </Text>
+                </View>
+              </View>
+
+              <Pressable
+                style={styles.pendingReviewButton}
+                onPress={() => {
+                  const first = pendingReviews[0];
+                  if (first) {
+                    router.push({
+                      pathname: ROUTES.COUPLE_QUIZ_REVIEW,
+                      params: { sessionId: first.id },
+                    });
+                  }
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="Review quiz answers"
+              >
+                <Text style={styles.pendingReviewButtonText}>Review</Text>
+              </Pressable>
+            </MotiView>
+          )}
 
           <MotiView
             from={{ opacity: 0, scale: 0.96 }}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { View, Pressable, LayoutChangeEvent } from "react-native";
+import { View, Pressable, LayoutChangeEvent, Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -19,6 +20,9 @@ export const TAB_ITEMS: readonly TabItem[] = [
 ];
 
 export function BottomTabBar({ activeTab, onTabPress }: BottomTabBarProps) {
+  const insets = useSafeAreaInsets();
+  const bottomPosition =
+    Math.max(insets.bottom, Platform.OS === "android" ? 16 : 0) + 12;
   const [barWidth, setBarWidth] = useState<number>(0);
   const translateX = useSharedValue(0);
 
@@ -46,8 +50,7 @@ export function BottomTabBar({ activeTab, onTabPress }: BottomTabBarProps) {
     setBarWidth(width);
     const avail = width - paddingHorizontal * 2;
     const tWidth = avail / numTabs;
-    translateX.value =
-      paddingHorizontal + activeTab * tWidth + indicatorMargin;
+    translateX.value = paddingHorizontal + activeTab * tWidth + indicatorMargin;
   };
 
   const animatedIndicatorStyle = useAnimatedStyle(() => {
@@ -65,7 +68,7 @@ export function BottomTabBar({ activeTab, onTabPress }: BottomTabBarProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { bottom: bottomPosition }]}>
       <View style={styles.pillBar} onLayout={onLayout}>
         {barWidth > 0 && (
           <Animated.View style={[styles.indicator, animatedIndicatorStyle]} />
@@ -83,11 +86,7 @@ export function BottomTabBar({ activeTab, onTabPress }: BottomTabBarProps) {
               accessibilityState={{ selected: isActive }}
               hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
             >
-              <Ionicons
-                name={item.icon}
-                size={22}
-                color="#FFFFFF"
-              />
+              <Ionicons name={item.icon} size={22} color="#FFFFFF" />
             </Pressable>
           );
         })}

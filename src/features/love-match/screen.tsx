@@ -69,7 +69,7 @@ export default function LoveMatchScreen() {
   const [activePicker, setActivePicker] = useState<ActiveDatePicker>(null);
 
   const [selectedDay, setSelectedDay] = useState<number>(12);
-  const [selectedMonth, setSelectedMonth] = useState<number>(3); // 0-indexed (April)
+  const [selectedMonth, setSelectedMonth] = useState<number>(3);
   const [selectedYear, setSelectedYear] = useState<number>(2001);
 
   useFocusEffect(

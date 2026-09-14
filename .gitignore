@@ -45,3 +45,6 @@ app-example
 
 CLAUDE.md
 AGENTS.md
+
+# Supabase CLI temp
+supabase/.temp/

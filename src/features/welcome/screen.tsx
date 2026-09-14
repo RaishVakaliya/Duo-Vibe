@@ -46,7 +46,7 @@ export default function WelcomeScreen() {
 
           <Pressable
             style={styles.buttonContainer}
-            onPress={() => router.push(ROUTES.ONBOARDING)}
+            onPress={() => router.push(ROUTES.ONBOARDING_NAME)}
             accessibilityRole="button"
             accessibilityLabel="Start Our Journey"
           >

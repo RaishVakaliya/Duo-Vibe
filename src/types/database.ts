@@ -18,6 +18,7 @@ export interface Database {
           partner_id: string | null;
           invite_code: string | null;
           relationship_type: string | null;
+          push_token: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -29,6 +30,7 @@ export interface Database {
           partner_id?: string | null;
           invite_code?: string | null;
           relationship_type?: string | null;
+          push_token?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -40,6 +42,7 @@ export interface Database {
           partner_id?: string | null;
           invite_code?: string | null;
           relationship_type?: string | null;
+          push_token?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -243,6 +246,86 @@ export interface Database {
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      quiz_sessions: {
+        Row: {
+          id: string;
+          answerer_id: string;
+          reviewer_id: string;
+          question_ids: Json;
+          status: "awaiting_review" | "completed";
+          score: number | null;
+          created_at: string;
+          completed_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          answerer_id: string;
+          reviewer_id: string;
+          question_ids: Json;
+          status?: "awaiting_review" | "completed";
+          score?: number | null;
+          created_at?: string;
+          completed_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          answerer_id?: string;
+          reviewer_id?: string;
+          question_ids?: Json;
+          status?: "awaiting_review" | "completed";
+          score?: number | null;
+          created_at?: string;
+          completed_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "quiz_sessions_answerer_id_fkey";
+            columns: ["answerer_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quiz_sessions_reviewer_id_fkey";
+            columns: ["reviewer_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      quiz_answers: {
+        Row: {
+          id: string;
+          session_id: string;
+          question_id: string;
+          guessed_option: string;
+          is_correct: boolean | null;
+        };
+        Insert: {
+          id?: string;
+          session_id: string;
+          question_id: string;
+          guessed_option: string;
+          is_correct?: boolean | null;
+        };
+        Update: {
+          id?: string;
+          session_id?: string;
+          question_id?: string;
+          guessed_option?: string;
+          is_correct?: boolean | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "quiz_answers_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: false;
+            referencedRelation: "quiz_sessions";
             referencedColumns: ["id"];
           },
         ];

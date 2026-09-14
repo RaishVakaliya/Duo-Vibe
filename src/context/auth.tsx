@@ -6,6 +6,7 @@ import {
   statusCodes,
 } from "@react-native-google-signin/google-signin";
 import { supabase } from "@/src/lib/supabase";
+import { registerForPushNotificationsAsync } from "@/src/lib/notifications";
 import {
   AuthContextType,
   AuthSignInResult,
@@ -34,6 +35,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const HAS_PARTNER_KEY = "@duo_has_partner";
 const RELATIONSHIP_TYPE_KEY = "@duo_relationship_type";
+const USER_NAME_KEY = "@duo_user_name";
+const AVATAR_URL_KEY = "@duo_avatar_url";
 
 function generateInviteCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -62,6 +65,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hasPartner, setHasPartnerState] = useState<boolean>(false);
+  const [userName, setUserNameState] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrlState] = useState<string | null>(null);
   const [relationshipType, setRelationshipTypeState] =
     useState<RelationshipType | null>(null);
   const [inviteCode, setInviteCode] = useState<string>(generateInviteCode());
@@ -89,11 +94,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const newCode = generateInviteCode();
         const nowIso = now.toISOString();
         const expiresTime = now.getTime() + 3600 * 1000;
+        const initialName =
+          (currentUser.user_metadata?.full_name as string) ||
+          (await AsyncStorage.getItem(USER_NAME_KEY)) ||
+          null;
+        const initialAvatar =
+          (currentUser.user_metadata?.avatar_url as string) ||
+          (await AsyncStorage.getItem(AVATAR_URL_KEY)) ||
+          null;
+        if (initialName) {
+          setUserNameState(initialName);
+        }
+        if (initialAvatar) {
+          setAvatarUrlState(initialAvatar);
+        }
         await supabase.from("profiles").insert({
           id: currentUser.id,
           email: currentUser.email ?? null,
-          full_name: currentUser.user_metadata?.full_name ?? null,
-          avatar_url: currentUser.user_metadata?.avatar_url ?? null,
+          full_name: initialName,
+          avatar_url: initialAvatar ?? currentUser.user_metadata?.avatar_url ?? null,
           invite_code: newCode,
           created_at: nowIso,
           updated_at: nowIso,
@@ -103,6 +122,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setCodeExpiresInSeconds(3600);
         setHasPartnerState(false);
       } else {
+        if (profile.full_name) {
+          setUserNameState(profile.full_name);
+          await AsyncStorage.setItem(USER_NAME_KEY, profile.full_name);
+        } else {
+          const stored = await AsyncStorage.getItem(USER_NAME_KEY);
+          if (stored) {
+            setUserNameState(stored);
+            await supabase
+              .from("profiles")
+              .update({ full_name: stored })
+              .eq("id", currentUser.id);
+          }
+        }
+        if (profile.avatar_url) {
+          setAvatarUrlState(profile.avatar_url);
+          await AsyncStorage.setItem(AVATAR_URL_KEY, profile.avatar_url);
+        } else {
+          const stored = await AsyncStorage.getItem(AVATAR_URL_KEY);
+          if (stored) {
+            setAvatarUrlState(stored);
+            await supabase
+              .from("profiles")
+              .update({ avatar_url: stored })
+              .eq("id", currentUser.id);
+          }
+        }
         if (profile.partner_id) {
           setHasPartnerState(true);
           await AsyncStorage.setItem(HAS_PARTNER_KEY, "true");
@@ -143,6 +188,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setCodeExpiresInSeconds(3600);
         }
       }
+
+      registerForPushNotificationsAsync(currentUser.id).catch((pushErr) => {
+        console.warn("Auto push token registration note:", pushErr);
+      });
     } catch (err: unknown) {
       console.warn("Failed to sync profile:", err);
     }
@@ -164,6 +213,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           storedRelationship === "long_distance"
         ) {
           setRelationshipTypeState(storedRelationship);
+        }
+
+        const storedName = await AsyncStorage.getItem(USER_NAME_KEY);
+        if (storedName) {
+          setUserNameState(storedName);
+        }
+
+        const storedAvatar = await AsyncStorage.getItem(AVATAR_URL_KEY);
+        if (storedAvatar) {
+          setAvatarUrlState(storedAvatar);
         }
 
         const { data } = await supabase.auth.getSession();
@@ -227,6 +286,102 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setRelationshipType = async (type: RelationshipType): Promise<void> => {
     setRelationshipTypeState(type);
     await AsyncStorage.setItem(RELATIONSHIP_TYPE_KEY, type);
+    if (user) {
+      try {
+        await supabase
+          .from("profiles")
+          .update({
+            relationship_type: type,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", user.id);
+      } catch (err) {
+        console.warn("Error updating relationship type in profile:", err);
+      }
+    }
+  };
+
+  const setUserName = async (name: string): Promise<void> => {
+    const trimmed = name.trim();
+    setUserNameState(trimmed);
+    await AsyncStorage.setItem(USER_NAME_KEY, trimmed);
+    if (user) {
+      try {
+        await supabase
+          .from("profiles")
+          .update({
+            full_name: trimmed,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", user.id);
+      } catch (err) {
+        console.warn("Error syncing user name to profile:", err);
+      }
+    }
+  };
+
+  const setAvatarUrl = async (url: string): Promise<void> => {
+    const trimmed = url.trim();
+    setAvatarUrlState(trimmed);
+    await AsyncStorage.setItem(AVATAR_URL_KEY, trimmed);
+    if (user) {
+      try {
+        await supabase
+          .from("profiles")
+          .update({
+            avatar_url: trimmed,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", user.id);
+      } catch (err) {
+        console.warn("Error syncing avatar to profile:", err);
+      }
+    }
+  };
+
+  const updateProfile = async (updates: {
+    fullName?: string;
+    avatarUrl?: string;
+  }): Promise<void> => {
+    if (updates.fullName !== undefined) {
+      await setUserName(updates.fullName);
+    }
+    if (updates.avatarUrl !== undefined) {
+      await setAvatarUrl(updates.avatarUrl);
+    }
+  };
+
+  const deleteAccount = async (): Promise<void> => {
+    try {
+      if (user) {
+        await supabase
+          .from("profiles")
+          .update({ partner_id: null, updated_at: new Date().toISOString() })
+          .eq("partner_id", user.id);
+
+        await supabase
+          .from("couples")
+          .delete()
+          .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+
+        // Delete profile row
+        await supabase.from("profiles").delete().eq("id", user.id);
+      }
+    } catch (err) {
+      console.warn("Error during deleteAccount cleanup:", err);
+    } finally {
+      await signOut();
+      await AsyncStorage.multiRemove([
+        HAS_PARTNER_KEY,
+        RELATIONSHIP_TYPE_KEY,
+        USER_NAME_KEY,
+        AVATAR_URL_KEY,
+      ]);
+      setUserNameState(null);
+      setAvatarUrlState(null);
+      setHasPartnerState(false);
+      setRelationshipTypeState(null);
+    }
   };
 
   const signInWithGoogle = async (): Promise<AuthSignInResult> => {
@@ -239,7 +394,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       try {
         await GoogleSignin.signOut();
-      } catch {}
+      } catch { }
 
       const userInfo = await GoogleSignin.signIn();
 
@@ -333,15 +488,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       try {
         await GoogleSignin.revokeAccess();
-      } catch {}
+      } catch { }
       try {
         await GoogleSignin.signOut();
-      } catch {}
+      } catch { }
       await supabase.auth.signOut();
       setUser(null);
       setSession(null);
       setHasPartnerState(false);
-      await AsyncStorage.removeItem(HAS_PARTNER_KEY);
+      setAvatarUrlState(null);
+      await AsyncStorage.multiRemove([HAS_PARTNER_KEY, AVATAR_URL_KEY]);
     } catch (err: unknown) {
       console.warn("Error signing out:", err);
     }
@@ -480,8 +636,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signInWithGoogle,
         signInWithEmail,
         signOut,
+        deleteAccount,
         setHasPartner,
         setRelationshipType,
+        userName,
+        setUserName,
+        avatarUrl,
+        setAvatarUrl,
+        updateProfile,
         connectPartnerCode,
       }}
     >
