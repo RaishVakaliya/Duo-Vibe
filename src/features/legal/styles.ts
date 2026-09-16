@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0D0B1A",
+    backgroundColor: COLORS.darkOverlay,
   },
   gradientBackground: {
     ...StyleSheet.absoluteFillObject,
@@ -17,20 +18,20 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingTop: 8,
-    paddingBottom: 16,
+    paddingBottom: 12,
   },
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
+    borderRadius: RADIUS.circleBack,
+    backgroundColor: "rgba(255, 255, 255, 0.12)",
     justifyContent: "center",
     alignItems: "center",
   },
   headerTitle: {
     fontFamily: "Fredoka_700Bold",
-    fontSize: 20,
-    color: "#FFFFFF",
+    fontSize: 22,
+    color: COLORS.white,
   },
   headerPlaceholder: {
     width: 40,
@@ -41,7 +42,7 @@ export const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "#1E1527",
+    backgroundColor: COLORS.darkCard,
     borderRadius: 22,
     padding: 22,
     borderWidth: 1,
@@ -57,7 +58,7 @@ export const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 16,
-    color: "#FFFFFF",
+    color: COLORS.white,
     marginTop: 14,
     marginBottom: 8,
   },

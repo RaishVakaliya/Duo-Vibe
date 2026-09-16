@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF5F7",
+    backgroundColor: COLORS.bgPinkLight,
   },
   gradientBackground: {
     ...StyleSheet.absoluteFillObject,
@@ -23,11 +24,11 @@ export const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    borderRadius: RADIUS.circleBack,
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.07,
     shadowRadius: 4,
@@ -46,11 +47,11 @@ export const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 22,
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
   },
   headerSubtitle: {
     fontSize: 12,
-    color: "#64748B",
+    color: COLORS.textSecondary,
     textAlign: "center",
     lineHeight: 16,
     paddingHorizontal: 16,
@@ -80,12 +81,12 @@ export const styles = StyleSheet.create({
   },
 
   questionCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 28,
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.card,
     paddingHorizontal: 20,
     paddingTop: 24,
     paddingBottom: 24,
-    shadowColor: "#FF8FA3",
+    shadowColor: COLORS.primaryLight,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.12,
     shadowRadius: 16,
@@ -94,7 +95,7 @@ export const styles = StyleSheet.create({
   progressCounter: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 14,
-    color: "#475569",
+    color: COLORS.textSlateLight,
     textAlign: "center",
     marginBottom: 14,
     letterSpacing: 0.5,
@@ -102,7 +103,7 @@ export const styles = StyleSheet.create({
   questionText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 21,
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
     textAlign: "center",
     lineHeight: 28,
     marginBottom: 24,
@@ -115,8 +116,8 @@ export const styles = StyleSheet.create({
   optionPill: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FBF3F4",
-    borderRadius: 26,
+    backgroundColor: COLORS.pillBg,
+    borderRadius: RADIUS.buttonFooter,
     paddingVertical: 14,
     paddingHorizontal: 18,
     gap: 12,
@@ -124,8 +125,8 @@ export const styles = StyleSheet.create({
     borderColor: "transparent",
   },
   optionPillSelected: {
-    borderColor: "#FF2D6C",
-    backgroundColor: "#FFE9EF",
+    borderColor: COLORS.primaryVibrant,
+    backgroundColor: COLORS.pillSelectedBg,
   },
   optionIcon: {
     width: 22,
@@ -136,11 +137,11 @@ export const styles = StyleSheet.create({
     flex: 1,
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 14.5,
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
     lineHeight: 20,
   },
   optionTextSelected: {
-    color: "#FF2D6C",
+    color: COLORS.primaryVibrant,
   },
 
   footer: {
@@ -153,15 +154,15 @@ export const styles = StyleSheet.create({
   prevButton: {
     flex: 1,
     height: 52,
-    borderRadius: 26,
-    backgroundColor: "#FFFFFF",
+    borderRadius: RADIUS.buttonFooter,
+    backgroundColor: COLORS.white,
     borderWidth: 1.5,
-    borderColor: "#F1F5F9",
+    borderColor: COLORS.borderLight,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
     gap: 6,
-    shadowColor: "#000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -175,35 +176,38 @@ export const styles = StyleSheet.create({
   prevButtonText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 16,
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
   },
   prevButtonTextDisabled: {
-    color: "#94A3B8",
+    color: COLORS.textMuted,
   },
   nextButton: {
     flex: 1,
     height: 52,
-    borderRadius: 26,
-    backgroundColor: "#FF2D6C",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 6,
-    shadowColor: "#FF2D6C",
+    borderRadius: RADIUS.buttonFooter,
+    overflow: "hidden",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.28,
     shadowRadius: 8,
     elevation: 4,
   },
   nextButtonDisabled: {
-    backgroundColor: "#CBD5E1",
     shadowOpacity: 0.05,
     elevation: 0,
+  },
+  nextButtonGradient: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 6,
+    borderRadius: RADIUS.buttonFooter,
   },
   nextButtonText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 16,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
 
   toastContainer: {
@@ -211,14 +215,14 @@ export const styles = StyleSheet.create({
     bottom: 110,
     left: 24,
     right: 24,
-    backgroundColor: "#1E1B26",
-    borderRadius: 20,
+    backgroundColor: COLORS.textPrimary,
+    borderRadius: RADIUS.cardSmall,
     paddingVertical: 16,
     paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    shadowColor: "#000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.25,
     shadowRadius: 16,
@@ -227,7 +231,7 @@ export const styles = StyleSheet.create({
   toastText: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 15,
-    color: "#FFFFFF",
+    color: COLORS.white,
     flex: 1,
   },
 });

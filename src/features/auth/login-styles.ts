@@ -1,5 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
-import { COLORS } from "@/src/constants/colors";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const LOGO_SIZE = Math.min(Math.round(SCREEN_WIDTH * 0.32), 130);
@@ -31,16 +31,17 @@ export const loginStyles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     justifyContent: "space-between",
   },
   header: {
-    paddingTop: 12,
+    paddingTop: 8,
+    paddingBottom: 12,
   },
   backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: RADIUS.circleBack,
     backgroundColor: "rgba(255, 255, 255, 0.12)",
     justifyContent: "center",
     alignItems: "center",
@@ -57,7 +58,7 @@ export const loginStyles = StyleSheet.create({
   title: {
     fontFamily: "Fredoka_700Bold",
     fontSize: SCREEN_WIDTH < 360 ? 28 : 34,
-    color: "#FFFFFF",
+    color: COLORS.white,
     marginTop: 16,
     textAlign: "center",
   },
@@ -73,11 +74,11 @@ export const loginStyles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "rgba(255, 255, 255, 0.08)",
     height: 56,
-    borderRadius: 28,
+    borderRadius: RADIUS.button,
     width: "100%",
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.12)",
-    shadowColor: "#000000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -90,7 +91,7 @@ export const loginStyles = StyleSheet.create({
   googleButtonText: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 16,
-    color: "#FFFFFF",
+    color: COLORS.white,
     letterSpacing: 0.2,
   },
   footer: {
@@ -99,7 +100,7 @@ export const loginStyles = StyleSheet.create({
   },
   footerText: {
     fontSize: 12,
-    color: "#8E7B8C",
+    color: COLORS.textDim,
     textAlign: "center",
     marginBottom: 4,
   },
@@ -110,11 +111,11 @@ export const loginStyles = StyleSheet.create({
   },
   linkText: {
     fontSize: 12,
-    color: "#FFFFFF",
+    color: COLORS.white,
     textDecorationLine: "underline",
   },
   andText: {
     fontSize: 12,
-    color: "#8E7B8C",
+    color: COLORS.textDim,
   },
 });

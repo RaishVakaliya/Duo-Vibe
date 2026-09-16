@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { COLORS } from "@/src/constants/colors";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
   title: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 24,
-    color: "#FFFFFF",
+    color: COLORS.white,
     textAlign: "center",
     marginBottom: 8,
   },
@@ -45,15 +45,15 @@ export const styles = StyleSheet.create({
   },
   devErrorText: {
     fontSize: 12,
-    color: "#FF8FA3",
+    color: COLORS.primaryLight,
     fontFamily: "monospace",
   },
   retryButton: {
     height: 52,
     width: 200,
-    borderRadius: 26,
+    borderRadius: RADIUS.buttonFooter,
     overflow: "hidden",
-    shadowColor: "#FF4D6D",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.35,
     shadowRadius: 8,
@@ -63,11 +63,11 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 26,
+    borderRadius: RADIUS.buttonFooter,
   },
   buttonText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 16,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
 });

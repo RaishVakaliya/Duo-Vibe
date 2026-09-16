@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
+import { GRADIENTS } from "@/src/constants/colors";
 import {
   getSessionForReview,
   subscribeToSessionUpdates,
@@ -246,8 +247,15 @@ export default function CoupleQuizResultScreen() {
             accessibilityRole="button"
             accessibilityLabel="Done"
           >
-            <Text style={styles.doneButtonText}>Done</Text>
-            <Ionicons name="checkmark-done" size={20} color="#FFFFFF" />
+            <LinearGradient
+              colors={[...GRADIENTS.primaryAction]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.doneButtonGradient}
+            >
+              <Text style={styles.doneButtonText}>Done</Text>
+              <Ionicons name="checkmark-done" size={20} color="#FFFFFF" />
+            </LinearGradient>
           </Pressable>
         </View>
       </SafeAreaView>

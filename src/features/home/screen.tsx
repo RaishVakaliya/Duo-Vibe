@@ -265,7 +265,6 @@ export default function HomeScreen() {
             style={styles.heroCard}
           >
             <Pressable
-              onPress={() => router.push(ROUTES.PLAY_COMPARE)}
               accessibilityRole="button"
               accessibilityLabel="Red flag or green flag couple game"
             >
@@ -370,7 +369,6 @@ export default function HomeScreen() {
             >
               <Pressable
                 style={styles.todaysCard}
-                onPress={() => router.push(ROUTES.PLAY_COMPARE)}
                 accessibilityRole="button"
                 accessibilityLabel="Answer Today's Prompt Card"
               >

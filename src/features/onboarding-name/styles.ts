@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
@@ -9,18 +10,19 @@ export const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     justifyContent: "space-between",
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: 12,
+    paddingTop: 8,
+    paddingBottom: 12,
   },
   backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: RADIUS.circleBack,
     backgroundColor: "rgba(255, 255, 255, 0.12)",
     justifyContent: "center",
     alignItems: "center",
@@ -39,13 +41,13 @@ export const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 36,
+    paddingTop: 24,
   },
   title: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 32,
     lineHeight: 38,
-    color: "#FFFFFF",
+    color: COLORS.white,
     marginBottom: 36,
   },
   inputContainer: {
@@ -54,12 +56,12 @@ export const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   inputContainerFocused: {
-    borderBottomColor: "#FF4D6D",
+    borderBottomColor: COLORS.primary,
   },
   textInput: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 26,
-    color: "#FFFFFF",
+    color: COLORS.white,
     paddingVertical: 4,
     paddingHorizontal: 0,
   },
@@ -68,7 +70,7 @@ export const styles = StyleSheet.create({
   },
   continueButton: {
     height: 56,
-    borderRadius: 28,
+    borderRadius: RADIUS.button,
     overflow: "hidden",
   },
   continueButtonDisabled: {
@@ -80,11 +82,12 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    borderRadius: RADIUS.button,
   },
   continueButtonText: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 18,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
   continueButtonTextDisabled: {
     color: "rgba(255, 255, 255, 0.3)",

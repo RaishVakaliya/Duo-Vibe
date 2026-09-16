@@ -16,6 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
 import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
+import { GRADIENTS } from "@/src/constants/colors";
 import {
   getSessionForReview,
   submitReview,
@@ -342,13 +343,24 @@ export default function CoupleQuizReviewScreen() {
                 accessibilityRole="button"
                 accessibilityLabel={isLast ? "Submit Review" : "Next question"}
               >
-                {isSubmitting ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.nextButtonText}>
-                    {isLast ? "Submit Review 🎉" : "Next"}
-                  </Text>
-                )}
+                <LinearGradient
+                  colors={
+                    currentGrade !== undefined && !isSubmitting
+                      ? [...GRADIENTS.primaryAction]
+                      : [...GRADIENTS.buttonDisabled]
+                  }
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.nextButtonGradient}
+                >
+                  {isSubmitting ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.nextButtonText}>
+                      {isLast ? "Submit Review 🎉" : "Next"}
+                    </Text>
+                  )}
+                </LinearGradient>
               </Pressable>
             </View>
           </>

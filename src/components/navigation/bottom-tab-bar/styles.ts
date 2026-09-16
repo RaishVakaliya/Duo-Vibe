@@ -1,4 +1,5 @@
 import { StyleSheet, Platform } from "react-native";
+import { COLORS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
@@ -20,7 +21,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 8,
     width: "100%",
     maxWidth: 420,
-    shadowColor: "#000000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.45,
     shadowRadius: 18,

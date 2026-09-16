@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { COLORS } from "@/src/constants/colors";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   overlay: {
@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
   dialogContainer: {
     width: "100%",
     maxWidth: 320,
-    backgroundColor: "#181024",
+    backgroundColor: COLORS.darkCardSubtle,
     borderRadius: 22,
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.12)",
@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
     paddingBottom: 18,
     paddingHorizontal: 20,
     alignItems: "center",
-    shadowColor: "#000000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.45,
     shadowRadius: 16,
@@ -30,7 +30,7 @@ export const styles = StyleSheet.create({
   title: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 18,
-    color: "#FFFFFF",
+    color: COLORS.white,
     textAlign: "center",
     marginBottom: 8,
   },
@@ -62,21 +62,21 @@ export const styles = StyleSheet.create({
     borderColor: "rgba(255, 255, 255, 0.12)",
   },
   destructiveButton: {
-    backgroundColor: "#EF4444",
+    backgroundColor: COLORS.error,
   },
   primaryButtonText: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 15,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
   cancelButtonText: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 15,
-    color: "#94A3B8",
+    color: COLORS.textMuted,
   },
   destructiveButtonText: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 15,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
 });

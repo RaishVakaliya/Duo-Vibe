@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF0F4",
+    backgroundColor: COLORS.bgPinkAlt,
   },
   gradientBackground: {
     ...StyleSheet.absoluteFillObject,
@@ -22,11 +23,11 @@ export const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.7)",
+    borderRadius: RADIUS.circleBack,
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 4,
@@ -38,7 +39,7 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   headerHeartIcon: {
-    shadowColor: "#FF4D6D",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -46,7 +47,7 @@ export const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 22,
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
   },
   headerSpacer: {
     width: 40,
@@ -63,7 +64,7 @@ export const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     lineHeight: 20,
-    color: "#64748B",
+    color: COLORS.textSecondary,
     textAlign: "center",
     paddingHorizontal: 16,
   },
@@ -78,12 +79,12 @@ export const styles = StyleSheet.create({
     flex: 1,
     aspectRatio: 1,
     maxWidth: 160,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.white,
     borderRadius: 80,
     justifyContent: "center",
     alignItems: "center",
     padding: 12,
-    shadowColor: "#FF8FA3",
+    shadowColor: COLORS.primaryLight,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.2,
     shadowRadius: 10,
@@ -95,7 +96,7 @@ export const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: COLORS.surfaceLight,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 6,
@@ -103,7 +104,7 @@ export const styles = StyleSheet.create({
   avatarLabel: {
     fontSize: 12,
     fontWeight: "500",
-    color: "#94A3B8",
+    color: COLORS.textMuted,
     marginBottom: 4,
   },
   nameInputContainer: {
@@ -115,7 +116,7 @@ export const styles = StyleSheet.create({
   nameInput: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 16,
-    color: "#0F172A",
+    color: COLORS.textPrimary,
     textAlign: "center",
     width: "100%",
     paddingVertical: 0,
@@ -129,14 +130,14 @@ export const styles = StyleSheet.create({
   },
   dateCard: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.white,
     borderRadius: 18,
     paddingVertical: 12,
     paddingHorizontal: 14,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    shadowColor: "#000000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
@@ -148,7 +149,7 @@ export const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: COLORS.borderLight,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -158,19 +159,19 @@ export const styles = StyleSheet.create({
   dateLabel: {
     fontSize: 11,
     fontWeight: "500",
-    color: "#94A3B8",
+    color: COLORS.textMuted,
     marginBottom: 2,
   },
   dateValue: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 13,
-    color: "#1E293B",
+    color: COLORS.textDarkSlate,
   },
   calculateButton: {
     height: 56,
-    borderRadius: 28,
+    borderRadius: RADIUS.button,
     overflow: "hidden",
-    shadowColor: "#FF4D6D",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 10,
@@ -185,12 +186,12 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 28,
+    borderRadius: RADIUS.button,
   },
   calculateText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 17,
-    color: "#FFFFFF",
+    color: COLORS.white,
     letterSpacing: 0.3,
   },
   modalOverlay: {
@@ -199,9 +200,9 @@ export const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalContainer: {
-    backgroundColor: "#FFFFFF",
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    backgroundColor: COLORS.white,
+    borderTopLeftRadius: RADIUS.card,
+    borderTopRightRadius: RADIUS.card,
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 34,
@@ -216,7 +217,7 @@ export const styles = StyleSheet.create({
   modalTitle: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 18,
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
   },
   modalCloseButton: {
     padding: 6,
@@ -229,8 +230,8 @@ export const styles = StyleSheet.create({
   },
   pickerColumn: {
     flex: 1,
-    backgroundColor: "#F8FAFC",
-    borderRadius: 16,
+    backgroundColor: COLORS.surfaceLight,
+    borderRadius: RADIUS.input,
     overflow: "hidden",
   },
   pickerItem: {
@@ -242,30 +243,31 @@ export const styles = StyleSheet.create({
     marginVertical: 2,
   },
   pickerItemSelected: {
-    backgroundColor: "#FF4D6D",
+    backgroundColor: COLORS.primary,
   },
   pickerItemText: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 14,
-    color: "#475569",
+    color: COLORS.textSlateLight,
   },
   pickerItemTextSelected: {
-    color: "#FFFFFF",
+    color: COLORS.white,
     fontFamily: "Fredoka_700Bold",
   },
   modalDoneButton: {
-    height: 50,
-    borderRadius: 25,
+    height: 52,
+    borderRadius: RADIUS.buttonFooter,
     overflow: "hidden",
   },
   modalDoneGradient: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    borderRadius: RADIUS.buttonFooter,
   },
   modalDoneText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 16,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
 });

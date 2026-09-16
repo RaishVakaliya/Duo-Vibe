@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { COLORS } from "@/src/constants/colors";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
@@ -30,21 +30,21 @@ export const styles = StyleSheet.create({
     fontFamily: "Fredoka_700Bold",
     fontSize: 32,
     lineHeight: 38,
-    color: "#FFFFFF",
+    color: COLORS.white,
     marginBottom: 12,
   },
   subtitle: {
     fontSize: 15,
     lineHeight: 22,
-    color: "#CBD5E1",
+    color: COLORS.borderDisabled,
     marginBottom: 28,
   },
   buttonContainer: {
     height: 56,
-    borderRadius: 28,
+    borderRadius: RADIUS.button,
     overflow: "hidden",
     marginBottom: 18,
-    shadowColor: "#ba21a8ff",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 10,
@@ -54,12 +54,12 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 28,
+    borderRadius: RADIUS.button,
   },
   buttonText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 17,
-    color: "#FFFFFF",
+    color: COLORS.white,
     letterSpacing: 0.4,
   },
   footerRow: {
@@ -70,11 +70,11 @@ export const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 14,
-    color: "#94A3B8",
+    color: COLORS.textMuted,
   },
   loginLink: {
     fontSize: 14,
-    color: "#FFFFFF",
+    color: COLORS.white,
     fontFamily: "Fredoka_700Bold",
     textDecorationLine: "underline",
     marginLeft: 5,

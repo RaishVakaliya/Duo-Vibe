@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF5F7",
+    backgroundColor: COLORS.bgPinkLight,
   },
   gradientBackground: {
     ...StyleSheet.absoluteFillObject,
@@ -23,11 +24,11 @@ export const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    borderRadius: RADIUS.circleBack,
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.07,
     shadowRadius: 4,
@@ -46,11 +47,11 @@ export const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 22,
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
   },
   headerSubtitle: {
     fontSize: 12,
-    color: "#64748B",
+    color: COLORS.textSecondary,
     textAlign: "center",
     lineHeight: 16,
     paddingHorizontal: 16,
@@ -66,12 +67,12 @@ export const styles = StyleSheet.create({
   },
 
   scoreHeroCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 28,
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.card,
     paddingVertical: 26,
     paddingHorizontal: 20,
     alignItems: "center",
-    shadowColor: "#FF8FA3",
+    shadowColor: COLORS.primaryLight,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.18,
     shadowRadius: 16,
@@ -81,11 +82,11 @@ export const styles = StyleSheet.create({
     width: 76,
     height: 76,
     borderRadius: 38,
-    backgroundColor: "#FFF0F4",
+    backgroundColor: COLORS.bgPinkAlt,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 12,
-    shadowColor: "#FF4D6D",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -94,37 +95,37 @@ export const styles = StyleSheet.create({
   scoreFraction: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 40,
-    color: "#FF2D6C",
+    color: COLORS.primaryVibrant,
     lineHeight: 46,
   },
   scorePercentage: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 18,
-    color: "#64748B",
+    color: COLORS.textSecondary,
     marginBottom: 8,
   },
   scoreHeadline: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 22,
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
     textAlign: "center",
     marginBottom: 6,
   },
   scoreDescription: {
     fontFamily: "Fredoka_400Regular",
     fontSize: 14,
-    color: "#64748B",
+    color: COLORS.textSecondary,
     textAlign: "center",
     lineHeight: 20,
     paddingHorizontal: 12,
   },
 
   breakdownCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 28,
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.card,
     paddingVertical: 20,
     paddingHorizontal: 18,
-    shadowColor: "#000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 10,
@@ -133,14 +134,14 @@ export const styles = StyleSheet.create({
   breakdownTitle: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 18,
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
     marginBottom: 14,
   },
   breakdownList: {
     gap: 12,
   },
   breakdownItem: {
-    backgroundColor: "#FBF3F4",
+    backgroundColor: COLORS.pillBg,
     borderRadius: 18,
     padding: 14,
     flexDirection: "row",
@@ -153,7 +154,7 @@ export const styles = StyleSheet.create({
   breakdownItemQuestion: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 14,
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
     marginBottom: 4,
     lineHeight: 18,
   },
@@ -165,12 +166,12 @@ export const styles = StyleSheet.create({
   breakdownItemGuessLabel: {
     fontFamily: "Fredoka_400Regular",
     fontSize: 12.5,
-    color: "#64748B",
+    color: COLORS.textSecondary,
   },
   breakdownItemGuessText: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 13,
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
   },
   statusBadge: {
     width: 32,
@@ -180,10 +181,10 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   statusBadgeCorrect: {
-    backgroundColor: "#ECFDF5",
+    backgroundColor: COLORS.successLight,
   },
   statusBadgeWrong: {
-    backgroundColor: "#FEF2F2",
+    backgroundColor: COLORS.errorLight,
   },
 
   footer: {
@@ -193,30 +194,34 @@ export const styles = StyleSheet.create({
   },
   doneButton: {
     height: 52,
-    borderRadius: 26,
-    backgroundColor: "#FF2D6C",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 8,
-    shadowColor: "#FF2D6C",
+    borderRadius: RADIUS.buttonFooter,
+    overflow: "hidden",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
   },
+  doneButtonGradient: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
+    borderRadius: RADIUS.buttonFooter,
+  },
   doneButtonText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 16,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
 
   waitingCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 28,
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.card,
     padding: 32,
     alignItems: "center",
-    shadowColor: "#FF8FA3",
+    shadowColor: COLORS.primaryLight,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.12,
     shadowRadius: 16,
@@ -226,7 +231,7 @@ export const styles = StyleSheet.create({
   waitingTitle: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 20,
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
     marginTop: 16,
     marginBottom: 8,
     textAlign: "center",
@@ -234,7 +239,7 @@ export const styles = StyleSheet.create({
   waitingText: {
     fontFamily: "Fredoka_400Regular",
     fontSize: 14,
-    color: "#64748B",
+    color: COLORS.textSecondary,
     textAlign: "center",
     lineHeight: 20,
     paddingHorizontal: 12,

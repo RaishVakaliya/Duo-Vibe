@@ -16,6 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
 import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
+import { GRADIENTS } from "@/src/constants/colors";
 import { CoupleIllustration } from "@/src/components/couple-illustration";
 import { submitAnswers, selectQuizQuestions } from "@/src/lib/quizSession";
 import { QuizQuestion } from "@/src/data/quizQuestions";
@@ -273,13 +274,24 @@ export default function CoupleQuizPlayScreen() {
             accessibilityRole="button"
             accessibilityLabel={isLast ? "Submit quiz" : "Next question"}
           >
-            {isSubmitting ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
-            ) : (
-              <Text style={styles.nextButtonText}>
-                {isLast ? "Submit 💕" : "Next"}
-              </Text>
-            )}
+            <LinearGradient
+              colors={
+                selectedAnswer && !isSubmitting
+                  ? [...GRADIENTS.primaryAction]
+                  : [...GRADIENTS.buttonDisabled]
+              }
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.nextButtonGradient}
+            >
+              {isSubmitting ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : (
+                <Text style={styles.nextButtonText}>
+                  {isLast ? "Submit 💕" : "Next"}
+                </Text>
+              )}
+            </LinearGradient>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -298,7 +310,14 @@ export default function CoupleQuizPlayScreen() {
               style={styles.submittedButton}
               onPress={() => router.replace(ROUTES.HOME)}
             >
-              <Text style={styles.submittedButtonText}>Back to Home</Text>
+              <LinearGradient
+                colors={[...GRADIENTS.primaryAction]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.submittedButtonGradient}
+              >
+                <Text style={styles.submittedButtonText}>Back to Home</Text>
+              </LinearGradient>
             </Pressable>
           </View>
         </View>

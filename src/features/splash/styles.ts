@@ -44,14 +44,14 @@ export const styles = StyleSheet.create({
   wordmark: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 48,
-    color: "#FFFFFF",
+    color: COLORS.white,
     textAlign: "center",
     letterSpacing: 0.5,
   },
   subtitle: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 14,
-    color: "#FF6B81",
+    color: COLORS.primaryLight,
     textAlign: "center",
     marginTop: 8,
     marginBottom: 36,
@@ -65,7 +65,7 @@ export const styles = StyleSheet.create({
     fontFamily: "Caveat_700Bold",
     fontSize: 28,
     lineHeight: 34,
-    color: "#FFFFFF",
+    color: COLORS.white,
     textAlign: "center",
   },
   accentRow: {

@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
+import { GRADIENTS } from "@/src/constants/colors";
 import { useAuth } from "@/src/context/auth";
 import { CoupleIllustration } from "@/src/components/couple-illustration";
 import {
@@ -263,14 +264,25 @@ export default function CoupleQuizStartScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Start Quiz"
               >
-                {isStarting ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <>
-                    <Text style={styles.actionButtonText}>Start Quiz</Text>
-                    <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
-                  </>
-                )}
+                <LinearGradient
+                  colors={
+                    isStarting
+                      ? [...GRADIENTS.buttonDisabled]
+                      : [...GRADIENTS.primaryAction]
+                  }
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.actionButtonGradient}
+                >
+                  {isStarting ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <>
+                      <Text style={styles.actionButtonText}>Start Quiz</Text>
+                      <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+                    </>
+                  )}
+                </LinearGradient>
               </Pressable>
             </View>
           )}

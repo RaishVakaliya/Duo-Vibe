@@ -19,6 +19,7 @@ import { MotiView } from "moti";
 import { styles } from "./styles";
 import { ActiveDatePicker } from "./types";
 import { ROUTES } from "@/src/constants/routes";
+import { GRADIENTS } from "@/src/constants/colors";
 import { calculateLoveMatch } from "@/src/lib/loveMatch";
 
 const MONTH_NAMES = [
@@ -313,8 +314,8 @@ export default function LoveMatchScreen() {
               <LinearGradient
                 colors={
                   isFormValid
-                    ? ["#FF4D6D", "#FF2D55", "#E11D48"]
-                    : ["#CBD5E1", "#94A3B8"]
+                    ? [...GRADIENTS.primaryAction]
+                    : [...GRADIENTS.buttonDisabled]
                 }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
@@ -440,7 +441,7 @@ export default function LoveMatchScreen() {
                 onPress={handleConfirmDate}
               >
                 <LinearGradient
-                  colors={["#FF4D6D", "#FF2D55"]}
+                  colors={[...GRADIENTS.primaryAction]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.modalDoneGradient}

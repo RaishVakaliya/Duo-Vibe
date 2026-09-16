@@ -189,8 +189,8 @@ export default function CrushCalculatorScreen() {
                 <LinearGradient
                   colors={
                     isFormValid
-                      ? ["#FF4D6D", "#FF2D55", "#E11D48"]
-                      : ["#CBD5E1", "#94A3B8"]
+                      ? [...GRADIENTS.primaryAction]
+                      : [...GRADIENTS.buttonDisabled]
                   }
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}

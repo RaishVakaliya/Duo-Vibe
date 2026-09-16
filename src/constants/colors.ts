@@ -1,15 +1,53 @@
 export const COLORS = {
+  // Brand & Accents
   primary: "#FF4D6D",
   primaryLight: "#FF8FA3",
+  primaryVibrant: "#FF2D6C",
+  primaryDark: "#E11D48",
   coral: "#FF6B5B",
   orange: "#FFA45C",
   purple: "#9B51E0",
   violet: "#6C5CE7",
   cyan: "#00D2FF",
   white: "#FFFFFF",
+  black: "#000000",
+
+  // Typography
+  textPrimary: "#1E1B26",
+  textSecondary: "#64748B",
   textMuted: "#94A3B8",
   textDim: "#BFA8BC",
+  textDarkSlate: "#1E293B",
+  textSlateLight: "#475569",
+
+  // Backgrounds & Surfaces
   darkOverlay: "#0D0B1A",
+  bgDark: "#12091F",
+  darkCard: "#1E1527",
+  darkCardSubtle: "#181024",
+  cardInnerDark: "#161028",
+  avatarPlaceholderBg: "#3A1A38",
+  bgPinkLight: "#FFF5F7",
+  bgPinkAlt: "#FFF0F4",
+  surfaceLight: "#F8FAFC",
+  surfaceCard: "#FFFFFF",
+  pillBg: "#FBF3F4",
+  pillSelectedBg: "#FFE9EF",
+  borderLight: "#F1F5F9",
+  borderDisabled: "#CBD5E1",
+  disabledBg: "#CBD5E1",
+
+  // Status & Feedback
+  success: "#10B981",
+  successDark: "#059669",
+  successLight: "#ECFDF5",
+  successBorder: "#A7F3D0",
+  error: "#EF4444",
+  errorDark: "#DC2626",
+  errorLight: "#FEF2F2",
+  errorBorder: "#FECACA",
+  errorText: "#B91C1C",
+
   // Love Match progress bar & theme tokens
   matchCommunication: "#0D9488",
   matchChemistry: "#059669",
@@ -33,6 +71,16 @@ export const GRADIENTS = {
    */
   primary: ["#FF4D6D", "#FF758C", "#FFA07A"] as const,
   primaryLocations: [0, 0.5, 1] as const,
+
+  /**
+   * Vibrant Pink Action Button Gradient (Used across primary calculate/next/submit actions)
+   */
+  primaryAction: ["#FF4D6D", "#FF2D55", "#E11D48"] as const,
+
+  /**
+   * Disabled Button Gradient
+   */
+  buttonDisabled: ["#CBD5E1", "#94A3B8"] as const,
 
   /**
    * Soft Pink to Rose Gradient
@@ -63,4 +111,20 @@ export const GRADIENTS = {
   gameWouldYouRather: ["#FBBF24", "#EF4444"] as const,
   gameGuessMyAnswer: ["#F59E0B", "#EC4899"] as const,
   gameAgreeOrDisagree: ["#A855F7", "#6366F1"] as const,
+};
+
+export const RADIUS = {
+  button: 28, // Standard full-pill button radius (h: 56)
+  buttonFooter: 26, // Dual-button footer radius (h: 52)
+  card: 28, // Main content / question / result cards
+  cardSmall: 20, // Secondary / modal / action cards
+  input: 16, // Text inputs & picker containers
+  circleBack: 20, // 40x40 circular back button
+  circleBackLg: 22, // 44x44 circular back button
+};
+
+export const SPACING = {
+  screenPadding: 20,
+  headerTop: 8,
+  headerBottom: 12,
 };

@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0D0B1A",
+    backgroundColor: COLORS.darkOverlay,
   },
   gradientBackground: {
     ...StyleSheet.absoluteFillObject,
@@ -17,20 +18,20 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingTop: 8,
-    paddingBottom: 16,
+    paddingBottom: 12,
   },
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
+    borderRadius: RADIUS.circleBack,
+    backgroundColor: "rgba(255, 255, 255, 0.12)",
     justifyContent: "center",
     alignItems: "center",
   },
   headerTitle: {
     fontFamily: "Fredoka_700Bold",
-    fontSize: 20,
-    color: "#FFFFFF",
+    fontSize: 22,
+    color: COLORS.white,
   },
   headerPlaceholder: {
     width: 40,
@@ -47,7 +48,7 @@ export const styles = StyleSheet.create({
   headline: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 22,
-    color: "#FFFFFF",
+    color: COLORS.white,
     marginBottom: 6,
   },
   subheadline: {
@@ -58,7 +59,7 @@ export const styles = StyleSheet.create({
   },
 
   formCard: {
-    backgroundColor: "#1E1527",
+    backgroundColor: COLORS.darkCard,
     borderRadius: 22,
     padding: 20,
     borderWidth: 1,
@@ -75,11 +76,11 @@ export const styles = StyleSheet.create({
   },
   textArea: {
     backgroundColor: "rgba(255, 255, 255, 0.06)",
-    borderRadius: 16,
+    borderRadius: RADIUS.input,
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.12)",
     padding: 16,
-    color: "#FFFFFF",
+    color: COLORS.white,
     fontFamily: "Fredoka_400Regular",
     fontSize: 15,
     minHeight: 160,
@@ -87,17 +88,21 @@ export const styles = StyleSheet.create({
   },
 
   submitButton: {
-    borderRadius: 18,
+    width: "100%",
+    height: 56,
+    borderRadius: RADIUS.button,
     overflow: "hidden",
   },
   submitButtonGradient: {
-    paddingVertical: 16,
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    borderRadius: RADIUS.button,
   },
   submitButtonText: {
-    fontFamily: "Fredoka_600SemiBold",
+    fontFamily: "Fredoka_700Bold",
     fontSize: 17,
-    color: "#FFFFFF",
+    color: COLORS.white,
+    letterSpacing: 0.3,
   },
 });

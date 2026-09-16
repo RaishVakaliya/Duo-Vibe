@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0D0B1A",
+    backgroundColor: COLORS.darkOverlay,
   },
   gradientBackground: {
     ...StyleSheet.absoluteFillObject,
@@ -17,20 +18,20 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingTop: 8,
-    paddingBottom: 16,
+    paddingBottom: 12,
   },
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
+    borderRadius: RADIUS.circleBack,
+    backgroundColor: "rgba(255, 255, 255, 0.12)",
     justifyContent: "center",
     alignItems: "center",
   },
   headerTitle: {
     fontFamily: "Fredoka_700Bold",
-    fontSize: 20,
-    color: "#FFFFFF",
+    fontSize: 22,
+    color: COLORS.white,
   },
   headerPlaceholder: {
     width: 40,
@@ -53,12 +54,12 @@ export const styles = StyleSheet.create({
   title: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 28,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
   tagline: {
     fontFamily: "Caveat_700Bold",
     fontSize: 22,
-    color: "#FF8FA3",
+    color: COLORS.primaryLight,
     marginTop: 2,
   },
   versionBadge: {
@@ -71,11 +72,11 @@ export const styles = StyleSheet.create({
   versionText: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 13,
-    color: "#FF8FA3",
+    color: COLORS.primaryLight,
   },
 
   card: {
-    backgroundColor: "#1E1527",
+    backgroundColor: COLORS.darkCard,
     borderRadius: 22,
     padding: 22,
     borderWidth: 1,
@@ -85,7 +86,7 @@ export const styles = StyleSheet.create({
   cardTitle: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 17,
-    color: "#FFFFFF",
+    color: COLORS.white,
     marginBottom: 10,
   },
   cardParagraph: {
@@ -109,7 +110,7 @@ export const styles = StyleSheet.create({
   featureText: {
     fontFamily: "Fredoka_500Medium",
     fontSize: 14,
-    color: "#FFFFFF",
+    color: COLORS.white,
     flex: 1,
   },
 

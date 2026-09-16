@@ -1,10 +1,10 @@
 import { StyleSheet } from "react-native";
-import { COLORS } from "@/src/constants/colors";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF0F4",
+    backgroundColor: COLORS.bgPinkAlt,
   },
   gradientBackground: {
     ...StyleSheet.absoluteFillObject,
@@ -24,11 +24,11 @@ export const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.7)",
+    borderRadius: RADIUS.circleBack,
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 4,
@@ -40,7 +40,7 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   headerHeartIcon: {
-    shadowColor: "#FF4D6D",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -48,7 +48,7 @@ export const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 22,
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
   },
   headerSpacer: {
     width: 40,
@@ -58,11 +58,11 @@ export const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   resultCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 28,
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.card,
     paddingVertical: 28,
     paddingHorizontal: 22,
-    shadowColor: "#FF8FA3",
+    shadowColor: COLORS.primaryLight,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
     shadowRadius: 14,
@@ -121,14 +121,14 @@ export const styles = StyleSheet.create({
   percentageLabel: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 14,
-    color: "#64748B",
+    color: COLORS.textSecondary,
     marginBottom: 4,
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   namesSubtitle: {
     fontSize: 15,
-    color: "#334155",
+    color: COLORS.textDarkSlate,
     fontWeight: "600",
     marginBottom: 12,
   },
@@ -136,13 +136,13 @@ export const styles = StyleSheet.create({
     fontFamily: "Fredoka_700Bold",
     fontSize: 54,
     lineHeight: 62,
-    color: "#FF2D55",
+    color: COLORS.primaryVibrant,
     marginBottom: 14,
   },
   headlineText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 20,
-    color: "#FF4D6D",
+    color: COLORS.primary,
     textAlign: "center",
     marginBottom: 10,
     paddingHorizontal: 8,
@@ -150,7 +150,7 @@ export const styles = StyleSheet.create({
   messageText: {
     fontSize: 14,
     lineHeight: 22,
-    color: "#475569",
+    color: COLORS.textSlateLight,
     textAlign: "center",
     fontStyle: "italic",
     paddingHorizontal: 12,
@@ -163,13 +163,13 @@ export const styles = StyleSheet.create({
   shareButton: {
     flex: 1,
     height: 52,
-    borderRadius: 26,
+    borderRadius: RADIUS.buttonFooter,
     borderWidth: 1.5,
-    borderColor: "#FF4D6D",
-    backgroundColor: "#FFFFFF",
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.white,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -178,14 +178,14 @@ export const styles = StyleSheet.create({
   shareButtonText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 15,
-    color: "#FF4D6D",
+    color: COLORS.primary,
   },
   tryAgainButton: {
     flex: 1,
     height: 52,
-    borderRadius: 26,
+    borderRadius: RADIUS.buttonFooter,
     overflow: "hidden",
-    shadowColor: "#FF4D6D",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -195,11 +195,11 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 26,
+    borderRadius: RADIUS.buttonFooter,
   },
   tryAgainText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 15,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
 });

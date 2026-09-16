@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#12091F",
+    backgroundColor: COLORS.bgDark,
   },
   gradientBackground: {
     ...StyleSheet.absoluteFillObject,
@@ -25,7 +26,7 @@ export const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: RADIUS.circleBack,
     backgroundColor: "rgba(255, 255, 255, 0.12)",
     justifyContent: "center",
     alignItems: "center",
@@ -36,7 +37,7 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   headerHeartIcon: {
-    shadowColor: "#FF4D6D",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.4,
     shadowRadius: 6,
@@ -44,7 +45,7 @@ export const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 22,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
   headerSpacer: {
     width: 40,
@@ -57,19 +58,19 @@ export const styles = StyleSheet.create({
   mainTitle: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 26,
-    color: "#FFFFFF",
+    color: COLORS.white,
     textAlign: "center",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
     lineHeight: 20,
-    color: "#CBD5E1",
+    color: COLORS.borderDisabled,
     textAlign: "center",
   },
   contentContainer: {
     flex: 1,
-    backgroundColor: "#FFF0F4",
+    backgroundColor: COLORS.bgPinkAlt,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
     paddingHorizontal: 20,
@@ -84,10 +85,10 @@ export const styles = StyleSheet.create({
     marginBottom: 28,
   },
   inputCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.cardSmall,
     padding: 18,
-    shadowColor: "#FF8FA3",
+    shadowColor: COLORS.primaryLight,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 10,
@@ -98,7 +99,7 @@ export const styles = StyleSheet.create({
   inputLabel: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 13,
-    color: "#64748B",
+    color: COLORS.textSecondary,
     marginBottom: 10,
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -106,12 +107,12 @@ export const styles = StyleSheet.create({
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F8FAFC",
-    borderRadius: 14,
+    backgroundColor: COLORS.surfaceLight,
+    borderRadius: RADIUS.input,
     paddingHorizontal: 14,
     height: 52,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: COLORS.borderLight,
   },
   inputIcon: {
     marginRight: 10,
@@ -120,14 +121,14 @@ export const styles = StyleSheet.create({
     flex: 1,
     fontFamily: "Fredoka_700Bold",
     fontSize: 16,
-    color: "#0F172A",
+    color: COLORS.textPrimary,
     height: "100%",
   },
   calculateButton: {
     height: 56,
-    borderRadius: 28,
+    borderRadius: RADIUS.button,
     overflow: "hidden",
-    shadowColor: "#FF4D6D",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 10,
@@ -142,12 +143,12 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 28,
+    borderRadius: RADIUS.button,
   },
   calculateText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 17,
-    color: "#FFFFFF",
+    color: COLORS.white,
     letterSpacing: 0.3,
   },
 });

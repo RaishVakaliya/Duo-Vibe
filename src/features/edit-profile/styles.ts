@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0D0B1A",
+    backgroundColor: COLORS.darkOverlay,
   },
   gradientBackground: {
     ...StyleSheet.absoluteFillObject,
@@ -20,20 +21,20 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingTop: 8,
-    paddingBottom: 16,
+    paddingBottom: 12,
   },
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
+    borderRadius: RADIUS.circleBack,
+    backgroundColor: "rgba(255, 255, 255, 0.12)",
     justifyContent: "center",
     alignItems: "center",
   },
   headerTitle: {
     fontFamily: "Fredoka_700Bold",
-    fontSize: 20,
-    color: "#FFFFFF",
+    fontSize: 22,
+    color: COLORS.white,
   },
   headerPlaceholder: {
     width: 40,
@@ -54,7 +55,7 @@ export const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 2.5,
-    borderColor: "#FF4D6D",
+    borderColor: COLORS.primary,
     padding: 3,
     justifyContent: "center",
     alignItems: "center",
@@ -64,7 +65,7 @@ export const styles = StyleSheet.create({
     width: 110,
     height: 110,
     borderRadius: 55,
-    backgroundColor: "#3A1A38",
+    backgroundColor: COLORS.avatarPlaceholderBg,
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
@@ -77,7 +78,7 @@ export const styles = StyleSheet.create({
   avatarLetter: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 48,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
   cameraBadge: {
     position: "absolute",
@@ -86,22 +87,22 @@ export const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: "#FF4D6D",
+    backgroundColor: COLORS.primary,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 2.5,
-    borderColor: "#0D0B1A",
+    borderColor: COLORS.darkOverlay,
   },
   changePhotoText: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 14,
-    color: "#FF8FA3",
+    color: COLORS.primaryLight,
     marginTop: 12,
   },
 
   formCard: {
     width: "100%",
-    backgroundColor: "#1E1527",
+    backgroundColor: COLORS.darkCard,
     borderRadius: 22,
     padding: 20,
     borderWidth: 1,
@@ -118,12 +119,12 @@ export const styles = StyleSheet.create({
   },
   nameInput: {
     backgroundColor: "rgba(255, 255, 255, 0.06)",
-    borderRadius: 16,
+    borderRadius: RADIUS.input,
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.12)",
     paddingHorizontal: 16,
     paddingVertical: 14,
-    color: "#FFFFFF",
+    color: COLORS.white,
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 17,
   },
@@ -137,17 +138,20 @@ export const styles = StyleSheet.create({
 
   saveButton: {
     width: "100%",
-    borderRadius: 18,
+    height: 56,
+    borderRadius: RADIUS.button,
     overflow: "hidden",
   },
   saveButtonGradient: {
-    paddingVertical: 16,
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    borderRadius: RADIUS.button,
   },
   saveButtonText: {
-    fontFamily: "Fredoka_600SemiBold",
+    fontFamily: "Fredoka_700Bold",
     fontSize: 17,
-    color: "#FFFFFF",
+    color: COLORS.white,
+    letterSpacing: 0.3,
   },
 });

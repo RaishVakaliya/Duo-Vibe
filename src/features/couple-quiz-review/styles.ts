@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF5F7",
+    backgroundColor: COLORS.bgPinkLight,
   },
   gradientBackground: {
     ...StyleSheet.absoluteFillObject,
@@ -23,11 +24,11 @@ export const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    borderRadius: RADIUS.circleBack,
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.07,
     shadowRadius: 4,
@@ -46,11 +47,11 @@ export const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 22,
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
   },
   headerSubtitle: {
     fontSize: 12,
-    color: "#64748B",
+    color: COLORS.textSecondary,
     textAlign: "center",
     lineHeight: 16,
     paddingHorizontal: 16,
@@ -81,11 +82,11 @@ export const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 28,
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.card,
     paddingHorizontal: 22,
     paddingVertical: 24,
-    shadowColor: "#FF8FA3",
+    shadowColor: COLORS.primaryLight,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.12,
     shadowRadius: 16,
@@ -95,7 +96,7 @@ export const styles = StyleSheet.create({
   progressCounter: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 13,
-    color: "#64748B",
+    color: COLORS.textSecondary,
     textAlign: "center",
     marginBottom: 10,
     letterSpacing: 0.5,
@@ -104,7 +105,7 @@ export const styles = StyleSheet.create({
   questionText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 21,
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
     textAlign: "center",
     lineHeight: 28,
     marginBottom: 24,
@@ -118,8 +119,8 @@ export const styles = StyleSheet.create({
   optionPill: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FBF3F4",
-    borderRadius: 24,
+    backgroundColor: COLORS.pillBg,
+    borderRadius: RADIUS.buttonFooter,
     paddingVertical: 13,
     paddingHorizontal: 16,
     gap: 12,
@@ -127,9 +128,9 @@ export const styles = StyleSheet.create({
     borderColor: "transparent",
   },
   optionPillGuessed: {
-    borderColor: "#FF2D6C",
-    backgroundColor: "#FFE9EF",
-    shadowColor: "#FF2D6C",
+    borderColor: COLORS.primaryVibrant,
+    backgroundColor: COLORS.pillSelectedBg,
+    shadowColor: COLORS.primaryVibrant,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 6,
@@ -147,15 +148,15 @@ export const styles = StyleSheet.create({
     flex: 1,
     fontFamily: "Fredoka_500Medium",
     fontSize: 15,
-    color: "#64748B",
+    color: COLORS.textSecondary,
     lineHeight: 20,
   },
   optionTextGuessed: {
     fontFamily: "Fredoka_700Bold",
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
   },
   partnerGuessBadge: {
-    backgroundColor: "#FF2D6C",
+    backgroundColor: COLORS.primaryVibrant,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -166,13 +167,13 @@ export const styles = StyleSheet.create({
   partnerGuessBadgeText: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 11,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
 
   gradingTitle: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 14,
-    color: "#64748B",
+    color: COLORS.textSecondary,
     textAlign: "center",
     marginBottom: 14,
   },
@@ -184,7 +185,7 @@ export const styles = StyleSheet.create({
   gradeButton: {
     flex: 1,
     height: 56,
-    borderRadius: 28,
+    borderRadius: RADIUS.button,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -192,26 +193,26 @@ export const styles = StyleSheet.create({
     borderWidth: 2,
   },
   correctButtonInactive: {
-    backgroundColor: "#ECFDF5",
-    borderColor: "#A7F3D0",
+    backgroundColor: COLORS.successLight,
+    borderColor: COLORS.successBorder,
   },
   correctButtonActive: {
-    backgroundColor: "#10B981",
-    borderColor: "#10B981",
-    shadowColor: "#10B981",
+    backgroundColor: COLORS.success,
+    borderColor: COLORS.success,
+    shadowColor: COLORS.success,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
   },
   wrongButtonInactive: {
-    backgroundColor: "#FEF2F2",
-    borderColor: "#FECACA",
+    backgroundColor: COLORS.errorLight,
+    borderColor: COLORS.errorBorder,
   },
   wrongButtonActive: {
-    backgroundColor: "#EF4444",
-    borderColor: "#EF4444",
-    shadowColor: "#EF4444",
+    backgroundColor: COLORS.error,
+    borderColor: COLORS.error,
+    shadowColor: COLORS.error,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -222,13 +223,13 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
   gradeButtonTextInactiveCorrect: {
-    color: "#059669",
+    color: COLORS.successDark,
   },
   gradeButtonTextInactiveWrong: {
-    color: "#DC2626",
+    color: COLORS.errorDark,
   },
   gradeButtonTextActive: {
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
 
   footer: {
@@ -241,15 +242,15 @@ export const styles = StyleSheet.create({
   prevButton: {
     flex: 1,
     height: 52,
-    borderRadius: 26,
-    backgroundColor: "#FFFFFF",
+    borderRadius: RADIUS.buttonFooter,
+    backgroundColor: COLORS.white,
     borderWidth: 1.5,
-    borderColor: "#F1F5F9",
+    borderColor: COLORS.borderLight,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
     gap: 6,
-    shadowColor: "#000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -263,35 +264,38 @@ export const styles = StyleSheet.create({
   prevButtonText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 16,
-    color: "#1E1B26",
+    color: COLORS.textPrimary,
   },
   prevButtonTextDisabled: {
-    color: "#94A3B8",
+    color: COLORS.textMuted,
   },
   nextButton: {
     flex: 1,
     height: 52,
-    borderRadius: 26,
-    backgroundColor: "#FF2D6C",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 6,
-    shadowColor: "#FF2D6C",
+    borderRadius: RADIUS.buttonFooter,
+    overflow: "hidden",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.28,
     shadowRadius: 8,
     elevation: 4,
   },
   nextButtonDisabled: {
-    backgroundColor: "#CBD5E1",
     shadowOpacity: 0.05,
     elevation: 0,
+  },
+  nextButtonGradient: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 6,
+    borderRadius: RADIUS.buttonFooter,
   },
   nextButtonText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 16,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
 
   loadingWrap: {

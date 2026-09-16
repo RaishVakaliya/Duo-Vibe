@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { COLORS } from "@/src/constants/colors";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
   appName: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 26,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
   statusBadge: {
     flexDirection: "row",
@@ -43,7 +43,7 @@ export const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 12,
-    color: "#FF8FA3",
+    color: COLORS.primaryLight,
     fontWeight: "600",
   },
   scrollContent: {
@@ -62,7 +62,7 @@ export const styles = StyleSheet.create({
   greetingTitle: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 24,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
   greetingEmoji: {
     fontSize: 22,
@@ -76,7 +76,7 @@ export const styles = StyleSheet.create({
     borderRadius: 24,
     overflow: "hidden",
     marginBottom: 26,
-    shadowColor: "#E11D48",
+    shadowColor: COLORS.primaryDark,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.35,
     shadowRadius: 14,
@@ -113,7 +113,7 @@ export const styles = StyleSheet.create({
   },
   heroFlagText: {
     fontSize: 12,
-    color: "#FFFFFF",
+    color: COLORS.white,
     fontWeight: "700",
   },
   heroCenterContent: {
@@ -124,7 +124,7 @@ export const styles = StyleSheet.create({
     fontFamily: "Fredoka_700Bold",
     fontSize: 26,
     lineHeight: 32,
-    color: "#FFFFFF",
+    color: COLORS.white,
     textAlign: "center",
   },
   heroSubtitle: {
@@ -148,7 +148,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    shadowColor: "#000000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
@@ -156,7 +156,7 @@ export const styles = StyleSheet.create({
   heroPlayText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 13,
-    color: "#E11D48",
+    color: COLORS.primaryDark,
   },
   sectionContainer: {
     marginBottom: 24,
@@ -170,7 +170,7 @@ export const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 18,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
   toolsGrid: {
     flexDirection: "row",
@@ -181,12 +181,12 @@ export const styles = StyleSheet.create({
   toolCard: {
     width: "31%",
     aspectRatio: 0.95,
-    borderRadius: 20,
+    borderRadius: RADIUS.cardSmall,
     padding: 10,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    shadowColor: "#000000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 6,
@@ -203,7 +203,7 @@ export const styles = StyleSheet.create({
   toolTitle: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 12,
-    color: "#FFFFFF",
+    color: COLORS.white,
     textAlign: "center",
     lineHeight: 15,
   },
@@ -225,12 +225,12 @@ export const styles = StyleSheet.create({
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 15,
     lineHeight: 22,
-    color: "#FFFFFF",
+    color: COLORS.white,
     marginBottom: 8,
   },
   todaysCardTapPrompt: {
     fontSize: 12,
-    color: "#FF8FA3",
+    color: COLORS.primaryLight,
     fontWeight: "700",
   },
   todaysCardRight: {
@@ -260,7 +260,7 @@ export const styles = StyleSheet.create({
   inviteBannerTitle: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 15,
-    color: "#FFFFFF",
+    color: COLORS.white,
     marginBottom: 4,
   },
   inviteBannerSubtitle: {
@@ -269,7 +269,7 @@ export const styles = StyleSheet.create({
     color: COLORS.textMuted,
   },
   inviteBannerButton: {
-    backgroundColor: "#FF4D6D",
+    backgroundColor: COLORS.primary,
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 16,
@@ -277,7 +277,7 @@ export const styles = StyleSheet.create({
   inviteBannerButtonText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 13,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
   signOutRow: {
     alignItems: "center",
@@ -285,7 +285,7 @@ export const styles = StyleSheet.create({
   },
   signOutText: {
     fontSize: 14,
-    color: "#94A3B8",
+    color: COLORS.textMuted,
     fontWeight: "600",
   },
   pendingReviewCard: {
@@ -310,7 +310,7 @@ export const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "#FF2D6C",
+    backgroundColor: COLORS.primaryVibrant,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -320,21 +320,21 @@ export const styles = StyleSheet.create({
   pendingReviewTitle: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 15,
-    color: "#FFFFFF",
+    color: COLORS.white,
     marginBottom: 2,
   },
   pendingReviewSubtitle: {
     fontFamily: "Fredoka_400Regular",
     fontSize: 12,
-    color: "#CBD5E1",
+    color: COLORS.borderDisabled,
     lineHeight: 16,
   },
   pendingReviewButton: {
-    backgroundColor: "#FF2D6C",
+    backgroundColor: COLORS.primaryVibrant,
     paddingVertical: 9,
     paddingHorizontal: 14,
     borderRadius: 16,
-    shadowColor: "#FF2D6C",
+    shadowColor: COLORS.primaryVibrant,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -343,6 +343,6 @@ export const styles = StyleSheet.create({
   pendingReviewButtonText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 13,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
 });

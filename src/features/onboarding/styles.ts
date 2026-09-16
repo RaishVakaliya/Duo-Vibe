@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
@@ -9,18 +10,19 @@ export const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     justifyContent: "space-between",
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: 12,
+    paddingTop: 8,
+    paddingBottom: 12,
   },
   backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: RADIUS.circleBack,
     backgroundColor: "rgba(255, 255, 255, 0.12)",
     justifyContent: "center",
     alignItems: "center",
@@ -39,13 +41,13 @@ export const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 36,
+    paddingTop: 24,
   },
   title: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 32,
     lineHeight: 38,
-    color: "#FFFFFF",
+    color: COLORS.white,
     marginBottom: 32,
   },
   optionsContainer: {
@@ -53,7 +55,7 @@ export const styles = StyleSheet.create({
   },
   optionCard: {
     height: 72,
-    borderRadius: 20,
+    borderRadius: RADIUS.cardSmall,
     overflow: "hidden",
   },
   optionUnselected: {
@@ -64,15 +66,15 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.08)",
     borderWidth: 1.5,
     borderColor: "rgba(255, 255, 255, 0.12)",
-    borderRadius: 20,
+    borderRadius: RADIUS.cardSmall,
   },
   optionSelectedGradient: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 22,
-    borderRadius: 20,
-    shadowColor: "#00D2D3",
+    borderRadius: RADIUS.cardSmall,
+    shadowColor: COLORS.cyan,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.35,
     shadowRadius: 10,
@@ -85,21 +87,21 @@ export const styles = StyleSheet.create({
   optionTextUnselected: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 19,
-    color: "#94A3B8",
+    color: COLORS.textMuted,
   },
   optionTextSelected: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 19,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
   footer: {
     paddingBottom: 24,
   },
   continueButton: {
     height: 56,
-    borderRadius: 28,
+    borderRadius: RADIUS.button,
     overflow: "hidden",
-    shadowColor: "#FF4D6D",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 10,
@@ -109,12 +111,12 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 28,
+    borderRadius: RADIUS.button,
   },
   continueButtonText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 18,
-    color: "#FFFFFF",
+    color: COLORS.white,
     letterSpacing: 0.4,
   },
 });

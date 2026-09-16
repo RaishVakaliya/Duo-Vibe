@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { COLORS } from "@/src/constants/colors";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
@@ -10,18 +10,19 @@ export const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     justifyContent: "space-between",
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: 12,
+    paddingTop: 8,
+    paddingBottom: 12,
   },
   backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: RADIUS.circleBack,
     backgroundColor: "rgba(255, 255, 255, 0.12)",
     justifyContent: "center",
     alignItems: "center",
@@ -40,13 +41,13 @@ export const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 24,
+    paddingTop: 16,
   },
   title: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 32,
     lineHeight: 38,
-    color: "#FFFFFF",
+    color: COLORS.white,
     marginBottom: 8,
   },
   subtitle: {
@@ -66,7 +67,7 @@ export const styles = StyleSheet.create({
     aspectRatio: 1,
     borderRadius: 24,
     overflow: "hidden",
-    shadowColor: "#000000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
@@ -87,7 +88,7 @@ export const styles = StyleSheet.create({
     fontFamily: "Fredoka_700Bold",
     fontSize: 15,
     lineHeight: 20,
-    color: "#FFFFFF",
+    color: COLORS.white,
     textAlign: "center",
     letterSpacing: 0.5,
   },
@@ -96,9 +97,9 @@ export const styles = StyleSheet.create({
   },
   continueButton: {
     height: 56,
-    borderRadius: 28,
+    borderRadius: RADIUS.button,
     overflow: "hidden",
-    shadowColor: "#FF4D6D",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 10,
@@ -108,12 +109,12 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 28,
+    borderRadius: RADIUS.button,
   },
   continueButtonText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 18,
-    color: "#FFFFFF",
+    color: COLORS.white,
     letterSpacing: 0.4,
   },
 });

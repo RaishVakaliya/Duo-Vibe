@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { COLORS } from "@/src/constants/colors";
+import { COLORS, RADIUS } from "@/src/constants/colors";
 
 export const styles = StyleSheet.create({
   container: {
@@ -10,24 +10,25 @@ export const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     justifyContent: "space-between",
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: 12,
+    paddingTop: 8,
+    paddingBottom: 12,
   },
   backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: RADIUS.circleBack,
     backgroundColor: "rgba(255, 255, 255, 0.12)",
     justifyContent: "center",
     alignItems: "center",
   },
   scrollContent: {
-    paddingTop: 28,
+    paddingTop: 20,
     paddingBottom: 16,
   },
   titleContainer: {
@@ -37,7 +38,7 @@ export const styles = StyleSheet.create({
     fontFamily: "Fredoka_700Bold",
     fontSize: 34,
     lineHeight: 40,
-    color: "#FFFFFF",
+    color: COLORS.white,
     marginBottom: 8,
   },
   subtitle: {
@@ -54,7 +55,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
-    shadowColor: "#000000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.25,
     shadowRadius: 10,
@@ -64,12 +65,12 @@ export const styles = StyleSheet.create({
     fontFamily: "Fredoka_700Bold",
     fontSize: 40,
     letterSpacing: 8,
-    color: "#FFFFFF",
+    color: COLORS.white,
     marginBottom: 6,
   },
   expiryText: {
     fontSize: 14,
-    color: "#CBD5E1",
+    color: COLORS.borderDisabled,
     fontWeight: "500",
   },
   refreshRow: {
@@ -84,14 +85,14 @@ export const styles = StyleSheet.create({
   },
   refreshText: {
     fontSize: 13,
-    color: "#FF8FA3",
+    color: COLORS.primaryLight,
     fontWeight: "600",
   },
   inviteButton: {
     height: 56,
-    borderRadius: 28,
+    borderRadius: RADIUS.button,
     overflow: "hidden",
-    shadowColor: "#FF4D6D",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 10,
@@ -102,7 +103,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 28,
+    borderRadius: RADIUS.button,
   },
   inviteButtonIcon: {
     marginRight: 8,
@@ -110,7 +111,7 @@ export const styles = StyleSheet.create({
   inviteButtonText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 17,
-    color: "#FFFFFF",
+    color: COLORS.white,
     letterSpacing: 0.3,
   },
   dividerRow: {
@@ -126,7 +127,7 @@ export const styles = StyleSheet.create({
   dividerText: {
     marginHorizontal: 16,
     fontSize: 14,
-    color: "#94A3B8",
+    color: COLORS.textMuted,
     fontWeight: "600",
   },
   partnerInputSection: {
@@ -141,7 +142,7 @@ export const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#CBD5E1",
+    color: COLORS.borderDisabled,
   },
   pasteButton: {
     flexDirection: "row",
@@ -152,31 +153,31 @@ export const styles = StyleSheet.create({
   },
   pasteButtonText: {
     fontSize: 13,
-    color: "#FFFFFF",
+    color: COLORS.white,
     fontWeight: "600",
   },
   inputCard: {
     backgroundColor: "rgba(255, 255, 255, 0.08)",
     borderWidth: 1.5,
     borderColor: "rgba(255, 255, 255, 0.14)",
-    borderRadius: 20,
+    borderRadius: RADIUS.cardSmall,
     height: 60,
     justifyContent: "center",
     paddingHorizontal: 20,
   },
   textInput: {
     fontSize: 22,
-    color: "#FFFFFF",
+    color: COLORS.white,
     letterSpacing: 6,
     fontFamily: "Fredoka_700Bold",
     textAlign: "center",
   },
   connectButton: {
     height: 52,
-    borderRadius: 26,
+    borderRadius: RADIUS.buttonFooter,
     overflow: "hidden",
     marginTop: 14,
-    shadowColor: "#FFA45C",
+    shadowColor: COLORS.orange,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -186,12 +187,12 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 26,
+    borderRadius: RADIUS.buttonFooter,
   },
   connectButtonText: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 16,
-    color: "#FFFFFF",
+    color: COLORS.white,
   },
   footer: {
     paddingBottom: 16,
@@ -204,7 +205,7 @@ export const styles = StyleSheet.create({
   laterButtonText: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#94A3B8",
+    color: COLORS.textMuted,
     textAlign: "center",
   },
 });
