@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, Pressable } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, Pressable, InteractionManager } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -13,6 +13,14 @@ import { ROUTES } from "@/src/constants/routes";
 
 export default function MemoriesScreen() {
   const router = useRouter();
+  const [readyForAnimation, setReadyForAnimation] = useState<boolean>(false);
+
+  useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => {
+      setReadyForAnimation(true);
+    });
+    return () => task.cancel();
+  }, []);
 
   const handleContinue = () => {
     router.push(ROUTES.READY);
@@ -59,11 +67,15 @@ export default function MemoriesScreen() {
           <View style={styles.polaroidContainer}>
             <MotiView
               from={{ translateY: -3, rotate: "-9deg" }}
-              animate={{ translateY: 5, rotate: "-7deg" }}
+              animate={
+                readyForAnimation
+                  ? { translateY: 5, rotate: "-7deg" }
+                  : { translateY: -3, rotate: "-9deg" }
+              }
               transition={{
                 type: "timing",
                 duration: 2600,
-                loop: true,
+                loop: readyForAnimation,
                 repeatReverse: true,
               }}
               style={[styles.polaroidCard, styles.polaroidLeft]}
@@ -78,11 +90,15 @@ export default function MemoriesScreen() {
 
             <MotiView
               from={{ translateY: 4, rotate: "7deg" }}
-              animate={{ translateY: -4, rotate: "5deg" }}
+              animate={
+                readyForAnimation
+                  ? { translateY: -4, rotate: "5deg" }
+                  : { translateY: 4, rotate: "7deg" }
+              }
               transition={{
                 type: "timing",
                 duration: 3000,
-                loop: true,
+                loop: readyForAnimation,
                 repeatReverse: true,
               }}
               style={[styles.polaroidCard, styles.polaroidRight]}
@@ -97,11 +113,15 @@ export default function MemoriesScreen() {
 
             <MotiView
               from={{ translateY: -5, rotate: "-1deg" }}
-              animate={{ translateY: 5, rotate: "1deg" }}
+              animate={
+                readyForAnimation
+                  ? { translateY: 5, rotate: "1deg" }
+                  : { translateY: -5, rotate: "-1deg" }
+              }
               transition={{
                 type: "timing",
                 duration: 2400,
-                loop: true,
+                loop: readyForAnimation,
                 repeatReverse: true,
               }}
               style={[styles.polaroidCard, styles.polaroidCenter]}

@@ -48,100 +48,70 @@ export default function RootLayout() {
               <Stack
                 screenOptions={{
                   headerShown: false,
+                  animation: "slide_from_right",
+                  gestureEnabled: true,
                   contentStyle: { backgroundColor: COLORS.darkOverlay },
                 }}
               >
+                {/* Entry & Auth Welcome: Soft Crossfade */}
                 <Stack.Screen name="index" options={{ animation: "fade" }} />
                 <Stack.Screen name="welcome" options={{ animation: "fade" }} />
-                <Stack.Screen
-                  name="login"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="onboarding-name"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="onboarding"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="date-ideas"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="play-compare"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="memories"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="ready"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="invite-partner"
-                  options={{ animation: "slide_from_right" }}
-                />
+
+                {/* Onboarding & Core Flows: Smooth Native iOS/Android slide from right */}
+                <Stack.Screen name="login" />
+                <Stack.Screen name="onboarding-name" />
+                <Stack.Screen name="onboarding" />
+                <Stack.Screen name="date-ideas" />
+                <Stack.Screen name="play-compare" />
+                <Stack.Screen name="memories" />
+                <Stack.Screen name="ready" />
+                <Stack.Screen name="invite-partner" />
+
+                {/* Main Hubs: Clean crossfade */}
                 <Stack.Screen name="home" options={{ animation: "fade" }} />
                 <Stack.Screen name="profile" options={{ animation: "fade" }} />
+
+                {/* Modal-style Presentation Screens */}
                 <Stack.Screen
                   name="edit-profile"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="about"
-                  options={{ animation: "slide_from_right" }}
+                  options={{
+                    presentation: "modal",
+                    animation: "slide_from_bottom",
+                  }}
                 />
                 <Stack.Screen
                   name="feedback"
-                  options={{ animation: "slide_from_right" }}
+                  options={{
+                    presentation: "modal",
+                    animation: "slide_from_bottom",
+                  }}
                 />
-                <Stack.Screen
-                  name="terms"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="privacy"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="love-match"
-                  options={{ animation: "slide_from_right" }}
-                />
+
+                {/* Legal & Info Pages */}
+                <Stack.Screen name="about" />
+                <Stack.Screen name="terms" />
+                <Stack.Screen name="privacy" />
+
+                {/* Feature Action Screens */}
+                <Stack.Screen name="love-match" />
+                <Stack.Screen name="crush-calculator" />
+                <Stack.Screen name="twenty-one-questions" />
+                <Stack.Screen name="couple-quiz" />
+                <Stack.Screen name="couple-quiz-play" />
+                <Stack.Screen name="couple-quiz-review" />
+
+                {/* Reveal Result Screens: Fade Transition for Delightful Reveal Moment */}
                 <Stack.Screen
                   name="love-match-result"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="crush-calculator"
-                  options={{ animation: "slide_from_right" }}
+                  options={{ animation: "fade_from_bottom" }}
                 />
                 <Stack.Screen
                   name="crush-calculator-result"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="twenty-one-questions"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="couple-quiz"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="couple-quiz-play"
-                  options={{ animation: "slide_from_right" }}
-                />
-                <Stack.Screen
-                  name="couple-quiz-review"
-                  options={{ animation: "slide_from_right" }}
+                  options={{ animation: "fade_from_bottom" }}
                 />
                 <Stack.Screen
                   name="couple-quiz-result"
-                  options={{ animation: "slide_from_right" }}
+                  options={{ animation: "fade_from_bottom" }}
                 />
               </Stack>
             </AlertProvider>

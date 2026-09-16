@@ -5,7 +5,6 @@ import {
   Image,
   ScrollView,
   Pressable,
-  ActivityIndicator,
   BackHandler,
 } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
@@ -265,6 +264,7 @@ export default function HomeScreen() {
             style={styles.heroCard}
           >
             <Pressable
+              onPress={() => router.push(ROUTES.PLAY_COMPARE)}
               accessibilityRole="button"
               accessibilityLabel="Red flag or green flag couple game"
             >
@@ -369,6 +369,7 @@ export default function HomeScreen() {
             >
               <Pressable
                 style={styles.todaysCard}
+                onPress={() => router.push(ROUTES.TWENTY_ONE_QUESTIONS)}
                 accessibilityRole="button"
                 accessibilityLabel="Answer Today's Prompt Card"
               >
@@ -421,20 +422,6 @@ export default function HomeScreen() {
             </MotiView>
           )}
 
-          <Pressable
-            style={styles.signOutRow}
-            onPress={handleSignOut}
-            disabled={isSigningOut}
-            hitSlop={{ top: 12, bottom: 12, left: 16, right: 16 }}
-            accessibilityRole="button"
-            accessibilityLabel="Sign Out of Account"
-          >
-            {isSigningOut ? (
-              <ActivityIndicator color="#FF8FA3" size="small" />
-            ) : (
-              <Text style={styles.signOutText}>Sign Out</Text>
-            )}
-          </Pressable>
         </ScrollView>
 
         <BottomTabBar activeTab={activeTab} onTabPress={handleTabPress} />
