@@ -6,7 +6,7 @@ import Svg, { Path, Defs, LinearGradient, Stop, Line } from "react-native-svg";
 import { MotiView } from "moti";
 import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
-import { useAuth } from "@/src/context/auth";
+import { useAuth, resolveInitialRoute } from "@/src/context/auth";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -125,17 +125,14 @@ export default function SplashScreen() {
       if (hasNavigatedRef.current) return;
       hasNavigatedRef.current = true;
 
-      if (user) {
-        if (hasPartner) {
-          router.replace(ROUTES.HOME);
-        } else {
-          router.replace({
-            pathname: ROUTES.INVITE_PARTNER,
-            params: { source: "auth" },
-          });
-        }
+      const targetRoute = resolveInitialRoute(user, hasPartner);
+      if (targetRoute === ROUTES.INVITE_PARTNER) {
+        router.replace({
+          pathname: ROUTES.INVITE_PARTNER,
+          params: { source: "auth" },
+        });
       } else {
-        router.replace(ROUTES.WELCOME);
+        router.replace(targetRoute);
       }
     }, remaining);
 

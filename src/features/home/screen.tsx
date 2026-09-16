@@ -70,7 +70,7 @@ const LOVE_TOOLS: readonly LoveToolItem[] = [
     iconColor: "#F43F5E",
     backgroundColor: "rgba(244, 63, 94, 0.12)",
     borderColor: "rgba(244, 63, 94, 0.25)",
-    route: ROUTES.MEMORIES,
+    // route: ROUTES.MEMORIES,
   },
   {
     id: "couple-challenge",
@@ -79,7 +79,7 @@ const LOVE_TOOLS: readonly LoveToolItem[] = [
     iconColor: "#10B981",
     backgroundColor: "rgba(16, 185, 129, 0.12)",
     borderColor: "rgba(16, 185, 129, 0.25)",
-    route: ROUTES.DATE_IDEAS,
+    // route: ROUTES.DATE_IDEAS,
   },
 ];
 
@@ -264,7 +264,7 @@ export default function HomeScreen() {
             style={styles.heroCard}
           >
             <Pressable
-              onPress={() => router.push(ROUTES.PLAY_COMPARE)}
+              // onPress={() => router.push(ROUTES.PLAY_COMPARE)}
               accessibilityRole="button"
               accessibilityLabel="Red flag or green flag couple game"
             >

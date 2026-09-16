@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, Pressable } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -8,9 +8,42 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { styles } from "./styles";
 import { GRADIENTS, COLORS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
+import { useAuth, resolveInitialRoute } from "@/src/context/auth";
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const { user, hasPartner, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      const target = resolveInitialRoute(user, hasPartner);
+      if (target !== ROUTES.WELCOME) {
+        if (target === ROUTES.INVITE_PARTNER) {
+          router.replace({
+            pathname: ROUTES.INVITE_PARTNER,
+            params: { source: "auth" },
+          });
+        } else {
+          router.replace(target);
+        }
+      }
+    }
+  }, [user, hasPartner, isLoading, router]);
+
+  const handleStartJourney = () => {
+    if (user) {
+      if (hasPartner) {
+        router.replace(ROUTES.HOME);
+      } else {
+        router.replace({
+          pathname: ROUTES.INVITE_PARTNER,
+          params: { source: "auth" },
+        });
+      }
+      return;
+    }
+    router.push(ROUTES.ONBOARDING_NAME);
+  };
 
   return (
     <View style={styles.container}>
@@ -48,7 +81,7 @@ export default function WelcomeScreen() {
 
           <Pressable
             style={styles.buttonContainer}
-            onPress={() => router.push(ROUTES.ONBOARDING_NAME)}
+            onPress={handleStartJourney}
             accessibilityRole="button"
             accessibilityLabel="Start Our Journey"
           >

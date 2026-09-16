@@ -13,6 +13,7 @@ import {
   AuthPartnerConnectResult,
   RelationshipType,
 } from "@/src/types";
+import { ROUTES, AppRoute } from "@/src/constants/routes";
 
 const GOOGLE_WEB_CLIENT_ID: string =
   process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ?? "";
@@ -54,6 +55,19 @@ function generateInviteCode(): string {
 interface AuthErrorLike {
   code?: string | number;
   message?: string;
+}
+
+export function resolveInitialRoute(
+  user: User | null,
+  hasPartner: boolean,
+): AppRoute {
+  if (!user) {
+    return ROUTES.WELCOME;
+  }
+  if (hasPartner) {
+    return ROUTES.HOME;
+  }
+  return ROUTES.INVITE_PARTNER;
 }
 
 function isAuthError(err: unknown): err is AuthErrorLike {
@@ -148,6 +162,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               .eq("id", currentUser.id);
           }
         }
+        if (
+          profile.relationship_type === "local" ||
+          profile.relationship_type === "long_distance"
+        ) {
+          setRelationshipTypeState(profile.relationship_type);
+          await AsyncStorage.setItem(
+            RELATIONSHIP_TYPE_KEY,
+            profile.relationship_type,
+          );
+        }
+
         if (profile.partner_id) {
           setHasPartnerState(true);
           await AsyncStorage.setItem(HAS_PARTNER_KEY, "true");
