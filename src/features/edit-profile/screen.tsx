@@ -7,6 +7,8 @@ import {
   Pressable,
   TextInput,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -132,82 +134,87 @@ export default function EditProfileScreen() {
           <View style={styles.headerPlaceholder} />
         </View>
 
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
+        <KeyboardAvoidingView
+          style={styles.keyboardAvoid}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-          <View style={styles.avatarWrapper}>
-            <Pressable
-              style={styles.avatarRing}
-              onPress={handlePickFromGallery}
-              accessibilityRole="button"
-              accessibilityLabel="Upload profile picture from gallery"
-            >
-              <View style={styles.avatarInner}>
-                {pickedImageUri && isUrl(pickedImageUri) ? (
-                  <Image
-                    source={{ uri: pickedImageUri }}
-                    style={styles.avatarImage}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <Text style={styles.avatarLetter}>{getInitial(name)}</Text>
-                )}
-              </View>
-
-              <View style={styles.cameraBadge}>
-                <Ionicons name="camera" size={17} color="#FFFFFF" />
-              </View>
-            </Pressable>
-
-            <Pressable
-              onPress={handlePickFromGallery}
-              accessibilityRole="button"
-              accessibilityLabel="Change photo text button"
-            >
-              <Text style={styles.changePhotoText}>Change Photo</Text>
-            </Pressable>
-          </View>
-
-          <View style={styles.formCard}>
-            <Text style={styles.inputLabel}>Your Name</Text>
-            <TextInput
-              style={styles.nameInput}
-              value={name}
-              onChangeText={setName}
-              placeholder="Enter your name"
-              placeholderTextColor="rgba(255, 255, 255, 0.3)"
-              maxLength={35}
-              autoCapitalize="words"
-              selectionColor="#FF4D6D"
-            />
-            <Text style={styles.inputHelper}>
-              This is the name your partner sees on sparks & games.
-            </Text>
-          </View>
-
-          <Pressable
-            style={styles.saveButton}
-            onPress={handleSave}
-            disabled={isSaving}
-            accessibilityRole="button"
-            accessibilityLabel="Save profile changes"
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
           >
-            <LinearGradient
-              colors={[...GRADIENTS.primary]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.saveButtonGradient}
+            <View style={styles.avatarWrapper}>
+              <Pressable
+                style={styles.avatarRing}
+                onPress={handlePickFromGallery}
+                accessibilityRole="button"
+                accessibilityLabel="Upload profile picture from gallery"
+              >
+                <View style={styles.avatarInner}>
+                  {pickedImageUri && isUrl(pickedImageUri) ? (
+                    <Image
+                      source={{ uri: pickedImageUri }}
+                      style={styles.avatarImage}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <Text style={styles.avatarLetter}>{getInitial(name)}</Text>
+                  )}
+                </View>
+
+                <View style={styles.cameraBadge}>
+                  <Ionicons name="camera" size={17} color="#FFFFFF" />
+                </View>
+              </Pressable>
+
+              <Pressable
+                onPress={handlePickFromGallery}
+                accessibilityRole="button"
+                accessibilityLabel="Change photo text button"
+              >
+                <Text style={styles.changePhotoText}>Change Photo</Text>
+              </Pressable>
+            </View>
+
+            <View style={styles.formCard}>
+              <Text style={styles.inputLabel}>Your Name</Text>
+              <TextInput
+                style={styles.nameInput}
+                value={name}
+                onChangeText={setName}
+                placeholder="Enter your name"
+                placeholderTextColor="rgba(255, 255, 255, 0.3)"
+                maxLength={35}
+                autoCapitalize="words"
+                selectionColor="#FF4D6D"
+              />
+              <Text style={styles.inputHelper}>
+                This is the name your partner sees on sparks & games.
+              </Text>
+            </View>
+
+            <Pressable
+              style={styles.saveButton}
+              onPress={handleSave}
+              disabled={isSaving}
+              accessibilityRole="button"
+              accessibilityLabel="Save profile changes"
             >
-              {isSaving ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
-              ) : (
-                <Text style={styles.saveButtonText}>Save Changes</Text>
-              )}
-            </LinearGradient>
-          </Pressable>
-        </ScrollView>
+              <LinearGradient
+                colors={[...GRADIENTS.primary]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.saveButtonGradient}
+              >
+                {isSaving ? (
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                ) : (
+                  <Text style={styles.saveButtonText}>Save Changes</Text>
+                )}
+              </LinearGradient>
+            </Pressable>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </View>
   );

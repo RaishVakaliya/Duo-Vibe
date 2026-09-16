@@ -40,7 +40,7 @@ export const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingBottom: 130,
+    paddingBottom: 110,
   },
 
   // Profile Hero (Matching Lovio Reference Image 1)

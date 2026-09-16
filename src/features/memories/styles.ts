@@ -1,5 +1,7 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 import { COLORS } from "@/src/constants/colors";
+
+const SCREEN_W = Dimensions.get("window").width;
 
 export const styles = StyleSheet.create({
   container: {
@@ -75,23 +77,23 @@ export const styles = StyleSheet.create({
     elevation: 8,
   },
   polaroidLeft: {
-    left: 12,
+    left: "3%",
     top: 30,
-    width: 175,
-    height: 215,
+    width: SCREEN_W * 0.44,
+    height: SCREEN_W * 0.44 * 1.22,
     zIndex: 1,
   },
   polaroidRight: {
-    right: 12,
+    right: "3%",
     top: 50,
-    width: 180,
-    height: 220,
+    width: SCREEN_W * 0.46,
+    height: SCREEN_W * 0.46 * 1.22,
     zIndex: 2,
   },
   polaroidCenter: {
     bottom: 20,
-    width: 190,
-    height: 230,
+    width: SCREEN_W * 0.48,
+    height: SCREEN_W * 0.48 * 1.22,
     zIndex: 3,
   },
   polaroidImage: {

@@ -47,7 +47,7 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
   },
   scrollContent: {
-    paddingBottom: 150,
+    paddingBottom: 110,
   },
   greetingSection: {
     marginBottom: 20,

@@ -11,6 +11,9 @@ export const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
+  keyboardAvoid: {
+    flex: 1,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",

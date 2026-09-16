@@ -1,5 +1,8 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 import { COLORS } from "@/src/constants/colors";
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const LOGO_SIZE = Math.min(Math.round(SCREEN_WIDTH * 0.32), 130);
 
 export const loginStyles = StyleSheet.create({
   container: {
@@ -48,14 +51,14 @@ export const loginStyles = StyleSheet.create({
     paddingVertical: 20,
   },
   logo: {
-    width: 130,
-    height: 130,
+    width: LOGO_SIZE,
+    height: LOGO_SIZE,
   },
   title: {
     fontFamily: "Fredoka_700Bold",
-    fontSize: 36,
+    fontSize: SCREEN_WIDTH < 360 ? 28 : 34,
     color: "#FFFFFF",
-    marginTop: 18,
+    marginTop: 16,
     textAlign: "center",
   },
   subtitle: {
