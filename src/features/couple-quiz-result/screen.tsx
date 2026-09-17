@@ -19,32 +19,8 @@ import {
   getSessionForReview,
   subscribeToSessionUpdates,
   ReviewSessionData,
+  getScoreHeadline,
 } from "@/src/lib/quizSession";
-
-function getScoreHeadline(percentage: number): { title: string; desc: string } {
-  if (percentage >= 90) {
-    return {
-      title: "Incredible Soulmates! 💖",
-      desc: "You know each other inside and out. Your bond is truly exceptional!",
-    };
-  }
-  if (percentage >= 70) {
-    return {
-      title: "Super In Sync! 💕",
-      desc: "You know your partner wonderfully well! A couple that really pays attention.",
-    };
-  }
-  if (percentage >= 50) {
-    return {
-      title: "Growing Closer Everyday! 🥰",
-      desc: "A great foundation with plenty of cute new things to keep discovering!",
-    };
-  }
-  return {
-    title: "Exciting Discoveries Ahead! 🌱",
-    desc: "Every answer is a chance to spark deeper conversation and learn more about each other.",
-  };
-}
 
 export default function CoupleQuizResultScreen() {
   const router = useRouter();

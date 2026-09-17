@@ -125,7 +125,7 @@ export default function SplashScreen() {
       if (hasNavigatedRef.current) return;
       hasNavigatedRef.current = true;
 
-      const targetRoute = resolveInitialRoute(user, hasPartner);
+      const targetRoute = resolveInitialRoute({ user, hasPartner });
       if (targetRoute === ROUTES.INVITE_PARTNER) {
         router.replace({
           pathname: ROUTES.INVITE_PARTNER,

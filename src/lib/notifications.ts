@@ -76,8 +76,6 @@ export async function registerForPushNotificationsAsync(
     });
     const token = tokenData.data;
 
-    console.log("Device push token obtained:", token);
-
     // 4. Save to Supabase profile
     if (token && userId) {
       const { error } = await supabase
@@ -87,11 +85,6 @@ export async function registerForPushNotificationsAsync(
 
       if (error) {
         console.warn("Failed to store push token in Supabase profile:", error);
-      } else {
-        console.log(
-          "Push token successfully saved to Supabase profile for user:",
-          userId,
-        );
       }
     }
 
@@ -134,8 +127,6 @@ export async function sendExpoPushNotification({
       channelId: "default",
     };
 
-    console.log("Sending push notification payload:", payload);
-
     const response = await fetch("https://exp.host/--/api/v2/push/send", {
       method: "POST",
       headers: {
@@ -146,9 +137,7 @@ export async function sendExpoPushNotification({
       body: JSON.stringify(payload),
     });
 
-    const responseData = await response.json();
-    console.log("Expo push service response:", responseData);
-    return true;
+    return response.ok;
   } catch (err: unknown) {
     console.warn("Failed to send Expo push notification:", err);
     return false;

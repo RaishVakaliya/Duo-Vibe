@@ -70,7 +70,6 @@ const LOVE_TOOLS: readonly LoveToolItem[] = [
     iconColor: "#F43F5E",
     backgroundColor: "rgba(244, 63, 94, 0.12)",
     borderColor: "rgba(244, 63, 94, 0.25)",
-    // route: ROUTES.MEMORIES,
   },
   {
     id: "couple-challenge",
@@ -79,9 +78,24 @@ const LOVE_TOOLS: readonly LoveToolItem[] = [
     iconColor: "#10B981",
     backgroundColor: "rgba(16, 185, 129, 0.12)",
     borderColor: "rgba(16, 185, 129, 0.25)",
-    // route: ROUTES.DATE_IDEAS,
   },
 ];
+
+function getGreetingData(date: Date = new Date()): {
+  greeting: string;
+  emoji: string;
+} {
+  const hour = date.getHours();
+  if (hour >= 5 && hour < 12) {
+    return { greeting: "Good Morning", emoji: "☀️" };
+  } else if (hour >= 12 && hour < 17) {
+    return { greeting: "Good Afternoon", emoji: "🌤️" };
+  } else if (hour >= 17 && hour < 21) {
+    return { greeting: "Good Evening", emoji: "👋" };
+  } else {
+    return { greeting: "Good Night", emoji: "🌙" };
+  }
+}
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -91,18 +105,7 @@ export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState<number>(0);
   const [pendingReviews, setPendingReviews] = useState<QuizSession[]>([]);
 
-  const greetingData = useMemo(() => {
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) {
-      return { greeting: "Good Morning", emoji: "☀️" };
-    } else if (hour >= 12 && hour < 17) {
-      return { greeting: "Good Afternoon", emoji: "🌤️" };
-    } else if (hour >= 17 && hour < 21) {
-      return { greeting: "Good Evening", emoji: "👋" };
-    } else {
-      return { greeting: "Good Night", emoji: "🌙" };
-    }
-  }, []);
+  const greetingData = useMemo(() => getGreetingData(), []);
 
   useFocusEffect(
     useCallback(() => {
@@ -264,7 +267,6 @@ export default function HomeScreen() {
             style={styles.heroCard}
           >
             <Pressable
-              // onPress={() => router.push(ROUTES.PLAY_COMPARE)}
               accessibilityRole="button"
               accessibilityLabel="Red flag or green flag couple game"
             >

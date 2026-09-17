@@ -20,41 +20,11 @@ import { styles } from "./styles";
 import { ActiveDatePicker } from "./types";
 import { ROUTES } from "@/src/constants/routes";
 import { GRADIENTS } from "@/src/constants/colors";
-import { calculateLoveMatch } from "@/src/lib/loveMatch";
-
-const MONTH_NAMES = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-] as const;
-
-function formatDateDisplay(isoString: string): string {
-  if (!isoString) return "Select Date";
-  try {
-    const [year, month, day] = isoString.split("-");
-    if (!year || !month || !day) return isoString;
-    const date = new Date(
-      parseInt(year, 10),
-      parseInt(month, 10) - 1,
-      parseInt(day, 10),
-    );
-    const dayFormatted = String(date.getDate()).padStart(2, "0");
-    const monthShort = date.toLocaleString("en-US", { month: "short" });
-    const fullYear = date.getFullYear();
-    return `${dayFormatted} ${monthShort} ${fullYear}`;
-  } catch {
-    return isoString;
-  }
-}
+import {
+  calculateLoveMatch,
+  formatDateDisplay,
+  MONTH_NAMES,
+} from "@/src/lib/loveMatch";
 
 export default function LoveMatchScreen() {
   const router = useRouter();

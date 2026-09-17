@@ -16,7 +16,7 @@ export default function WelcomeScreen() {
 
   useEffect(() => {
     if (!isLoading && user) {
-      const target = resolveInitialRoute(user, hasPartner);
+      const target = resolveInitialRoute({ user, hasPartner });
       if (target !== ROUTES.WELCOME) {
         if (target === ROUTES.INVITE_PARTNER) {
           router.replace({

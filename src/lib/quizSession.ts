@@ -8,34 +8,51 @@ import { QuizAnswer, QuizSession } from "@/src/types";
 import { Database } from "@/src/types/database";
 import { sendExpoPushNotification } from "@/src/lib/notifications";
 
-function shuffleArray<T>(array: T[]): T[] {
-  const arr = [...array];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j] as T, arr[i] as T];
-  }
-  return arr;
-}
+import { selectBalancedRandom } from "@/src/lib/questionSelector";
 
 export function selectQuizQuestions(): QuizQuestion[] {
-  const categories: QuizCategory[] = [
+  const categories: readonly QuizCategory[] = [
     "preferences",
     "habits",
     "memories",
     "future",
   ];
-  const shuffledCategories = shuffleArray(categories);
-  const categoryCounts = [3, 3, 2, 2];
-  const selected: QuizQuestion[] = [];
+  return selectBalancedRandom(
+    QUIZ_QUESTION_BANK,
+    categories,
+    (q) => q.category,
+    [3, 3, 2, 2],
+  );
+}
 
-  shuffledCategories.forEach((category, idx) => {
-    const pool = QUIZ_QUESTION_BANK.filter((q) => q.category === category);
-    const count = categoryCounts[idx] ?? 2;
-    const picked = shuffleArray(pool).slice(0, count);
-    selected.push(...picked);
-  });
+export interface ScoreHeadline {
+  title: string;
+  desc: string;
+}
 
-  return shuffleArray(selected);
+export function getScoreHeadline(percentage: number): ScoreHeadline {
+  if (percentage >= 90) {
+    return {
+      title: "Incredible Soulmates! 💖",
+      desc: "You know each other inside and out. Your bond is truly exceptional!",
+    };
+  }
+  if (percentage >= 70) {
+    return {
+      title: "Super In Sync! 💕",
+      desc: "You know your partner wonderfully well! A couple that really pays attention.",
+    };
+  }
+  if (percentage >= 50) {
+    return {
+      title: "Growing Closer Everyday! 🥰",
+      desc: "A great foundation with plenty of cute new things to keep discovering!",
+    };
+  }
+  return {
+    title: "Exciting Discoveries Ahead! 🌱",
+    desc: "Every answer is a chance to spark deeper conversation and learn more about each other.",
+  };
 }
 
 export async function createQuizSession(

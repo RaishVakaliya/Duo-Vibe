@@ -27,6 +27,7 @@ import {
   BottomTabBar,
   TabItem,
 } from "@/src/components/navigation/bottom-tab-bar";
+import { getInitial } from "@/src/lib/profile";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -52,21 +53,6 @@ export default function ProfileScreen() {
     Constants?.expoConfig?.android?.versionCode ??
     Constants?.expoConfig?.ios?.buildNumber ??
     "1";
-
-  const isUrl = (val: string | null): boolean => {
-    if (!val) return false;
-    return (
-      val.startsWith("http://") ||
-      val.startsWith("https://") ||
-      val.startsWith("file://") ||
-      val.startsWith("data:")
-    );
-  };
-
-  const getInitial = (name: string | null): string => {
-    if (!name || !name.trim()) return "D";
-    return name.trim().charAt(0).toUpperCase();
-  };
 
   // Fetch actual partner name if connected
   useEffect(() => {
@@ -235,7 +221,7 @@ export default function ProfileScreen() {
   };
 
   const renderAvatarContent = () => {
-    if (avatarUrl && isUrl(avatarUrl)) {
+    if (avatarUrl) {
       return (
         <Image
           source={{ uri: avatarUrl }}

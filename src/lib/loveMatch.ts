@@ -55,42 +55,36 @@ export function calculateLoveMatch(
   return { overall, communication, chemistry, trust, longTerm };
 }
 
-if (__DEV__) {
+export const MONTH_NAMES = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+] as const;
+
+export function formatDateDisplay(isoString: string): string {
+  if (!isoString) return "Select Date";
   try {
-    const res1 = calculateLoveMatch(
-      "Rahul",
-      "2001-04-12",
-      "Priya",
-      "2002-11-08",
+    const [year, month, day] = isoString.split("-");
+    if (!year || !month || !day) return isoString;
+    const date = new Date(
+      parseInt(year, 10),
+      parseInt(month, 10) - 1,
+      parseInt(day, 10),
     );
-    const res2 = calculateLoveMatch(
-      "Rahul",
-      "2001-04-12",
-      "Priya",
-      "2002-11-08",
-    );
-    const testA = JSON.stringify(res1) === JSON.stringify(res2);
-
-    const resSwappedDob = calculateLoveMatch(
-      "Rahul",
-      "2002-11-08",
-      "Priya",
-      "2001-04-12",
-    );
-    const testB = JSON.stringify(res1) !== JSON.stringify(resSwappedDob);
-
-    const resSwappedOrder = calculateLoveMatch(
-      "Priya",
-      "2002-11-08",
-      "Rahul",
-      "2001-04-12",
-    );
-    const testC = JSON.stringify(res1) === JSON.stringify(resSwappedOrder);
-
-    if (!testA || !testB || !testC) {
-      console.warn("LoveMatch verification failed:", { testA, testB, testC });
-    }
-  } catch (e) {
-    console.warn("LoveMatch test error:", e);
+    const dayFormatted = String(date.getDate()).padStart(2, "0");
+    const monthShort = date.toLocaleString("en-US", { month: "short" });
+    const fullYear = date.getFullYear();
+    return `${dayFormatted} ${monthShort} ${fullYear}`;
+  } catch {
+    return isoString;
   }
 }

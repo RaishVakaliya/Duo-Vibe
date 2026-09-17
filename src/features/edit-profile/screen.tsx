@@ -21,6 +21,7 @@ import { styles } from "./styles";
 import { GRADIENTS } from "@/src/constants/colors";
 import { useAuth } from "@/src/context/auth";
 import { useAlert } from "@/src/components/ui/alert-dialog";
+import { getInitial } from "@/src/lib/profile";
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -32,11 +33,6 @@ export default function EditProfileScreen() {
     avatarUrl ?? null,
   );
   const [isSaving, setIsSaving] = useState<boolean>(false);
-
-  const getInitial = (str: string | null): string => {
-    if (!str || !str.trim()) return "D";
-    return str.trim().charAt(0).toUpperCase();
-  };
 
   const handlePickFromGallery = async (): Promise<void> => {
     try {
@@ -102,11 +98,6 @@ export default function EditProfileScreen() {
     }
   };
 
-  const isUrl = (val: string | null): boolean => {
-    if (!val) return false;
-    return val.startsWith("http://") || val.startsWith("https://") || val.startsWith("file://") || val.startsWith("data:");
-  };
-
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -151,7 +142,7 @@ export default function EditProfileScreen() {
                 accessibilityLabel="Upload profile picture from gallery"
               >
                 <View style={styles.avatarInner}>
-                  {pickedImageUri && isUrl(pickedImageUri) ? (
+                  {pickedImageUri ? (
                     <Image
                       source={{ uri: pickedImageUri }}
                       style={styles.avatarImage}

@@ -57,16 +57,32 @@ interface AuthErrorLike {
   message?: string;
 }
 
+export interface InitialRouteState {
+  user: User | null;
+  hasPartner: boolean;
+  onboardingComplete?: boolean;
+}
+
 export function resolveInitialRoute(
-  user: User | null,
-  hasPartner: boolean,
+  authStateOrUser: InitialRouteState | User | null,
+  legacyHasPartner?: boolean,
 ): AppRoute {
-  if (!user) {
+  const state: InitialRouteState =
+    authStateOrUser && typeof authStateOrUser === "object" && "hasPartner" in authStateOrUser
+      ? (authStateOrUser as InitialRouteState)
+      : {
+        user: authStateOrUser as User | null,
+        hasPartner: Boolean(legacyHasPartner),
+      };
+
+  if (!state.user) {
     return ROUTES.WELCOME;
   }
-  if (hasPartner) {
+
+  if (state.hasPartner) {
     return ROUTES.HOME;
   }
+
   return ROUTES.INVITE_PARTNER;
 }
 
