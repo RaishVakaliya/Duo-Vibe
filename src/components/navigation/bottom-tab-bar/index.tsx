@@ -63,7 +63,7 @@ export function BottomTabBar({ activeTab, onTabPress }: BottomTabBarProps) {
   const handleTabPress = (index: number, item: TabItem): void => {
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch {}
+    } catch { }
     onTabPress(index, item);
   };
 

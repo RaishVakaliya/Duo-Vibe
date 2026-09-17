@@ -101,9 +101,9 @@ export default function CrushCalculatorScreen() {
             transition={{ type: "timing", duration: 400 }}
             style={styles.headerTextSection}
           >
-            <Text style={styles.mainTitle}>Calculate Your Crush ✨</Text>
+            <Text style={styles.mainTitle}>Calculate Your Crush</Text>
             <Text style={styles.subtitle}>
-              Enter your name and find out what your crush feels!
+              Enter both names to check your connection and chemistry.
             </Text>
           </MotiView>
         </View>

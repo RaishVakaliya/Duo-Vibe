@@ -30,7 +30,7 @@ export default function PrivacyScreen() {
             accessibilityRole="button"
             accessibilityLabel="Go back"
           >
-            <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+            <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
           </Pressable>
 
           <Text style={styles.headerTitle}>Privacy Policy</Text>

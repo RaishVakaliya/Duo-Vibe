@@ -163,7 +163,7 @@ export default function InvitePartnerScreen() {
               accessibilityRole="button"
               accessibilityLabel="Go back"
             >
-              <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+              <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
             </Pressable>
           </View>
         ) : (

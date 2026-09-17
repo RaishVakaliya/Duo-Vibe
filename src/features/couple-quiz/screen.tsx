@@ -204,8 +204,8 @@ export default function CoupleQuizStartScreen() {
                 Waiting for Partner Review
               </Text>
               <Text style={styles.blockingText}>
-                Waiting for your partner to review your last quiz. We&apos;ll
-                notify you as soon as they grade your answers! 💕
+                Waiting for your partner to review your quiz. You will receive
+                a notification as soon as they finish grading your answers.
               </Text>
 
               <Pressable
@@ -222,7 +222,7 @@ export default function CoupleQuizStartScreen() {
                 <CoupleIllustration width={280} height={145} />
               </View>
 
-              <Text style={styles.cardTitle}>Test Your Connection 💕</Text>
+              <Text style={styles.cardTitle}>Couple Connection Quiz</Text>
               <Text style={styles.cardDescription}>
                 Answer 10 multiple-choice questions about your partner. When you
                 finish, your partner will review your answers to reveal your

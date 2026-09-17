@@ -108,7 +108,7 @@ export const styles = StyleSheet.create({
     fontSize: 20,
   },
   featureText: {
-    fontFamily: "Fredoka_500Medium",
+    fontFamily: "Fredoka_400Regular",
     fontSize: 14,
     color: COLORS.white,
     flex: 1,

@@ -238,7 +238,7 @@ export default function TwentyOneQuestionsScreen() {
               style={styles.nextButtonGradient}
             >
               <Text style={styles.nextButtonText}>
-                {isLast ? "Finish 💕" : "Next"}
+                {isLast ? "Finish Quiz" : "Next"}
               </Text>
             </LinearGradient>
           </Pressable>
@@ -251,7 +251,7 @@ export default function TwentyOneQuestionsScreen() {
         >
           <Ionicons name="heart" size={22} color="#FF4D6D" />
           <Text style={styles.toastText}>
-            Great conversation! 💕 Keep exploring each other.
+            Great conversation! Saved to your memory bank.
           </Text>
         </Animated.View>
       )}

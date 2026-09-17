@@ -357,7 +357,7 @@ export default function CoupleQuizReviewScreen() {
                     <ActivityIndicator size="small" color="#FFFFFF" />
                   ) : (
                     <Text style={styles.nextButtonText}>
-                      {isLast ? "Submit Review 🎉" : "Next"}
+                      {isLast ? "Submit Review" : "Next"}
                     </Text>
                   )}
                 </LinearGradient>

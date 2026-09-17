@@ -48,7 +48,7 @@ export default function RelationshipTypeScreen() {
             accessibilityRole="button"
             accessibilityLabel="Go back"
           >
-            <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+            <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
           </Pressable>
 
           <View style={styles.progressBarTrack}>

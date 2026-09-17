@@ -39,7 +39,7 @@ export default function FeedbackScreen() {
       setIsSubmitting(false);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       showAlert({
-        title: "Thank You! 💕",
+        title: "Thank You!",
         message:
           "Your feedback has been received. Thank you for helping us shape Duo Vibe!",
         buttons: [
@@ -71,7 +71,7 @@ export default function FeedbackScreen() {
             accessibilityRole="button"
             accessibilityLabel="Go back"
           >
-            <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+            <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
           </Pressable>
 
           <Text style={styles.headerTitle}>Feedback</Text>
@@ -85,7 +85,7 @@ export default function FeedbackScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.introCard}>
-            <Text style={styles.headline}>Share Your Thoughts 💌</Text>
+            <Text style={styles.headline}>Share Your Feedback</Text>
             <Text style={styles.subheadline}>
               Have an idea for a new game? Found an issue? Or just want to tell us
               how Duo Vibe made you smile? We read every message!

@@ -116,11 +116,43 @@ export const GRADIENTS = {
 export const RADIUS = {
   button: 28, // Standard full-pill button radius (h: 56)
   buttonFooter: 26, // Dual-button footer radius (h: 52)
-  card: 28, // Main content / question / result cards
-  cardSmall: 20, // Secondary / modal / action cards
-  input: 16, // Text inputs & picker containers
+  card: 20, // Structured card radius (restrained, modern, not squircle bubble)
+  cardSmall: 16, // Secondary / inner modal / option cards
+  input: 14, // Crisp text inputs & picker containers
+  pill: 9999, // Pill tags and badges
   circleBack: 20, // 40x40 circular back button
   circleBackLg: 22, // 44x44 circular back button
+};
+
+export const SHADOWS = {
+  subtle: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  card: {
+    shadowColor: "#1E1B26",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  cardElevated: {
+    shadowColor: "#1E1B26",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 14,
+    elevation: 5,
+  },
+  primaryAction: {
+    shadowColor: "#FF4D6D",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 4,
+  },
 };
 
 export const SPACING = {
@@ -128,3 +160,4 @@ export const SPACING = {
   headerTop: 8,
   headerBottom: 12,
 };
+

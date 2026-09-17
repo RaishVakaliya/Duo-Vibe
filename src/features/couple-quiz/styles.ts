@@ -223,7 +223,7 @@ export const styles = StyleSheet.create({
     marginBottom: 14,
   },
   errorText: {
-    fontFamily: "Fredoka_500Medium",
+    fontFamily: "Fredoka_600SemiBold",
     fontSize: 13,
     color: COLORS.errorText,
     flex: 1,

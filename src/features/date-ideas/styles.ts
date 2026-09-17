@@ -68,16 +68,16 @@ export const styles = StyleSheet.create({
     width: "100%",
   },
   cardGradientBorder: {
-    borderRadius: 24,
+    borderRadius: RADIUS.card,
     padding: 2,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 4,
   },
   cardInner: {
     backgroundColor: COLORS.cardInnerDark,
-    borderRadius: 22,
+    borderRadius: RADIUS.card - 2,
     padding: 24,
   },
   cardHeader: {

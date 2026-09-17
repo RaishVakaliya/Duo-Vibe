@@ -188,7 +188,7 @@ export default function HomeScreen() {
                 color="#FF8FA3"
               />
               <Text style={styles.statusText}>
-                {hasPartner ? "Connected Space 💕" : "Partner Pending"}
+                {hasPartner ? "Connected Space" : "Partner Pending"}
               </Text>
             </View>
           </View>
@@ -233,10 +233,10 @@ export default function HomeScreen() {
                 </View>
                 <View style={styles.pendingReviewTextWrap}>
                   <Text style={styles.pendingReviewTitle}>
-                    Partner Quiz Ready!
+                    Partner Quiz Ready
                   </Text>
                   <Text style={styles.pendingReviewSubtitle}>
-                    Your partner finished a Couple Quiz! Tap to review 💕
+                    Your partner submitted a Couple Quiz. Tap to review.
                   </Text>
                 </View>
               </View>
@@ -382,7 +382,7 @@ export default function HomeScreen() {
                     }
                   </Text>
                   <Text style={styles.todaysCardTapPrompt}>
-                    {"Tap to reveal & answer 💌"}
+                    {"Tap to reveal & answer"}
                   </Text>
                 </View>
 

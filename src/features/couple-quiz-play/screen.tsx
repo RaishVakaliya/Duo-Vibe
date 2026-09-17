@@ -288,7 +288,7 @@ export default function CoupleQuizPlayScreen() {
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
                 <Text style={styles.nextButtonText}>
-                  {isLast ? "Submit 💕" : "Next"}
+                  {isLast ? "Submit Answers" : "Next"}
                 </Text>
               )}
             </LinearGradient>
@@ -302,7 +302,7 @@ export default function CoupleQuizPlayScreen() {
             <View style={styles.submittedIconWrap}>
               <Ionicons name="heart" size={38} color="#FF2D6C" />
             </View>
-            <Text style={styles.submittedTitle}>Quiz Sent! 💕</Text>
+            <Text style={styles.submittedTitle}>Quiz Sent to Partner</Text>
             <Text style={styles.submittedSubtitle}>
               We&apos;ll notify you once your partner reviews your answers!
             </Text>

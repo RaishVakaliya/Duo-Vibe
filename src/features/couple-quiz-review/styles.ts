@@ -146,7 +146,7 @@ export const styles = StyleSheet.create({
   },
   optionText: {
     flex: 1,
-    fontFamily: "Fredoka_500Medium",
+    fontFamily: "Fredoka_400Regular",
     fontSize: 15,
     color: COLORS.textSecondary,
     lineHeight: 20,

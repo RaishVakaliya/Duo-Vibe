@@ -246,7 +246,7 @@ export const styles = StyleSheet.create({
     marginBottom: 16,
   },
   versionText: {
-    fontFamily: "Fredoka_500Medium",
+    fontFamily: "Fredoka_600SemiBold",
     fontSize: 13,
     color: "rgba(255, 255, 255, 0.35)",
   },

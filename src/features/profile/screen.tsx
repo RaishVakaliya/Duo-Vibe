@@ -101,7 +101,7 @@ export default function ProfileScreen() {
     if (!hasPartner) {
       showAlert({
         title: "Partner Required",
-        message: "Pair with a partner first to change your relationship type 💕",
+        message: "Pair with a partner first to change your relationship type.",
       });
       return;
     }
@@ -114,7 +114,7 @@ export default function ProfileScreen() {
     if (!hasPartner) {
       showAlert({
         title: "Partner Required",
-        message: "Pair with a partner first to change your relationship type 💕",
+        message: "Pair with a partner first to change your relationship type.",
       });
     }
   };
@@ -254,7 +254,7 @@ export default function ProfileScreen() {
             accessibilityRole="button"
             accessibilityLabel="Go back to Home"
           >
-            <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+            <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
           </Pressable>
 
           <View style={styles.headerPlaceholder} />
@@ -294,8 +294,8 @@ export default function ProfileScreen() {
                 <View style={styles.partnerStatusDot} />
                 <Text style={styles.partnerStatusText}>
                   {partnerName
-                    ? `Connected with ${partnerName} 💕`
-                    : "Connected Space 💕"}
+                    ? `Connected with ${partnerName}`
+                    : "Connected Space"}
                 </Text>
               </View>
             ) : (
@@ -312,7 +312,7 @@ export default function ProfileScreen() {
               >
                 <View style={styles.waitingStatusDot} />
                 <Text style={styles.waitingStatusText}>Waiting for partner</Text>
-                <Text style={styles.waitingInviteLink}>Invite 🔗</Text>
+                <Text style={styles.waitingInviteLink}>Invite</Text>
               </Pressable>
             )}
           </MotiView>
@@ -517,7 +517,7 @@ export default function ProfileScreen() {
               Version {appVersion} • Build {appBuildNumber}
             </Text>
             <Text style={styles.copyrightText}>
-              Duo Vibe • Made with 💕 for couples
+              Duo Vibe • Crafted for couples
             </Text>
           </View>
         </ScrollView>
