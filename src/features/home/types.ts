@@ -14,11 +14,16 @@ export interface LoveToolItem {
   route?: AppRoute;
 }
 
-export interface HeroBannerProps {
-  onPress: () => void;
+export interface RedGreenFlagBannerProps {
+  onPress?: () => void;
+}
+
+export interface LoveToolsGridProps {
+  tools?: readonly LoveToolItem[];
+  onToolPress: (tool: LoveToolItem) => void;
 }
 
 export interface TodaysCardProps {
-  question: string;
   onPress: () => void;
+  quote?: string;
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -6,7 +6,7 @@ import {
   ScrollView,
   Pressable,
   Switch,
-  Linking,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -14,20 +14,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
-import * as Haptics from "expo-haptics";
-import Constants from "expo-constants";
 import { styles } from "./styles";
 import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
-import { useAuth } from "@/src/context/auth";
-import { useAlert } from "@/src/components/ui/alert-dialog";
-import { supabase } from "@/src/lib/supabase";
-import { registerForPushNotificationsAsync } from "@/src/lib/notifications";
 import {
   BottomTabBar,
-  TabItem,
 } from "@/src/components/navigation/bottom-tab-bar";
 import { getInitial } from "@/src/lib/profile";
+import { useProfileData } from "./use-profile-data";
+import { ProfileMenuItem } from "./components/profile-menu-item";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -36,189 +31,21 @@ export default function ProfileScreen() {
     userName,
     avatarUrl,
     hasPartner,
-    relationshipType,
-    setRelationshipType,
-    signOut,
-    deleteAccount,
-  } = useAuth();
-  const { showAlert } = useAlert();
-
-  const [pushNotificationsEnabled, setPushNotificationsEnabled] =
-    useState<boolean>(true);
-  const [isActionLoading, setIsActionLoading] = useState<boolean>(false);
-  const [partnerName, setPartnerName] = useState<string | null>(null);
-
-  const appVersion = Constants?.expoConfig?.version ?? "1.0.0";
-  const appBuildNumber =
-    Constants?.expoConfig?.android?.versionCode ??
-    Constants?.expoConfig?.ios?.buildNumber ??
-    "1";
-
-  // Fetch actual partner name if connected
-  useEffect(() => {
-    if (!user || !hasPartner) return;
-    const fetchPartnerProfile = async () => {
-      try {
-        const { data: myProfile } = await supabase
-          .from("profiles")
-          .select("partner_id")
-          .eq("id", user.id)
-          .maybeSingle();
-
-        let partnerId = myProfile?.partner_id;
-        if (!partnerId) {
-          const { data: couple } = await supabase
-            .from("couples")
-            .select("user1_id, user2_id")
-            .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
-            .eq("status", "connected")
-            .maybeSingle();
-          if (couple) {
-            partnerId =
-              couple.user1_id === user.id ? couple.user2_id : couple.user1_id;
-          }
-        }
-
-        if (partnerId) {
-          const { data: pProfile } = await supabase
-            .from("profiles")
-            .select("full_name")
-            .eq("id", partnerId)
-            .maybeSingle();
-          if (pProfile?.full_name) {
-            setPartnerName(pProfile.full_name);
-          }
-        }
-      } catch (err) {
-        console.warn("Failed to fetch partner info:", err);
-      }
-    };
-    fetchPartnerProfile();
-  }, [user, hasPartner]);
-
-  // Handle relationship type toggle
-  const handleToggleRelationship = async (isLongDistance: boolean): Promise<void> => {
-    if (!hasPartner) {
-      showAlert({
-        title: "Partner Required",
-        message: "Pair with a partner first to change your relationship type.",
-      });
-      return;
-    }
-    Haptics.selectionAsync();
-    const newType = isLongDistance ? "long_distance" : "local";
-    await setRelationshipType(newType);
-  };
-
-  const handleRelationshipCardPress = (): void => {
-    if (!hasPartner) {
-      showAlert({
-        title: "Partner Required",
-        message: "Pair with a partner first to change your relationship type.",
-      });
-    }
-  };
-
-  const handleToggleNotifications = async (value: boolean): Promise<void> => {
-    setPushNotificationsEnabled(value);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (value && user) {
-      try {
-        await registerForPushNotificationsAsync(user.id);
-      } catch (err) {
-        console.warn("Error re-registering push token:", err);
-      }
-    }
-  };
-
-  const handleSupportEmail = async (): Promise<void> => {
-    const email = "support@duovibe.app";
-    const subject = encodeURIComponent("Duo Vibe App Support");
-    const mailtoUrl = `mailto:${email}?subject=${subject}`;
-    try {
-      const supported = await Linking.canOpenURL(mailtoUrl);
-      if (supported) {
-        await Linking.openURL(mailtoUrl);
-      } else {
-        showAlert({
-          title: "Support Email",
-          message: `Reach out to our support team at: ${email}`,
-        });
-      }
-    } catch {
-      showAlert({
-        title: "Support Email",
-        message: `Reach out to our support team at: ${email}`,
-      });
-    }
-  };
-
-  const handleSignOut = (): void => {
-    showAlert({
-      title: "Sign Out",
-      message: "Are you sure you want to sign out of Duo Vibe?",
-      buttons: [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Sign Out",
-          style: "destructive",
-          onPress: async () => {
-            setIsActionLoading(true);
-            try {
-              await signOut();
-              router.replace(ROUTES.WELCOME);
-            } catch {
-              showAlert({
-                title: "Error",
-                message: "Failed to sign out. Please try again.",
-              });
-            } finally {
-              setIsActionLoading(false);
-            }
-          },
-        },
-      ],
-    });
-  };
-
-  const handleDeleteAccount = (): void => {
-    showAlert({
-      title: "Delete Account",
-      message:
-        "Are you sure you want to permanently delete your Duo Vibe account? This will disconnect your partner and erase your private data.",
-      buttons: [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            setIsActionLoading(true);
-            try {
-              await deleteAccount();
-              router.replace(ROUTES.WELCOME);
-            } catch {
-              showAlert({
-                title: "Error",
-                message: "Failed to delete account. Please try again.",
-              });
-            } finally {
-              setIsActionLoading(false);
-            }
-          },
-        },
-      ],
-    });
-  };
-
-  const handleTabPress = (_index: number, item: TabItem): void => {
-    switch (item.id) {
-      case "home":
-        router.replace(ROUTES.HOME);
-        break;
-      case "profile":
-        break;
-    }
-  };
+    partnerName,
+    isLongDistance,
+    pushNotificationsEnabled,
+    isActionLoading,
+    actionLoadingMessage,
+    appVersion,
+    appBuildNumber,
+    handleToggleRelationship,
+    handleRelationshipCardPress,
+    handleToggleNotifications,
+    handleSupportEmail,
+    handleSignOut,
+    handleDeleteAccount,
+    handleTabPress,
+  } = useProfileData();
 
   const renderAvatarContent = () => {
     if (avatarUrl) {
@@ -232,8 +59,6 @@ export default function ProfileScreen() {
     }
     return <Text style={styles.avatarLetter}>{getInitial(userName)}</Text>;
   };
-
-  const isLongDistance = relationshipType === "long_distance";
 
   return (
     <View style={styles.container}>
@@ -374,142 +199,61 @@ export default function ProfileScreen() {
 
           <Text style={styles.sectionHeader}>Feedback & Support</Text>
           <View style={styles.settingsGroup}>
-            <Pressable
-              style={[styles.settingsRow, styles.settingsRowBorder]}
+            <ProfileMenuItem
+              title="About the App"
+              subtitle="Our story and mission"
               onPress={() => router.push(ROUTES.ABOUT)}
-              accessibilityRole="button"
               accessibilityLabel="About Duo Vibe"
-            >
-              <View style={styles.settingsRowContent}>
-                <Text style={styles.settingsRowTitle}>About the App</Text>
-                <Text style={styles.settingsRowSubtitle}>
-                  Our story and mission
-                </Text>
-              </View>
-              <Ionicons
-                name="chevron-forward"
-                size={18}
-                color="rgba(255, 255, 255, 0.3)"
-              />
-            </Pressable>
-
-            <Pressable
-              style={[styles.settingsRow, styles.settingsRowBorder]}
+              hasBorder
+            />
+            <ProfileMenuItem
+              title="Provide Feedback"
+              subtitle="Share your thoughts & suggestions"
               onPress={() => router.push(ROUTES.FEEDBACK)}
-              accessibilityRole="button"
               accessibilityLabel="Provide Feedback"
-            >
-              <View style={styles.settingsRowContent}>
-                <Text style={styles.settingsRowTitle}>Provide Feedback</Text>
-                <Text style={styles.settingsRowSubtitle}>
-                  Share your thoughts & suggestions
-                </Text>
-              </View>
-              <Ionicons
-                name="chevron-forward"
-                size={18}
-                color="rgba(255, 255, 255, 0.3)"
-              />
-            </Pressable>
-
-            <Pressable
-              style={styles.settingsRow}
+              hasBorder
+            />
+            <ProfileMenuItem
+              title="Support Email"
+              subtitle="support@duovibe.app"
               onPress={handleSupportEmail}
-              accessibilityRole="button"
               accessibilityLabel="Support Email"
-            >
-              <View style={styles.settingsRowContent}>
-                <Text style={styles.settingsRowTitle}>Support Email</Text>
-                <Text style={styles.settingsRowSubtitle}>
-                  support@duovibe.app
-                </Text>
-              </View>
-              <Ionicons
-                name="chevron-forward"
-                size={18}
-                color="rgba(255, 255, 255, 0.3)"
-              />
-            </Pressable>
+            />
           </View>
 
           <Text style={styles.sectionHeader}>Legal</Text>
           <View style={styles.settingsGroup}>
-            <Pressable
-              style={[styles.settingsRow, styles.settingsRowBorder]}
+            <ProfileMenuItem
+              title="Terms of Service"
               onPress={() => router.push(ROUTES.TERMS)}
-              accessibilityRole="button"
               accessibilityLabel="Terms of Service"
-            >
-              <View style={styles.settingsRowContent}>
-                <Text style={styles.settingsRowTitle}>Terms of Service</Text>
-              </View>
-              <Ionicons
-                name="chevron-forward"
-                size={18}
-                color="rgba(255, 255, 255, 0.3)"
-              />
-            </Pressable>
-
-            <Pressable
-              style={styles.settingsRow}
+              hasBorder
+            />
+            <ProfileMenuItem
+              title="Privacy Policy"
               onPress={() => router.push(ROUTES.PRIVACY)}
-              accessibilityRole="button"
               accessibilityLabel="Privacy Policy"
-            >
-              <View style={styles.settingsRowContent}>
-                <Text style={styles.settingsRowTitle}>Privacy Policy</Text>
-              </View>
-              <Ionicons
-                name="chevron-forward"
-                size={18}
-                color="rgba(255, 255, 255, 0.3)"
-              />
-            </Pressable>
+            />
           </View>
 
           <Text style={styles.sectionHeader}>Account</Text>
           <View style={styles.settingsGroup}>
-            <Pressable
-              style={[styles.settingsRow, styles.settingsRowBorder]}
+            <ProfileMenuItem
+              title="Sign Out"
+              subtitle="Log out of your account"
               onPress={handleSignOut}
               disabled={isActionLoading}
-              accessibilityRole="button"
               accessibilityLabel="Sign Out"
-            >
-              <View style={styles.settingsRowContent}>
-                <Text style={styles.settingsRowTitle}>Sign Out</Text>
-                <Text style={styles.settingsRowSubtitle}>
-                  Log out of your account
-                </Text>
-              </View>
-              <Ionicons
-                name="chevron-forward"
-                size={18}
-                color="rgba(255, 255, 255, 0.3)"
-              />
-            </Pressable>
-
-            <Pressable
-              style={styles.settingsRow}
+              hasBorder
+            />
+            <ProfileMenuItem
+              title="Delete Account"
+              subtitle="Permanently remove account & unlink partner"
               onPress={handleDeleteAccount}
               disabled={isActionLoading}
-              accessibilityRole="button"
               accessibilityLabel="Delete Account"
-            >
-              <View style={styles.settingsRowContent}>
-                <Text style={[styles.settingsRowTitle, styles.destructiveText]}>
-                  Delete Account
-                </Text>
-                <Text style={styles.settingsRowSubtitle}>
-                  Permanently remove account & unlink partner
-                </Text>
-              </View>
-              <Ionicons
-                name="chevron-forward"
-                size={18}
-                color="rgba(239, 68, 68, 0.5)"
-              />
-            </Pressable>
+              isDestructive
+            />
           </View>
 
           <View style={styles.footer}>
@@ -523,6 +267,17 @@ export default function ProfileScreen() {
         </ScrollView>
 
         <BottomTabBar activeTab={4} onTabPress={handleTabPress} />
+
+        {isActionLoading && (
+          <View style={styles.loadingOverlay}>
+            <View style={styles.loadingCard}>
+              <ActivityIndicator size="large" color="#FF4D6D" />
+              <Text style={styles.loadingText}>
+                {actionLoadingMessage || "Please wait..."}
+              </Text>
+            </View>
+          </View>
+        )}
       </SafeAreaView>
     </View>
   );

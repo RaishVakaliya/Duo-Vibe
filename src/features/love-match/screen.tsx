@@ -1,122 +1,52 @@
-import React, { useState, useCallback } from "react";
+import React from "react";
 import {
   View,
   Text,
-  TextInput,
   Pressable,
   ScrollView,
   Platform,
   KeyboardAvoidingView,
-  Modal,
-  BackHandler,
 } from "react-native";
-import { useRouter, useFocusEffect } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
 import { styles } from "./styles";
-import { ActiveDatePicker } from "./types";
-import { ROUTES } from "@/src/constants/routes";
 import { GRADIENTS } from "@/src/constants/colors";
-import {
-  calculateLoveMatch,
-  formatDateDisplay,
-  MONTH_NAMES,
-} from "@/src/lib/loveMatch";
+import { useLoveMatchForm } from "./use-love-match-form";
+import { PartnerAvatarInput } from "./components/partner-avatar-input";
+import { DobInput } from "./components/dob-input";
+import { DatePickerModal } from "./components/date-picker-modal";
 
 export default function LoveMatchScreen() {
-  const router = useRouter();
-
-  const [name1, setName1] = useState<string>("");
-  const [dob1, setDob1] = useState<string>("2001-04-12");
-  const [name2, setName2] = useState<string>("");
-  const [dob2, setDob2] = useState<string>("2002-11-08");
-
-  const [isFocused1, setIsFocused1] = useState<boolean>(false);
-  const [isFocused2, setIsFocused2] = useState<boolean>(false);
-
-  const [activePicker, setActivePicker] = useState<ActiveDatePicker>(null);
-
-  const [selectedDay, setSelectedDay] = useState<number>(12);
-  const [selectedMonth, setSelectedMonth] = useState<number>(3);
-  const [selectedYear, setSelectedYear] = useState<number>(2001);
-
-  useFocusEffect(
-    useCallback(() => {
-      const onBackPress = () => {
-        router.replace(ROUTES.HOME);
-        return true;
-      };
-
-      const subscription = BackHandler.addEventListener(
-        "hardwareBackPress",
-        onBackPress,
-      );
-
-      return () => subscription.remove();
-    }, [router]),
-  );
-
-  const isFormValid =
-    name1.trim().length > 0 &&
-    dob1.length > 0 &&
-    name2.trim().length > 0 &&
-    dob2.length > 0;
-
-  const handleOpenDatePicker = (target: "user" | "partner"): void => {
-    const currentIso = target === "user" ? dob1 : dob2;
-    if (currentIso) {
-      const [y, m, d] = currentIso.split("-");
-      if (y && m && d) {
-        setSelectedYear(parseInt(y, 10));
-        setSelectedMonth(parseInt(m, 10) - 1);
-        setSelectedDay(parseInt(d, 10));
-      }
-    } else {
-      setSelectedYear(2001);
-      setSelectedMonth(0);
-      setSelectedDay(1);
-    }
-    setActivePicker(target);
-  };
-
-  const handleConfirmDate = (): void => {
-    const y = selectedYear;
-    const m = String(selectedMonth + 1).padStart(2, "0");
-    const d = String(selectedDay).padStart(2, "0");
-    const isoFormatted = `${y}-${m}-${d}`;
-
-    if (activePicker === "user") {
-      setDob1(isoFormatted);
-    } else if (activePicker === "partner") {
-      setDob2(isoFormatted);
-    }
-    setActivePicker(null);
-  };
-
-  const handleCalculate = (): void => {
-    if (!isFormValid) return;
-    const matchResult = calculateLoveMatch(name1, dob1, name2, dob2);
-    router.push({
-      pathname: ROUTES.LOVE_MATCH_RESULT,
-      params: {
-        name1: name1.trim(),
-        name2: name2.trim(),
-        overall: String(matchResult.overall),
-        communication: String(matchResult.communication),
-        chemistry: String(matchResult.chemistry),
-        trust: String(matchResult.trust),
-        longTerm: String(matchResult.longTerm),
-      },
-    });
-  };
-
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 70 }, (_, i) => currentYear - i);
-  const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
-  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  const {
+    name1,
+    setName1,
+    dob1,
+    name2,
+    setName2,
+    dob2,
+    isFocused1,
+    setIsFocused1,
+    isFocused2,
+    setIsFocused2,
+    activePicker,
+    setActivePicker,
+    selectedDay,
+    setSelectedDay,
+    selectedMonth,
+    setSelectedMonth,
+    selectedYear,
+    setSelectedYear,
+    years,
+    days,
+    isFormValid,
+    handleOpenDatePicker,
+    handleConfirmDate,
+    handleCalculate,
+    handleBack,
+  } = useLoveMatchForm();
 
   return (
     <View style={styles.container}>
@@ -132,7 +62,7 @@ export default function LoveMatchScreen() {
         <View style={styles.headerRow}>
           <Pressable
             style={styles.backButton}
-            onPress={() => router.replace(ROUTES.HOME)}
+            onPress={handleBack}
             accessibilityRole="button"
             accessibilityLabel="Go back"
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
@@ -174,101 +104,45 @@ export default function LoveMatchScreen() {
             </MotiView>
 
             <View style={styles.avatarsRow}>
-              <MotiView
-                from={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: "spring", damping: 15 }}
-                style={styles.avatarCard}
-              >
-                <View style={styles.avatarIconCircle}>
-                  <Ionicons name="person" size={22} color="#334155" />
-                </View>
-                <Text style={styles.avatarLabel}>Your Name</Text>
-                <View style={styles.nameInputContainer}>
-                  <TextInput
-                    style={styles.nameInput}
-                    placeholder={isFocused1 ? "" : "Rahul"}
-                    placeholderTextColor="#CBD5E1"
-                    value={name1}
-                    onChangeText={setName1}
-                    onFocus={() => setIsFocused1(true)}
-                    onBlur={() => setIsFocused1(false)}
-                    autoCapitalize="words"
-                    autoCorrect={false}
-                    maxLength={20}
-                    cursorColor="#FF4D6D"
-                    selectionColor="rgba(255, 77, 109, 0.35)"
-                    underlineColorAndroid="transparent"
-                    accessibilityLabel="Enter your name"
-                  />
-                </View>
-              </MotiView>
+              <PartnerAvatarInput
+                label="Your Name"
+                name={name1}
+                onChangeName={setName1}
+                isFocused={isFocused1}
+                onFocus={() => setIsFocused1(true)}
+                onBlur={() => setIsFocused1(false)}
+                placeholder="Rahul"
+                accessibilityLabel="Enter your name"
+                delay={0}
+              />
 
-              <MotiView
-                from={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: "spring", damping: 15, delay: 100 }}
-                style={styles.avatarCard}
-              >
-                <View style={styles.avatarIconCircle}>
-                  <Ionicons name="person" size={22} color="#334155" />
-                </View>
-                <Text style={styles.avatarLabel}>Partner Name</Text>
-                <View style={styles.nameInputContainer}>
-                  <TextInput
-                    style={styles.nameInput}
-                    placeholder={isFocused2 ? "" : "Priya"}
-                    placeholderTextColor="#CBD5E1"
-                    value={name2}
-                    onChangeText={setName2}
-                    onFocus={() => setIsFocused2(true)}
-                    onBlur={() => setIsFocused2(false)}
-                    autoCapitalize="words"
-                    autoCorrect={false}
-                    maxLength={20}
-                    cursorColor="#FF4D6D"
-                    selectionColor="rgba(255, 77, 109, 0.35)"
-                    underlineColorAndroid="transparent"
-                    accessibilityLabel="Enter partner name"
-                  />
-                </View>
-              </MotiView>
+              <PartnerAvatarInput
+                label="Partner Name"
+                name={name2}
+                onChangeName={setName2}
+                isFocused={isFocused2}
+                onFocus={() => setIsFocused2(true)}
+                onBlur={() => setIsFocused2(false)}
+                placeholder="Priya"
+                accessibilityLabel="Enter partner name"
+                delay={100}
+              />
             </View>
 
             <View style={styles.datesRow}>
-              <Pressable
-                style={styles.dateCard}
+              <DobInput
+                label="Your DOB"
+                dob={dob1}
                 onPress={() => handleOpenDatePicker("user")}
-                accessibilityRole="button"
                 accessibilityLabel="Select your date of birth"
-              >
-                <View style={styles.dateIconBox}>
-                  <Ionicons name="calendar-outline" size={18} color="#64748B" />
-                </View>
-                <View style={styles.dateTextBox}>
-                  <Text style={styles.dateLabel}>Your DOB</Text>
-                  <Text style={styles.dateValue}>
-                    {formatDateDisplay(dob1)}
-                  </Text>
-                </View>
-              </Pressable>
+              />
 
-              <Pressable
-                style={styles.dateCard}
+              <DobInput
+                label="Partner DOB"
+                dob={dob2}
                 onPress={() => handleOpenDatePicker("partner")}
-                accessibilityRole="button"
                 accessibilityLabel="Select partner date of birth"
-              >
-                <View style={styles.dateIconBox}>
-                  <Ionicons name="calendar-outline" size={18} color="#64748B" />
-                </View>
-                <View style={styles.dateTextBox}>
-                  <Text style={styles.dateLabel}>Partner DOB</Text>
-                  <Text style={styles.dateValue}>
-                    {formatDateDisplay(dob2)}
-                  </Text>
-                </View>
-              </Pressable>
+              />
             </View>
 
             <Pressable
@@ -297,131 +171,20 @@ export default function LoveMatchScreen() {
           </ScrollView>
         </KeyboardAvoidingView>
 
-        <Modal
+        <DatePickerModal
           visible={activePicker !== null}
-          transparent
-          animationType="slide"
-          onRequestClose={() => setActivePicker(null)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContainer}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>
-                  {activePicker === "user"
-                    ? "Select Your Date of Birth"
-                    : "Select Partner's Date of Birth"}
-                </Text>
-                <Pressable
-                  style={styles.modalCloseButton}
-                  onPress={() => setActivePicker(null)}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
-                  <Ionicons name="close" size={22} color="#64748B" />
-                </Pressable>
-              </View>
-
-              <View style={styles.modalColumnsRow}>
-                <ScrollView
-                  style={styles.pickerColumn}
-                  showsVerticalScrollIndicator={false}
-                >
-                  {days.map((d) => {
-                    const isSelected = d === selectedDay;
-                    return (
-                      <Pressable
-                        key={d}
-                        style={[
-                          styles.pickerItem,
-                          isSelected && styles.pickerItemSelected,
-                        ]}
-                        onPress={() => setSelectedDay(d)}
-                      >
-                        <Text
-                          style={[
-                            styles.pickerItemText,
-                            isSelected && styles.pickerItemTextSelected,
-                          ]}
-                        >
-                          {String(d).padStart(2, "0")}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </ScrollView>
-
-                <ScrollView
-                  style={styles.pickerColumn}
-                  showsVerticalScrollIndicator={false}
-                >
-                  {MONTH_NAMES.map((mName, idx) => {
-                    const isSelected = idx === selectedMonth;
-                    return (
-                      <Pressable
-                        key={mName}
-                        style={[
-                          styles.pickerItem,
-                          isSelected && styles.pickerItemSelected,
-                        ]}
-                        onPress={() => setSelectedMonth(idx)}
-                      >
-                        <Text
-                          style={[
-                            styles.pickerItemText,
-                            isSelected && styles.pickerItemTextSelected,
-                          ]}
-                        >
-                          {mName}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </ScrollView>
-
-                <ScrollView
-                  style={styles.pickerColumn}
-                  showsVerticalScrollIndicator={false}
-                >
-                  {years.map((y) => {
-                    const isSelected = y === selectedYear;
-                    return (
-                      <Pressable
-                        key={y}
-                        style={[
-                          styles.pickerItem,
-                          isSelected && styles.pickerItemSelected,
-                        ]}
-                        onPress={() => setSelectedYear(y)}
-                      >
-                        <Text
-                          style={[
-                            styles.pickerItemText,
-                            isSelected && styles.pickerItemTextSelected,
-                          ]}
-                        >
-                          {y}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </ScrollView>
-              </View>
-
-              <Pressable
-                style={styles.modalDoneButton}
-                onPress={handleConfirmDate}
-              >
-                <LinearGradient
-                  colors={[...GRADIENTS.primaryAction]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.modalDoneGradient}
-                >
-                  <Text style={styles.modalDoneText}>Done</Text>
-                </LinearGradient>
-              </Pressable>
-            </View>
-          </View>
-        </Modal>
+          activePicker={activePicker}
+          selectedDay={selectedDay}
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          days={days}
+          years={years}
+          onSelectDay={setSelectedDay}
+          onSelectMonth={setSelectedMonth}
+          onSelectYear={setSelectedYear}
+          onConfirm={handleConfirmDate}
+          onClose={() => setActivePicker(null)}
+        />
       </SafeAreaView>
     </View>
   );

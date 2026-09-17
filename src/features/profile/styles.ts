@@ -256,4 +256,26 @@ export const styles = StyleSheet.create({
     color: "rgba(255, 255, 255, 0.22)",
     marginTop: 4,
   },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.65)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },
+  loadingCard: {
+    backgroundColor: "rgba(30, 27, 38, 0.95)",
+    paddingVertical: 24,
+    paddingHorizontal: 32,
+    borderRadius: RADIUS.card,
+    alignItems: "center",
+    gap: 14,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.12)",
+  },
+  loadingText: {
+    fontFamily: "Fredoka_600SemiBold",
+    fontSize: 15,
+    color: COLORS.white,
+  },
 });

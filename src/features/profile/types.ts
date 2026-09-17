@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface ProfileScreenProps { }
 
 export interface PartnerProfileData {
@@ -5,4 +7,15 @@ export interface PartnerProfileData {
   fullName: string | null;
   avatarUrl: string | null;
   email: string | null;
+}
+
+export interface ProfileMenuItemProps {
+  title: string;
+  subtitle?: string;
+  onPress?: () => void;
+  accessibilityLabel: string;
+  hasBorder?: boolean;
+  isDestructive?: boolean;
+  disabled?: boolean;
+  rightComponent?: React.ReactNode;
 }
