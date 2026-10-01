@@ -330,6 +330,47 @@ export interface Database {
           },
         ];
       };
+      secret_crush_messages: {
+        Row: {
+          id: string;
+          sender_id: string;
+          message: string;
+          status: "sent" | "opened" | "replied";
+          reply_message: string | null;
+          opened_at: string | null;
+          replied_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          sender_id: string;
+          message: string;
+          status?: "sent" | "opened" | "replied";
+          reply_message?: string | null;
+          opened_at?: string | null;
+          replied_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          sender_id?: string;
+          message?: string;
+          status?: "sent" | "opened" | "replied";
+          reply_message?: string | null;
+          opened_at?: string | null;
+          replied_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "secret_crush_messages_sender_id_fkey";
+            columns: ["sender_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;

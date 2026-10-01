@@ -25,6 +25,8 @@ export const ROUTES = {
   FEEDBACK: "/feedback",
   TERMS: "/terms",
   PRIVACY: "/privacy",
+  SECRET_CRUSH: "/secret-crush",
+  SECRET_CRUSH_REVEAL: "/secret-crush/[id]",
 } as const;
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];

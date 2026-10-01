@@ -50,6 +50,7 @@ export const DEFAULT_LOVE_TOOLS: readonly LoveToolItem[] = [
     iconColor: "#F43F5E",
     backgroundColor: "rgba(244, 63, 94, 0.12)",
     borderColor: "rgba(244, 63, 94, 0.25)",
+    route: ROUTES.SECRET_CRUSH,
   },
   {
     id: "couple-challenge",

@@ -156,3 +156,18 @@ export interface QuizAnswer {
   guessed_option: string;
   is_correct: boolean | null;
 }
+
+// ─── Secret Crush ────────────────────────────────────────────────────────────
+
+export type SecretCrushStatus = "sent" | "opened" | "replied";
+
+export interface SecretCrushMessage {
+  id: string;
+  sender_id: string;
+  message: string;
+  status: SecretCrushStatus;
+  reply_message: string | null;
+  opened_at: string | null;
+  replied_at: string | null;
+  created_at: string;
+}

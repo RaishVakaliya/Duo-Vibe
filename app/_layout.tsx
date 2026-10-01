@@ -99,6 +99,11 @@ export default function RootLayout() {
                 <Stack.Screen name="couple-quiz" />
                 <Stack.Screen name="couple-quiz-play" />
                 <Stack.Screen name="couple-quiz-review" />
+                <Stack.Screen name="secret-crush" />
+                <Stack.Screen
+                  name="secret-crush/[id]"
+                  options={{ animation: "fade_from_bottom" }}
+                />
 
                 {/* Reveal Result Screens: Fade Transition for Delightful Reveal Moment */}
                 <Stack.Screen
