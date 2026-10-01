@@ -59,6 +59,7 @@ export const DEFAULT_LOVE_TOOLS: readonly LoveToolItem[] = [
     iconColor: "#10B981",
     backgroundColor: "rgba(16, 185, 129, 0.12)",
     borderColor: "rgba(16, 185, 129, 0.25)",
+    route: ROUTES.COUPLE_CHALLENGE,
   },
 ];
 

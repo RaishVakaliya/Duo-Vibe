@@ -27,6 +27,8 @@ export const ROUTES = {
   PRIVACY: "/privacy",
   SECRET_CRUSH: "/secret-crush",
   SECRET_CRUSH_REVEAL: "/secret-crush/[id]",
+  COUPLE_CHALLENGE: "/couple-challenge",
+  COUPLE_CHALLENGE_ALL: "/couple-challenge-all",
 } as const;
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];

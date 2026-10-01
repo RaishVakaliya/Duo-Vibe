@@ -104,6 +104,8 @@ export default function RootLayout() {
                   name="secret-crush/[id]"
                   options={{ animation: "fade_from_bottom" }}
                 />
+                <Stack.Screen name="couple-challenge" />
+                <Stack.Screen name="couple-challenge-all" />
 
                 {/* Reveal Result Screens: Fade Transition for Delightful Reveal Moment */}
                 <Stack.Screen

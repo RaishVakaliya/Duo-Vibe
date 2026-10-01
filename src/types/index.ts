@@ -161,6 +161,29 @@ export interface QuizAnswer {
 
 export type SecretCrushStatus = "sent" | "opened" | "replied";
 
+// ─── Couple Challenge ────────────────────────────────────────────────────────
+
+export type ChallengeLoadState = "loading" | "error" | "no_partner" | "ready";
+
+export interface CoupleChallengeDayEntry {
+  day: number;
+  completedAt: string;   // ISO timestamptz
+  completedBy: string;   // user id
+}
+
+export interface CoupleChallengeProgress {
+  id: string;
+  couple_key: string;
+  user_a_id: string;
+  user_b_id: string;
+  current_day: number;
+  completed_days: CoupleChallengeDayEntry[];
+  last_completed_at: string | null;
+  started_at: string;
+}
+
+// ─── Secret Crush ─────────────────────────────────────────────────────────────
+
 export interface SecretCrushMessage {
   id: string;
   sender_id: string;

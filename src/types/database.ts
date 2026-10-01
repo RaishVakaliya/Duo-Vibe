@@ -371,6 +371,54 @@ export interface Database {
           },
         ];
       };
+      couple_challenge_progress: {
+        Row: {
+          id: string;
+          couple_key: string;
+          user_a_id: string;
+          user_b_id: string;
+          current_day: number;
+          completed_days: Json;
+          last_completed_at: string | null;
+          started_at: string;
+        };
+        Insert: {
+          id?: string;
+          couple_key: string;
+          user_a_id: string;
+          user_b_id: string;
+          current_day?: number;
+          completed_days?: Json;
+          last_completed_at?: string | null;
+          started_at?: string;
+        };
+        Update: {
+          id?: string;
+          couple_key?: string;
+          user_a_id?: string;
+          user_b_id?: string;
+          current_day?: number;
+          completed_days?: Json;
+          last_completed_at?: string | null;
+          started_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "couple_challenge_progress_user_a_id_fkey";
+            columns: ["user_a_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "couple_challenge_progress_user_b_id_fkey";
+            columns: ["user_b_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
