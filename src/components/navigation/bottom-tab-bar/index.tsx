@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Pressable, LayoutChangeEvent, Platform } from "react-native";
+import { View, Text, Pressable, LayoutChangeEvent, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   useSharedValue,
@@ -19,7 +19,7 @@ export const TAB_ITEMS: readonly TabItem[] = [
   { id: "profile", name: "Profile", icon: "person" },
 ];
 
-export function BottomTabBar({ activeTab, onTabPress }: BottomTabBarProps) {
+export function BottomTabBar({ activeTab, onTabPress, badges }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const bottomPosition =
     Math.max(insets.bottom, Platform.OS === "android" ? 16 : 0) + 12;
@@ -76,6 +76,7 @@ export function BottomTabBar({ activeTab, onTabPress }: BottomTabBarProps) {
 
         {TAB_ITEMS.map((item, index) => {
           const isActive = activeTab === index;
+          const badgeCount = badges?.[item.id] ?? 0;
           return (
             <Pressable
               key={item.id}
@@ -87,6 +88,13 @@ export function BottomTabBar({ activeTab, onTabPress }: BottomTabBarProps) {
               hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
             >
               <Ionicons name={item.icon} size={22} color="#FFFFFF" />
+              {badgeCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
+                    {badgeCount > 99 ? "99+" : badgeCount}
+                  </Text>
+                </View>
+              )}
             </Pressable>
           );
         })}

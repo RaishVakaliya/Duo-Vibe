@@ -202,6 +202,9 @@ export function useProfileData() {
       case "home":
         router.replace(ROUTES.HOME);
         break;
+      case "chat":
+        router.replace(ROUTES.CHAT);
+        break;
       case "profile":
         break;
     }

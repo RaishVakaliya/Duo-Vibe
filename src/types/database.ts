@@ -419,6 +419,41 @@ export interface Database {
           },
         ];
       };
+      chat_messages: {
+        Row: {
+          id: string;
+          couple_key: string;
+          sender_id: string;
+          content: string;
+          created_at: string;
+          read_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          couple_key: string;
+          sender_id: string;
+          content: string;
+          created_at?: string;
+          read_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          couple_key?: string;
+          sender_id?: string;
+          content?: string;
+          created_at?: string;
+          read_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_sender_id_fkey";
+            columns: ["sender_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;

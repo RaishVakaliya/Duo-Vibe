@@ -70,6 +70,7 @@ export default function RootLayout() {
                 {/* Main Hubs: Clean crossfade */}
                 <Stack.Screen name="home" options={{ animation: "fade" }} />
                 <Stack.Screen name="profile" options={{ animation: "fade" }} />
+                <Stack.Screen name="chat" options={{ animation: "fade" }} />
 
                 {/* Modal-style Presentation Screens */}
                 <Stack.Screen

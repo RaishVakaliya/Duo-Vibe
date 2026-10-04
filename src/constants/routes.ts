@@ -29,6 +29,7 @@ export const ROUTES = {
   SECRET_CRUSH_REVEAL: "/secret-crush/[id]",
   COUPLE_CHALLENGE: "/couple-challenge",
   COUPLE_CHALLENGE_ALL: "/couple-challenge-all",
+  CHAT: "/chat",
 } as const;
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];

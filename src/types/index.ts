@@ -194,3 +194,18 @@ export interface SecretCrushMessage {
   replied_at: string | null;
   created_at: string;
 }
+
+// ─── Chat ─────────────────────────────────────────────────────────────────────
+
+export type ChatMessageStatus = "sending" | "sent" | "failed";
+
+export interface ChatMessage {
+  id: string;
+  couple_key: string;
+  sender_id: string;
+  content: string;
+  created_at: string;
+  read_at: string | null;
+  /** Client-side only — not persisted to DB */
+  status?: ChatMessageStatus;
+}

@@ -1,9 +1,10 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import { BackHandler } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { ROUTES } from "@/src/constants/routes";
 import { useAuth } from "@/src/context/auth";
-import { getPendingReviewSessions } from "@/src/lib/quizSession";
+import { getPendingReviewSessions, getPartnerId } from "@/src/lib/quizSession";
+import { buildCoupleKey, getUnreadCount, subscribeToUnreadBadge } from "@/src/lib/chat";
 import { QuizSession } from "@/src/types";
 import { TabItem } from "@/src/components/navigation/bottom-tab-bar";
 import { LoveToolItem } from "./types";
@@ -29,8 +30,10 @@ export function useHomeData() {
   const { user, hasPartner } = useAuth();
   const [activeTab, setActiveTab] = useState<number>(0);
   const [pendingReviews, setPendingReviews] = useState<QuizSession[]>([]);
+  const [unreadChatCount, setUnreadChatCount] = useState<number>(0);
 
   const greetingData = useMemo(() => getGreetingData(), []);
+  const unsubscribeChatBadgeRef = useRef<(() => void) | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -39,6 +42,28 @@ export function useHomeData() {
         getPendingReviewSessions(user.id)
           .then((sessions) => setPendingReviews(sessions))
           .catch((err) => console.warn("Pending reviews note:", err));
+
+        if (hasPartner) {
+          getPartnerId(user.id).then((partnerId) => {
+            if (!partnerId) return;
+            const coupleKey = buildCoupleKey(user.id, partnerId);
+            getUnreadCount(coupleKey, user.id)
+              .then(setUnreadChatCount)
+              .catch(() => { });
+
+            if (unsubscribeChatBadgeRef.current) {
+              unsubscribeChatBadgeRef.current();
+            }
+            unsubscribeChatBadgeRef.current = subscribeToUnreadBadge(
+              coupleKey,
+              () => {
+                getUnreadCount(coupleKey, user.id)
+                  .then(setUnreadChatCount)
+                  .catch(() => { });
+              },
+            );
+          });
+        }
       }
 
       const onBackPress = () => {
@@ -51,8 +76,14 @@ export function useHomeData() {
         onBackPress,
       );
 
-      return () => subscription.remove();
-    }, [user]),
+      return () => {
+        subscription.remove();
+        if (unsubscribeChatBadgeRef.current) {
+          unsubscribeChatBadgeRef.current();
+          unsubscribeChatBadgeRef.current = null;
+        }
+      };
+    }, [user, hasPartner]),
   );
 
   const handleTabPress = useCallback(
@@ -60,6 +91,9 @@ export function useHomeData() {
       setActiveTab(index);
       switch (item.id) {
         case "home":
+          break;
+        case "chat":
+          router.push(ROUTES.CHAT);
           break;
         case "profile":
           router.push(ROUTES.PROFILE);
@@ -101,6 +135,7 @@ export function useHomeData() {
     greetingData,
     pendingReviews,
     activeTab,
+    unreadChatCount,
     handleTabPress,
     handleToolPress,
     handleReviewPress,

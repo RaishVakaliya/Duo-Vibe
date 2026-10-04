@@ -25,6 +25,7 @@ export default function HomeScreen() {
     greetingData,
     pendingReviews,
     activeTab,
+    unreadChatCount,
     handleTabPress,
     handleToolPress,
     handleReviewPress,
@@ -150,7 +151,11 @@ export default function HomeScreen() {
           )}
         </ScrollView>
 
-        <BottomTabBar activeTab={activeTab} onTabPress={handleTabPress} />
+        <BottomTabBar
+          activeTab={activeTab}
+          onTabPress={handleTabPress}
+          badges={{ chat: unreadChatCount }}
+        />
       </SafeAreaView>
     </View>
   );

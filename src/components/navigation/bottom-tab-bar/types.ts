@@ -13,4 +13,5 @@ export interface TabItem {
 export interface BottomTabBarProps {
   activeTab: number;
   onTabPress: (index: number, item: TabItem) => void;
+  badges?: Record<string, number>;
 }
