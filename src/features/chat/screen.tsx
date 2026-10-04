@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Platform,
   Image,
+  Keyboard,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -22,6 +23,7 @@ import { ROUTES } from "@/src/constants/routes";
 import { useChat } from "./use-chat";
 import { ChatBubble } from "./components/chat-bubble";
 import { ThemeModal } from "./components/theme-modal";
+import { ImageViewerModal } from "./components/image-viewer-modal";
 import { getBgColors, getBubbleColors } from "./chat-themes";
 import { ChatMessage } from "@/src/types";
 import { useAlert } from "@/src/components/ui/alert-dialog";
@@ -95,6 +97,8 @@ export default function ChatScreen() {
     hasMore,
     chatTheme,
     isThemeModalOpen,
+    fullScreenImageUri,
+    setFullScreenImageUri,
     setIsThemeModalOpen,
     updateChatTheme,
     setDraftText,
@@ -106,6 +110,29 @@ export default function ChatScreen() {
   } = useChat();
 
   const inputRef = useRef<TextInput>(null);
+  const [isKeyboardOpen, setIsKeyboardOpen] = React.useState<boolean>(false);
+  const restingBottomInsetRef = useRef<number>(insets.bottom);
+
+  React.useEffect(() => {
+    if (insets.bottom > 0) {
+      restingBottomInsetRef.current = insets.bottom;
+    }
+  }, [insets.bottom]);
+
+  React.useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      () => setIsKeyboardOpen(true)
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => setIsKeyboardOpen(false)
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   // Active theme gradient colors
   const activeBgColors = useMemo(() => {
@@ -185,12 +212,13 @@ export default function ChatScreen() {
               item.status === "failed"
             }
             bubbleColors={activeBubbleColors}
+            onOpenImage={(url) => setFullScreenImageUri(url)}
             onRetry={handleRetryMessage}
           />
         </View>
       );
     },
-    [messages, userId, activeBubbleColors, handleRetryMessage],
+    [messages, userId, activeBubbleColors, setFullScreenImageUri, handleRetryMessage],
   );
 
   const listFooter = hasMore ? (
@@ -337,7 +365,7 @@ export default function ChatScreen() {
           <KeyboardAvoidingView
             style={styles.keyboardAvoiding}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+            keyboardVerticalOffset={0}
           >
             {/* ── Message List ─── */}
             {messages.length === 0 ? (
@@ -372,7 +400,15 @@ export default function ChatScreen() {
             <View
               style={[
                 styles.inputBarWrapper,
-                { paddingBottom: Math.max(insets.bottom, 8) },
+                {
+                  paddingBottom: isKeyboardOpen
+                    ? 6
+                    : Math.max(
+                        insets.bottom,
+                        restingBottomInsetRef.current,
+                        Platform.OS === "android" ? 16 : 8
+                      ),
+                },
               ]}
             >
               <View style={styles.inputRow}>
@@ -386,6 +422,7 @@ export default function ChatScreen() {
                     placeholder="Message"
                     placeholderTextColor="#8696A0"
                     multiline
+                    textAlignVertical="center"
                     returnKeyType="default"
                     blurOnSubmit={false}
                     accessibilityLabel="Message input"
@@ -438,6 +475,13 @@ export default function ChatScreen() {
         currentTheme={chatTheme}
         onClose={() => setIsThemeModalOpen(false)}
         onSelectTheme={updateChatTheme}
+      />
+
+      {/* ── WhatsApp Style Full Screen Image Viewer Modal ──────────── */}
+      <ImageViewerModal
+        isVisible={Boolean(fullScreenImageUri)}
+        imageUri={fullScreenImageUri}
+        onClose={() => setFullScreenImageUri(null)}
       />
     </View>
   );

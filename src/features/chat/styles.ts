@@ -276,6 +276,9 @@ export const styles = StyleSheet.create({
     backgroundColor: "transparent",
     paddingHorizontal: 6,
     paddingTop: 4,
+    flexShrink: 0,
+    zIndex: 10,
+    elevation: 10,
   },
   inputRow: {
     flexDirection: "row",
@@ -538,5 +541,44 @@ export const styles = StyleSheet.create({
     fontFamily: "Fredoka_700Bold",
     fontSize: 16,
     color: "#FFFFFF",
+  },
+
+  // ── Full Screen Image Viewer ───────────────────────────────────────────
+  imageViewerContainer: {
+    flex: 1,
+    backgroundColor: "#000000",
+  },
+  imageViewerSafeArea: {
+    flex: 1,
+  },
+  imageViewerHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255, 255, 255, 0.1)",
+  },
+  imageViewerBackBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  imageViewerTitle: {
+    fontFamily: "Fredoka_600SemiBold",
+    fontSize: 17,
+    color: "#FFFFFF",
+  },
+  imageViewerBody: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  imageViewerFullImage: {
+    width: "100%",
+    height: "100%",
   },
 });

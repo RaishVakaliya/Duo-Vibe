@@ -42,6 +42,7 @@ export function useChat(): UseChat {
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [chatTheme, setChatTheme] = useState<ChatTheme>(DEFAULT_CHAT_THEME);
   const [isThemeModalOpen, setIsThemeModalOpen] = useState<boolean>(false);
+  const [fullScreenImageUri, setFullScreenImageUri] = useState<string | null>(null);
 
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const unsubscribePresenceRef = useRef<(() => void) | null>(null);
@@ -157,7 +158,7 @@ export function useChat(): UseChat {
       const key = coupleKeyRef.current;
       const uid = user?.id;
       if (key && uid) {
-        markMessagesRead(key, uid).catch(() => {});
+        markMessagesRead(key, uid).catch(() => { });
       }
     }, [user?.id]),
   );
@@ -313,6 +314,8 @@ export function useChat(): UseChat {
     coupleKey,
     chatTheme,
     isThemeModalOpen,
+    fullScreenImageUri,
+    setFullScreenImageUri,
     setIsThemeModalOpen,
     updateChatTheme,
     setDraftText,

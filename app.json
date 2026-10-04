@@ -22,6 +22,7 @@
     },
     "android": {
       "package": "com.duovibe.app",
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "backgroundColor": "#0D0B1A",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

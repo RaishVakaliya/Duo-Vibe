@@ -22,6 +22,7 @@ export function ChatBubble({
   isMine,
   bubbleColors,
   onRetry,
+  onOpenImage,
 }: ChatBubbleProps) {
   const isFailed = message.status === "failed";
   const isSending = message.status === "sending";
@@ -51,7 +52,12 @@ export function ChatBubble({
               style={styles.bubbleMineGradient}
             >
               {isImage ? (
-                <View style={styles.imageContainer}>
+                <Pressable
+                  style={styles.imageContainer}
+                  onPress={() => onOpenImage?.(imageUrl)}
+                  accessibilityRole="imagebutton"
+                  accessibilityLabel="View full screen photo"
+                >
                   <Image
                     source={{ uri: imageUrl }}
                     style={styles.bubbleImage}
@@ -78,7 +84,7 @@ export function ChatBubble({
                       />
                     )}
                   </View>
-                </View>
+                </Pressable>
               ) : (
                 <View style={styles.bubbleContentRow}>
                   <Text style={styles.bubbleMineText}>{message.content}</Text>
@@ -132,7 +138,12 @@ export function ChatBubble({
       <View style={styles.bubblePartnerWrapper}>
         <View style={styles.bubblePartner}>
           {isImage ? (
-            <View style={styles.imageContainer}>
+            <Pressable
+              style={styles.imageContainer}
+              onPress={() => onOpenImage?.(imageUrl)}
+              accessibilityRole="imagebutton"
+              accessibilityLabel="View full screen photo"
+            >
               <Image
                 source={{ uri: imageUrl }}
                 style={styles.bubbleImage}
@@ -143,7 +154,7 @@ export function ChatBubble({
                   {timeString}
                 </Text>
               </View>
-            </View>
+            </Pressable>
           ) : (
             <View style={styles.bubbleContentRow}>
               <Text style={styles.bubblePartnerText}>{message.content}</Text>

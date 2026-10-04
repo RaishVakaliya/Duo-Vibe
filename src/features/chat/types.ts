@@ -27,6 +27,7 @@ export interface ChatBubbleProps {
   bubbleColors: readonly [string, string];
   showTail?: boolean;
   onRetry?: (messageId: string) => void;
+  onOpenImage?: (imageUrl: string) => void;
 }
 
 export interface ThemeModalProps {
@@ -34,6 +35,12 @@ export interface ThemeModalProps {
   currentTheme: ChatTheme;
   onClose: () => void;
   onSelectTheme: (newTheme: ChatTheme) => void;
+}
+
+export interface ImageViewerModalProps {
+  isVisible: boolean;
+  imageUri: string | null;
+  onClose: () => void;
 }
 
 export interface UseChat {
@@ -51,6 +58,8 @@ export interface UseChat {
   coupleKey: string | null;
   chatTheme: ChatTheme;
   isThemeModalOpen: boolean;
+  fullScreenImageUri: string | null;
+  setFullScreenImageUri: (uri: string | null) => void;
   setIsThemeModalOpen: (open: boolean) => void;
   updateChatTheme: (newTheme: ChatTheme) => void;
   setDraftText: (text: string) => void;

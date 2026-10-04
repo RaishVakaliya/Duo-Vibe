@@ -116,7 +116,7 @@ export default function SecretCrushRevealScreen() {
         {/* ─── Sender View ──────────────────────────────────────────── */}
         {mode === "sender" && (
           <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{ flex: 1 }}
           >
             <ScrollView
@@ -174,7 +174,7 @@ export default function SecretCrushRevealScreen() {
         {/* ─── Recipient View ───────────────────────────────────────── */}
         {mode === "recipient" && (
           <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{ flex: 1 }}
           >
             <ScrollView
