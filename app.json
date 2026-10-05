@@ -55,8 +55,12 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/icon.png",
-          "color": "#FF2D6C"
+          "icon": "./assets/images/notification_icon.png",
+          "color": "#FF2D6C",
+          "defaultChannel": "duo-messages",
+          "sounds": [
+            "./assets/sounds/notification.wav"
+          ]
         }
       ]
     ],

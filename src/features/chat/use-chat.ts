@@ -18,6 +18,7 @@ import {
   loadSavedChatTheme,
   saveChatTheme,
 } from "./chat-themes";
+import { clearAppBadge } from "@/src/lib/notifications";
 
 const PAGE_SIZE = 50;
 
@@ -152,13 +153,16 @@ export function useChat(): UseChat {
     };
   }, [load]);
 
-  // ─── Mark read on focus ───────────────────────────────────────────────
+  // ─── Mark read + clear OS badge on focus ─────────────────────────────
   useFocusEffect(
     useCallback(() => {
       const key = coupleKeyRef.current;
       const uid = user?.id;
       if (key && uid) {
+        // Mark partner messages as read in the DB
         markMessagesRead(key, uid).catch(() => { });
+        // Clear the OS badge counter
+        clearAppBadge().catch(() => { });
       }
     }, [user?.id]),
   );

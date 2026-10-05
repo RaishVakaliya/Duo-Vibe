@@ -17,7 +17,7 @@ try {
       handleNotification: async () => ({
         shouldShowAlert: true,
         shouldPlaySound: true,
-        shouldSetBadge: false,
+        shouldSetBadge: true,
         shouldShowBanner: true,
         shouldShowList: true,
       }),
@@ -41,12 +41,13 @@ export async function registerForPushNotificationsAsync(
       Platform.OS === "android" &&
       Notifications.setNotificationChannelAsync
     ) {
-      await Notifications.setNotificationChannelAsync("default", {
-        name: "default",
+      await Notifications.setNotificationChannelAsync("duo-messages", {
+        name: "Duo Vibe Messages",
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
         lightColor: "#FF2D6C",
-        sound: "default",
+        sound: "notification",        // matches assets/sounds/notification.wav
+        showBadge: true,
       });
     }
 
@@ -119,12 +120,13 @@ export async function sendExpoPushNotification({
   try {
     const payload = {
       to,
-      sound: "default",
+      sound: "notification",         // custom notification.wav on Android
       title,
       body,
       data: data ?? {},
       priority: "high",
-      channelId: "default",
+      channelId: "duo-messages",      // matches the channel above
+      badge: 1,
     };
 
     const response = await fetch("https://exp.host/--/api/v2/push/send", {
@@ -141,5 +143,20 @@ export async function sendExpoPushNotification({
   } catch (err: unknown) {
     console.warn("Failed to send Expo push notification:", err);
     return false;
+  }
+}
+
+/**
+ * Clear the OS-level badge count to 0.
+ * Call this whenever the user opens the chat screen.
+ */
+export async function clearAppBadge(): Promise<void> {
+  if (!Notifications || Platform.OS === "web") return;
+  try {
+    if (typeof Notifications.setBadgeCountAsync === "function") {
+      await Notifications.setBadgeCountAsync(0);
+    }
+  } catch (err) {
+    console.warn("[notifications] clearAppBadge error:", err);
   }
 }
