@@ -242,6 +242,66 @@ export const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
+  // ── Dual-completion status row ───────────────────────────────────────
+  dualStatusRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 14,
+  },
+  dualStatusPill: {
+    flex: 1,
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    alignItems: "center",
+    gap: 4,
+    borderWidth: 1.5,
+  },
+  dualStatusPillDone: {
+    backgroundColor: GREEN_LIGHT,
+    borderColor: GREEN_BORDER,
+  },
+  dualStatusPillPending: {
+    backgroundColor: "#F8FAFC",
+    borderColor: "#E2E8F0",
+  },
+  dualStatusLabel: {
+    fontFamily: "Fredoka_600SemiBold",
+    fontSize: 12,
+    color: COLORS.textMuted,
+    letterSpacing: 0.3,
+  },
+  dualStatusValueDone: {
+    fontFamily: "Fredoka_700Bold",
+    fontSize: 14,
+    color: GREEN,
+  },
+  dualStatusValuePending: {
+    fontFamily: "Fredoka_600SemiBold",
+    fontSize: 14,
+    color: COLORS.textMuted,
+  },
+
+  // ── Waiting for partner banner (I’m done, partner isn’t yet) ───────────────
+  waitingBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: "#FFF7ED",
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: "#FED7AA",
+  },
+  waitingBannerText: {
+    fontFamily: "Fredoka_600SemiBold",
+    fontSize: 14,
+    color: "#92400E",
+    flex: 1,
+    lineHeight: 20,
+  },
+
   // ── Day already completed state ───────────────────────────────────────
   alreadyDoneCard: {
     flexDirection: "row",

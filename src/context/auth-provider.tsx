@@ -131,20 +131,74 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await AsyncStorage.setItem(HAS_PARTNER_KEY, status ? "true" : "false");
   };
 
+  useEffect(() => {
+    if (!user || !hasPartner) return;
+    const channel = supabase
+      .channel(`couple_rel_${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "couples",
+        },
+        (payload) => {
+          if (
+            payload.new &&
+            (payload.new.relationship_type === "local" ||
+              payload.new.relationship_type === "long_distance")
+          ) {
+            const newType = payload.new.relationship_type as RelationshipType;
+            setRelationshipTypeState(newType);
+            AsyncStorage.setItem(RELATIONSHIP_TYPE_KEY, newType).catch(() => { });
+          }
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel).catch(() => { });
+    };
+  }, [user, hasPartner]);
+
   const setRelationshipType = async (type: RelationshipType): Promise<void> => {
     setRelationshipTypeState(type);
     await AsyncStorage.setItem(RELATIONSHIP_TYPE_KEY, type);
     if (user) {
       try {
+        const nowIso = new Date().toISOString();
         await supabase
           .from("profiles")
           .update({
             relationship_type: type,
-            updated_at: new Date().toISOString(),
+            updated_at: nowIso,
           })
           .eq("id", user.id);
+
+        const { data: myProfile } = await supabase
+          .from("profiles")
+          .select("partner_id")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (myProfile?.partner_id) {
+          await supabase
+            .from("profiles")
+            .update({
+              relationship_type: type,
+              updated_at: nowIso,
+            })
+            .eq("id", myProfile.partner_id);
+
+          await supabase
+            .from("couples")
+            .update({
+              relationship_type: type,
+            })
+            .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+        }
       } catch (err) {
-        console.warn("Error updating relationship type in profile:", err);
+        console.warn("Error updating relationship type:", err);
       }
     }
   };

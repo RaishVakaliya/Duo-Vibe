@@ -2,24 +2,27 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { useAuth } from "@/src/context/auth";
 import { getPartnerId } from "@/src/lib/quizSession";
 import {
-  getOrCreateCoupleProgress,
-  markDayComplete,
-  subscribeToChallengeProgress,
+  loadChallengeState,
+  markMyDayComplete,
+  subscribeToCompletions,
+  computeCurrentDay,
 } from "@/src/lib/challenge";
 import { supabase } from "@/src/lib/supabase";
-import { CoupleChallengeProgress } from "@/src/types";
+import {
+  CoupleChallengeState,
+  CoupleChallengeDayCompletion,
+} from "@/src/types";
 import { UseCoupleChallenge, ChallengeLoadState } from "./types";
 
 export function useCoupleChallenge(): UseCoupleChallenge {
   const { user, hasPartner } = useAuth();
 
   const [loadState, setLoadState] = useState<ChallengeLoadState>("loading");
-  const [progress, setProgress] = useState<CoupleChallengeProgress | null>(null);
+  const [challengeState, setChallengeState] = useState<CoupleChallengeState | null>(null);
   const [partnerName, setPartnerName] = useState<string | null>(null);
   const [isMarkingDone, setIsMarkingDone] = useState<boolean>(false);
 
-  // Keep unsubscribe fn in a ref so we can clean up on unmount without
-  // putting it in the dependency array.
+  const partnerIdRef = useRef<string | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
   const load = useCallback(async () => {
@@ -42,6 +45,8 @@ export function useCoupleChallenge(): UseCoupleChallenge {
         return;
       }
 
+      partnerIdRef.current = partnerId;
+
       // Fetch partner display name
       const { data: partnerProfile } = await supabase
         .from("profiles")
@@ -50,15 +55,43 @@ export function useCoupleChallenge(): UseCoupleChallenge {
         .maybeSingle();
       setPartnerName(partnerProfile?.full_name ?? null);
 
-      const p = await getOrCreateCoupleProgress(user.id, partnerId);
-      setProgress(p);
+      // Load full state (progress + per-user completions)
+      const state = await loadChallengeState(user.id, partnerId);
+      setChallengeState(state);
       setLoadState("ready");
 
-      // Set up realtime — silent fail handled inside the lib
+      // Real-time: any INSERT into couple_challenge_completions for this progress
       if (unsubscribeRef.current) unsubscribeRef.current();
-      unsubscribeRef.current = subscribeToChallengeProgress(p.id, (updated) => {
-        setProgress(updated);
-      });
+      unsubscribeRef.current = subscribeToCompletions(
+        state.progress.id,
+        (newCompletion: CoupleChallengeDayCompletion) => {
+          setChallengeState((prev) => {
+            if (!prev) return prev;
+
+            const isMe = newCompletion.userId === user.id;
+            const isPartner = newCompletion.userId === partnerIdRef.current;
+
+            // Avoid duplicate entries in local state
+            const targetList = isMe ? prev.myCompletions : isPartner ? prev.partnerCompletions : null;
+            if (!targetList) return prev;
+            if (targetList.some((c) => c.id === newCompletion.id)) return prev;
+
+            const newMy = isMe
+              ? [...prev.myCompletions, newCompletion]
+              : prev.myCompletions;
+            const newPartner = isPartner
+              ? [...prev.partnerCompletions, newCompletion]
+              : prev.partnerCompletions;
+
+            return {
+              ...prev,
+              myCompletions: newMy,
+              partnerCompletions: newPartner,
+              currentDay: computeCurrentDay(newMy, newPartner),
+            };
+          });
+        },
+      );
     } catch (err) {
       console.error("[useCoupleChallenge] load error:", err);
       setLoadState("error");
@@ -76,46 +109,73 @@ export function useCoupleChallenge(): UseCoupleChallenge {
   }, [load]);
 
   const handleMarkDone = useCallback(async () => {
-    if (!progress || !user || isMarkingDone) return;
+    if (!challengeState || !user || isMarkingDone) return;
 
-    const day = progress.current_day;
-    const alreadyDone = progress.completed_days.some((e) => e.day === day);
-    if (alreadyDone) return;
+    const day = challengeState.currentDay;
+    if (day > 30) return; // all done
 
-    // Optimistic update
-    const optimisticEntry = {
+    // Check if I've already marked this day done
+    const alreadyDoneByMe = challengeState.myCompletions.some((c) => c.day === day);
+    if (alreadyDoneByMe) return;
+
+    // Optimistic update — add a temporary completion for "me"
+    const optimistic: CoupleChallengeDayCompletion = {
+      id: `optimistic_${day}`,
+      progressId: challengeState.progress.id,
+      userId: user.id,
       day,
       completedAt: new Date().toISOString(),
-      completedBy: user.id,
     };
-    setProgress((prev) =>
-      prev
-        ? {
-            ...prev,
-            completed_days: [...prev.completed_days, optimisticEntry],
-            current_day: Math.min(prev.current_day + 1, 30),
-            last_completed_at: optimisticEntry.completedAt,
-          }
-        : prev,
-    );
+
+    setChallengeState((prev) => {
+      if (!prev) return prev;
+      const newMy = [...prev.myCompletions, optimistic];
+      return {
+        ...prev,
+        myCompletions: newMy,
+        currentDay: computeCurrentDay(newMy, prev.partnerCompletions),
+      };
+    });
 
     setIsMarkingDone(true);
     try {
-      const updated = await markDayComplete(progress, day, user.id);
-      // Reconcile with server truth (realtime may also fire, that's fine)
-      setProgress(updated);
+      const serverCompletion = await markMyDayComplete(
+        challengeState.progress.id,
+        user.id,
+        day,
+      );
+      // Replace the optimistic entry with the server-confirmed one
+      setChallengeState((prev) => {
+        if (!prev) return prev;
+        const newMy = prev.myCompletions
+          .filter((c) => c.id !== `optimistic_${day}`)
+          .concat(serverCompletion);
+        return {
+          ...prev,
+          myCompletions: newMy,
+          currentDay: computeCurrentDay(newMy, prev.partnerCompletions),
+        };
+      });
     } catch (err) {
       console.error("[useCoupleChallenge] markDone error:", err);
-      // Roll back optimistic update on failure
-      setProgress(progress);
+      // Roll back the optimistic update
+      setChallengeState((prev) => {
+        if (!prev) return prev;
+        const newMy = prev.myCompletions.filter((c) => c.id !== `optimistic_${day}`);
+        return {
+          ...prev,
+          myCompletions: newMy,
+          currentDay: computeCurrentDay(newMy, prev.partnerCompletions),
+        };
+      });
     } finally {
       setIsMarkingDone(false);
     }
-  }, [progress, user, isMarkingDone]);
+  }, [challengeState, user, isMarkingDone]);
 
   return {
     loadState,
-    progress,
+    challengeState,
     partnerName,
     isMarkingDone,
     handleMarkDone,

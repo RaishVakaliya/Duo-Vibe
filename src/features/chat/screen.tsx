@@ -5,12 +5,11 @@ import {
   FlatList,
   TextInput,
   Pressable,
-  KeyboardAvoidingView,
   ActivityIndicator,
   Platform,
   Image,
-  Keyboard,
 } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
@@ -110,29 +109,6 @@ export default function ChatScreen() {
   } = useChat();
 
   const inputRef = useRef<TextInput>(null);
-  const [isKeyboardOpen, setIsKeyboardOpen] = React.useState<boolean>(false);
-  const restingBottomInsetRef = useRef<number>(insets.bottom);
-
-  React.useEffect(() => {
-    if (insets.bottom > 0) {
-      restingBottomInsetRef.current = insets.bottom;
-    }
-  }, [insets.bottom]);
-
-  React.useEffect(() => {
-    const showSub = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
-      () => setIsKeyboardOpen(true)
-    );
-    const hideSub = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
-      () => setIsKeyboardOpen(false)
-    );
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, []);
 
   // Active theme gradient colors
   const activeBgColors = useMemo(() => {
@@ -400,15 +376,7 @@ export default function ChatScreen() {
             <View
               style={[
                 styles.inputBarWrapper,
-                {
-                  paddingBottom: isKeyboardOpen
-                    ? 6
-                    : Math.max(
-                        insets.bottom,
-                        restingBottomInsetRef.current,
-                        Platform.OS === "android" ? 16 : 8
-                      ),
-                },
+                { paddingBottom: Math.max(insets.bottom, 8) },
               ]}
             >
               <View style={styles.inputRow}>

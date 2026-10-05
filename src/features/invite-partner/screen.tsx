@@ -3,10 +3,10 @@ import {
   View,
   Text,
   Pressable,
-  KeyboardAvoidingView,
   Platform,
   ScrollView,
 } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";

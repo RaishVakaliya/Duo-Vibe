@@ -18,49 +18,101 @@ import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
 import { useCoupleChallenge } from "./use-couple-challenge";
 import { COUPLE_CHALLENGE_BANK } from "@/src/data/coupleChallenges";
-import { isDayUnlocked } from "@/src/lib/challenge";
-import { CoupleChallengeProgress } from "@/src/types";
+import { CoupleChallengeState } from "@/src/types";
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function ProgressBar({ progress }: { progress: CoupleChallengeProgress }) {
-  const completedCount = progress.completed_days.length;
-  const fillPercent = Math.min((completedCount / 30) * 100, 100);
+function ProgressBar({ state }: { state: CoupleChallengeState }) {
+  // Count days where BOTH partners have completed
+  const myDays = new Set(state.myCompletions.map((c) => c.day));
+  const partnerDays = new Set(state.partnerCompletions.map((c) => c.day));
+  const bothCompletedCount = Array.from({ length: 30 }, (_, i) => i + 1).filter(
+    (d) => myDays.has(d) && partnerDays.has(d),
+  ).length;
+  const fillPercent = Math.min((bothCompletedCount / 30) * 100, 100);
+
   return (
     <View style={styles.progressContainer}>
-      <Text style={styles.progressLabel}>Your 30-Day Journey</Text>
+      <Text style={styles.progressLabel}>Your 30-Day Journey Together</Text>
       <View style={styles.progressTrack}>
         <View style={[styles.progressFill, { width: `${fillPercent}%` }]} />
       </View>
-      <Text style={styles.progressNumbers}>{completedCount} / 30 days done</Text>
+      <Text style={styles.progressNumbers}>{bothCompletedCount} / 30 days both done</Text>
+    </View>
+  );
+}
+
+function DualStatusRow({
+  state,
+  partnerName,
+  day,
+}: {
+  state: CoupleChallengeState;
+  partnerName: string | null;
+  day: number;
+}) {
+  const myDone = state.myCompletions.some((c) => c.day === day);
+  const partnerDone = state.partnerCompletions.some((c) => c.day === day);
+
+  return (
+    <View style={styles.dualStatusRow}>
+      {/* Me */}
+      <View
+        style={[
+          styles.dualStatusPill,
+          myDone ? styles.dualStatusPillDone : styles.dualStatusPillPending,
+        ]}
+      >
+        <Ionicons
+          name={myDone ? "checkmark-circle" : "ellipse-outline"}
+          size={20}
+          color={myDone ? "#10B981" : "#94A3B8"}
+        />
+        <Text style={styles.dualStatusLabel}>YOU</Text>
+        <Text style={myDone ? styles.dualStatusValueDone : styles.dualStatusValuePending}>
+          {myDone ? "Done ✓" : "Pending"}
+        </Text>
+      </View>
+
+      {/* Partner */}
+      <View
+        style={[
+          styles.dualStatusPill,
+          partnerDone ? styles.dualStatusPillDone : styles.dualStatusPillPending,
+        ]}
+      >
+        <Ionicons
+          name={partnerDone ? "checkmark-circle" : "ellipse-outline"}
+          size={20}
+          color={partnerDone ? "#10B981" : "#94A3B8"}
+        />
+        <Text style={styles.dualStatusLabel}>{partnerName?.toUpperCase() ?? "PARTNER"}</Text>
+        <Text style={partnerDone ? styles.dualStatusValueDone : styles.dualStatusValuePending}>
+          {partnerDone ? "Done ✓" : "Pending"}
+        </Text>
+      </View>
     </View>
   );
 }
 
 function TodayCard({
-  progress,
+  state,
   partnerName,
   isMarkingDone,
   onMarkDone,
 }: {
-  progress: CoupleChallengeProgress;
+  state: CoupleChallengeState;
   partnerName: string | null;
   isMarkingDone: boolean;
   onMarkDone: () => void;
 }) {
-  const day = progress.current_day;
+  const day = state.currentDay;
   const challenge = COUPLE_CHALLENGE_BANK[day - 1];
   if (!challenge) return null;
 
-  const myEntry = progress.completed_days.find((e) => e.day === day);
-  const isDoneByMe = !!myEntry;
-  const isDoneByPartner = isDoneByMe && partnerName
-    ? myEntry.completedBy !== myEntry.completedBy // always false — checked below
-    : false;
-
-  // More accurate: if day is in completed_days, it's done by whoever pressed it.
-  // Since only one row exists per day, we just show "done" state.
-  const isDone = isDoneByMe;
+  const myDone = state.myCompletions.some((c) => c.day === day);
+  const partnerDone = state.partnerCompletions.some((c) => c.day === day);
+  const bothDone = myDone && partnerDone;
 
   return (
     <MotiView
@@ -82,16 +134,29 @@ function TodayCard({
       <Text style={styles.todayCardTitle}>{challenge.title}</Text>
       <Text style={styles.todayCardDescription}>{challenge.description}</Text>
 
-      {isDone ? (
+      {/* Dual status pills */}
+      <DualStatusRow state={state} partnerName={partnerName} day={day} />
+
+      {/* Action area */}
+      {bothDone ? (
+        /* Both done — day fully complete */
         <View style={styles.alreadyDoneCard}>
           <Ionicons name="checkmark-circle" size={22} color="#10B981" />
           <Text style={styles.alreadyDoneText}>
-            {partnerName
-              ? `Completed! ${partnerName} can see this too 💕`
-              : "Challenge completed! 🎉"}
+            Both of you completed this! 🎉 Next day unlocked.
+          </Text>
+        </View>
+      ) : myDone ? (
+        /* I'm done, waiting for partner */
+        <View style={styles.waitingBanner}>
+          <Ionicons name="time-outline" size={20} color="#92400E" />
+          <Text style={styles.waitingBannerText}>
+            You're done! Waiting for{" "}
+            {partnerName ?? "your partner"} to complete this challenge too 💕
           </Text>
         </View>
       ) : (
+        /* Not done yet — show button */
         <Pressable
           style={[styles.doneButton, isMarkingDone && styles.doneButtonDisabled]}
           onPress={onMarkDone}
@@ -110,7 +175,7 @@ function TodayCard({
             ) : (
               <>
                 <Ionicons name="checkmark-circle-outline" size={20} color="#FFFFFF" />
-                <Text style={styles.doneButtonText}>Done ✓</Text>
+                <Text style={styles.doneButtonText}>I did it! ✓</Text>
               </>
             )}
           </LinearGradient>
@@ -152,7 +217,7 @@ function UpcomingRow({
 
 export default function CoupleChallengeScreen() {
   const router = useRouter();
-  const { loadState, progress, partnerName, isMarkingDone, handleMarkDone, handleRetry } =
+  const { loadState, challengeState, partnerName, isMarkingDone, handleMarkDone, handleRetry } =
     useCoupleChallenge();
 
   useFocusEffect(
@@ -166,12 +231,11 @@ export default function CoupleChallengeScreen() {
   );
 
   // Upcoming days: next 3 after current_day (capped at 30)
-  const upcomingDays =
-    progress
-      ? [1, 2, 3]
-          .map((offset) => progress.current_day + offset)
-          .filter((d) => d <= 30)
-      : [];
+  const upcomingDays = challengeState
+    ? [1, 2, 3]
+      .map((offset) => challengeState.currentDay + offset)
+      .filter((d) => d <= 30)
+    : [];
 
   return (
     <View style={styles.container}>
@@ -265,7 +329,7 @@ export default function CoupleChallengeScreen() {
           </ScrollView>
         )}
 
-        {loadState === "ready" && progress && (
+        {loadState === "ready" && challengeState && (
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
@@ -276,13 +340,13 @@ export default function CoupleChallengeScreen() {
               animate={{ opacity: 1, translateY: 0 }}
               transition={{ type: "timing", duration: 350 }}
             >
-              <ProgressBar progress={progress} />
+              <ProgressBar state={challengeState} />
             </MotiView>
 
             {/* Today's challenge */}
-            {progress.current_day <= 30 ? (
+            {challengeState.currentDay <= 30 ? (
               <TodayCard
-                progress={progress}
+                state={challengeState}
                 partnerName={partnerName}
                 isMarkingDone={isMarkingDone}
                 onMarkDone={handleMarkDone}
@@ -297,7 +361,7 @@ export default function CoupleChallengeScreen() {
               >
                 <Ionicons name="trophy" size={28} color="#10B981" />
                 <Text style={styles.alreadyDoneText}>
-                  🎉 You{"'"}ve completed all 30 days together! Incredible.
+                  🎉 You{"'"}ve both completed all 30 days together! Incredible.
                 </Text>
               </MotiView>
             )}

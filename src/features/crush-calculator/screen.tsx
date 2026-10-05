@@ -6,9 +6,9 @@ import {
   Pressable,
   ScrollView,
   Platform,
-  KeyboardAvoidingView,
   BackHandler,
 } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useRouter, useFocusEffect } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";

@@ -165,10 +165,30 @@ export type SecretCrushStatus = "sent" | "opened" | "replied";
 
 export type ChallengeLoadState = "loading" | "error" | "no_partner" | "ready";
 
+/** A single per-user completion record (maps to couple_challenge_completions table) */
+export interface CoupleChallengeDayCompletion {
+  id: string;
+  progressId: string;
+  userId: string;
+  day: number;
+  completedAt: string; // ISO timestamptz
+}
+
+/** Aggregated view of both partners' completions for a given day */
+export interface DayCompletionStatus {
+  day: number;
+  myCompleted: boolean;
+  partnerCompleted: boolean;
+  bothCompleted: boolean;
+  myCompletedAt: string | null;
+  partnerCompletedAt: string | null;
+}
+
+/** @deprecated — kept for backward-compat; new code uses CoupleChallengeDayCompletion */
 export interface CoupleChallengeDayEntry {
   day: number;
-  completedAt: string;   // ISO timestamptz
-  completedBy: string;   // user id
+  completedAt: string;
+  completedBy: string;
 }
 
 export interface CoupleChallengeProgress {
@@ -177,10 +197,19 @@ export interface CoupleChallengeProgress {
   user_a_id: string;
   user_b_id: string;
   current_day: number;
-  completed_days: CoupleChallengeDayEntry[];
+  completed_days: CoupleChallengeDayEntry[]; // legacy JSONB, kept for backward-compat
   last_completed_at: string | null;
   started_at: string;
 }
+
+/** Full state combining progress + per-user completions */
+export interface CoupleChallengeState {
+  progress: CoupleChallengeProgress;
+  myCompletions: CoupleChallengeDayCompletion[];
+  partnerCompletions: CoupleChallengeDayCompletion[];
+  currentDay: number; // computed: first day where both haven't completed
+}
+
 
 // ─── Secret Crush ─────────────────────────────────────────────────────────────
 
@@ -194,6 +223,36 @@ export interface SecretCrushMessage {
   replied_at: string | null;
   created_at: string;
 }
+
+// ─── 21 Questions Shared Session ─────────────────────────────────────────────
+
+export interface TwentyOneQuestionsSession {
+  id: string;
+  couple_key: string;
+  question_ids: string[];
+  created_at: string;
+  reset_at: string | null;
+}
+
+export interface TwentyOneQuestionsAnswer {
+  id: string;
+  session_id: string;
+  user_id: string;
+  question_id: string;
+  answer: string;
+  answered_at: string;
+}
+
+/** What each partner's answer looks like after both have answered */
+export interface TwentyOneQuestionsReveal {
+  questionId: string;
+  question: string;
+  options: string[];
+  myAnswer: string | null;
+  partnerAnswer: string | null;
+  bothAnswered: boolean;
+}
+
 
 // ─── Chat ─────────────────────────────────────────────────────────────────────
 

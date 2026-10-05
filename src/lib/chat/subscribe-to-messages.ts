@@ -36,7 +36,7 @@ export function subscribeToNewMessages(
       .on(
         "postgres_changes",
         {
-          event: "INSERT",
+          event: "*",
           schema: "public",
           table: "chat_messages",
           filter: `couple_key=eq.${coupleKey}`,
@@ -68,8 +68,8 @@ export function subscribeToNewMessages(
 }
 
 /**
- * Subscribe to INSERT events for unread count badge only.
- * Simpler — only cares about existence of new messages, not content.
+ * Subscribe to INSERT and UPDATE events for unread count badge.
+ * Fires callback on both new incoming messages (INSERT) and read status changes (UPDATE).
  * Returns an unsubscribe function.
  */
 export function subscribeToUnreadBadge(
@@ -84,7 +84,7 @@ export function subscribeToUnreadBadge(
       .on(
         "postgres_changes",
         {
-          event: "INSERT",
+          event: "*",
           schema: "public",
           table: "chat_messages",
           filter: `couple_key=eq.${coupleKey}`,

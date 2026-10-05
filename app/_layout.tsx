@@ -16,6 +16,8 @@ import {
 } from "@expo-google-fonts/fredoka";
 import { Caveat_400Regular, Caveat_700Bold } from "@expo-google-fonts/caveat";
 
+import { KeyboardProvider } from "react-native-keyboard-controller";
+
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -42,7 +44,8 @@ export default function RootLayout() {
       <GestureHandlerRootView
         style={{ flex: 1, backgroundColor: COLORS.darkOverlay }}
       >
-        <GluestackUIProvider mode="dark">
+        <KeyboardProvider>
+          <GluestackUIProvider mode="dark">
           <AuthProvider>
             <AlertProvider>
               <Stack
@@ -125,7 +128,8 @@ export default function RootLayout() {
             </AlertProvider>
           </AuthProvider>
         </GluestackUIProvider>
-      </GestureHandlerRootView>
+      </KeyboardProvider>
+    </GestureHandlerRootView>
     </ErrorBoundary>
   );
 }

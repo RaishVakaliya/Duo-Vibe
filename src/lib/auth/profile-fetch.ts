@@ -115,32 +115,32 @@ export async function syncUserProfile(
     }
 
     let finalRelationship: RelationshipType | null = null;
-    if (
-      profile.relationship_type === "local" ||
-      profile.relationship_type === "long_distance"
-    ) {
-      finalRelationship = profile.relationship_type;
-      await AsyncStorage.setItem(
-        RELATIONSHIP_TYPE_KEY,
-        profile.relationship_type,
-      );
+    let hasPartner = Boolean(profile.partner_id);
+
+    const { data: couple } = await supabase
+      .from("couples")
+      .select("relationship_type, status")
+      .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
+      .eq("status", "connected")
+      .maybeSingle();
+
+    if (couple) {
+      hasPartner = true;
+      await AsyncStorage.setItem(HAS_PARTNER_KEY, "true");
+      if (
+        couple.relationship_type === "local" ||
+        couple.relationship_type === "long_distance"
+      ) {
+        finalRelationship = couple.relationship_type as RelationshipType;
+      }
     }
 
-    let hasPartner = Boolean(profile.partner_id);
-    if (hasPartner) {
-      await AsyncStorage.setItem(HAS_PARTNER_KEY, "true");
-    } else {
-      const { data: couple } = await supabase
-        .from("couples")
-        .select("*")
-        .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
-        .eq("status", "connected")
-        .maybeSingle();
+    if (!finalRelationship && (profile.relationship_type === "local" || profile.relationship_type === "long_distance")) {
+      finalRelationship = profile.relationship_type as RelationshipType;
+    }
 
-      if (couple) {
-        hasPartner = true;
-        await AsyncStorage.setItem(HAS_PARTNER_KEY, "true");
-      }
+    if (finalRelationship) {
+      await AsyncStorage.setItem(RELATIONSHIP_TYPE_KEY, finalRelationship);
     }
 
     const lastUpdated = profile.updated_at

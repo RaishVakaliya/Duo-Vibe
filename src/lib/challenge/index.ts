@@ -2,6 +2,8 @@ import { supabase } from "@/src/lib/supabase";
 import {
   CoupleChallengeProgress,
   CoupleChallengeDayEntry,
+  CoupleChallengeDayCompletion,
+  CoupleChallengeState,
 } from "@/src/types";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -18,6 +20,7 @@ export function buildCoupleKey(userId: string, partnerId: string): string {
 /**
  * Safely parse completed_days from raw JSONB. Defaults to [] on any error
  * so a malformed/legacy row never crashes callers.
+ * @deprecated Use the new couple_challenge_completions table queries instead.
  */
 export function safeParseCompletedDays(raw: unknown): CoupleChallengeDayEntry[] {
   if (!Array.isArray(raw)) return [];
@@ -31,7 +34,7 @@ export function safeParseCompletedDays(raw: unknown): CoupleChallengeDayEntry[] 
   );
 }
 
-/** Map a raw Supabase row into the typed domain model. */
+/** Map a raw Supabase row into the typed progress domain model. */
 function rowToProgress(row: {
   id: string;
   couple_key: string;
@@ -54,13 +57,45 @@ function rowToProgress(row: {
   };
 }
 
+/** Map a raw completions row into the typed domain model. */
+function rowToCompletion(row: {
+  id: string;
+  progress_id: string;
+  user_id: string;
+  day: number;
+  completed_at: string;
+}): CoupleChallengeDayCompletion {
+  return {
+    id: row.id,
+    progressId: row.progress_id,
+    userId: row.user_id,
+    day: row.day,
+    completedAt: row.completed_at,
+  };
+}
+
+/**
+ * Compute the active current_day from per-user completion rows.
+ * current_day = first day 1–30 where BOTH partners have NOT yet completed it.
+ * Returns 31 when all 30 days are finished by both.
+ */
+export function computeCurrentDay(
+  myCompletions: CoupleChallengeDayCompletion[],
+  partnerCompletions: CoupleChallengeDayCompletion[],
+): number {
+  const myDays = new Set(myCompletions.map((c) => c.day));
+  const partnerDays = new Set(partnerCompletions.map((c) => c.day));
+  for (let d = 1; d <= 30; d++) {
+    if (!myDays.has(d) || !partnerDays.has(d)) return d;
+  }
+  return 31; // all done
+}
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 /**
  * Fetches the shared couple_challenge_progress row for this user pair,
  * creating one via upsert (on conflict: couple_key) if it doesn't exist yet.
- * The upsert prevents duplicate rows even if both partners hit this
- * simultaneously for the first time.
  */
 export async function getOrCreateCoupleProgress(
   userId: string,
@@ -68,7 +103,6 @@ export async function getOrCreateCoupleProgress(
 ): Promise<CoupleChallengeProgress> {
   const coupleKey = buildCoupleKey(userId, partnerId);
 
-  // Sort so user_a is always the lexicographically smaller id
   const sorted = [userId, partnerId].sort();
   const userAId: string = sorted[0]!;
   const userBId: string = sorted[1]!;
@@ -92,7 +126,6 @@ export async function getOrCreateCoupleProgress(
 
   if (error) throw new Error(error.message);
 
-  // ignoreDuplicates: true means upsert returns null on conflict; re-fetch.
   if (!data) {
     const { data: existing, error: fetchError } = await supabase
       .from("couple_challenge_progress")
@@ -112,110 +145,131 @@ export async function getOrCreateCoupleProgress(
 }
 
 /**
- * Returns true if the given day is unlocked.
- * Day 1 is always unlocked. Any subsequent day unlocks only after the
- * previous day's completedAt is at least 24 hours in the past.
+ * Fetches all completion rows for a given progress record.
+ * Returns both arrays so the caller can distinguish "my" vs "partner" completions.
+ */
+export async function fetchCompletions(progressId: string): Promise<CoupleChallengeDayCompletion[]> {
+  const { data, error } = await supabase
+    .from("couple_challenge_completions")
+    .select("id, progress_id, user_id, day, completed_at")
+    .eq("progress_id", progressId)
+    .order("day", { ascending: true });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []).map(rowToCompletion);
+}
+
+/**
+ * Loads the full CoupleChallengeState for a given user pair.
+ * Creates the progress row if it doesn't exist, then fetches all completions.
+ */
+export async function loadChallengeState(
+  userId: string,
+  partnerId: string,
+): Promise<CoupleChallengeState> {
+  const progress = await getOrCreateCoupleProgress(userId, partnerId);
+  const allCompletions = await fetchCompletions(progress.id);
+
+  const myCompletions = allCompletions.filter((c) => c.userId === userId);
+  const partnerCompletions = allCompletions.filter((c) => c.userId === partnerId);
+  const currentDay = computeCurrentDay(myCompletions, partnerCompletions);
+
+  return { progress, myCompletions, partnerCompletions, currentDay };
+}
+
+/**
+ * Returns true if the given day is unlocked for the current user.
+ * Day 1 is always unlocked.
+ * Day N+1 unlocks only after BOTH partners have completed day N.
  */
 export function isDayUnlocked(
-  progress: CoupleChallengeProgress,
+  state: CoupleChallengeState,
   day: number,
 ): boolean {
   if (day <= 1) return true;
-
-  const prevEntry = progress.completed_days.find((e) => e.day === day - 1);
-  if (!prevEntry) return false;
-
-  const completedAt = new Date(prevEntry.completedAt).getTime();
-  const msIn24Hours = 24 * 60 * 60 * 1000;
-  return Date.now() - completedAt >= msIn24Hours;
+  const prevDay = day - 1;
+  const myDone = state.myCompletions.some((c) => c.day === prevDay);
+  const partnerDone = state.partnerCompletions.some((c) => c.day === prevDay);
+  return myDone && partnerDone;
 }
 
 /**
- * Marks a day as complete for the given user.
- * Appends to completed_days and advances current_day when this was the
- * active day. Safe to call even if the day was already completed
- * (idempotent: checks before appending).
+ * Marks a specific day as complete for the current user.
+ * Inserts a new row into couple_challenge_completions (unique constraint prevents duplicates).
+ * Returns the updated completion that was inserted, or the existing one if already done.
  */
-export async function markDayComplete(
-  progress: CoupleChallengeProgress,
+export async function markMyDayComplete(
+  progressId: string,
+  userId: string,
   day: number,
-  completedByUserId: string,
-): Promise<CoupleChallengeProgress> {
-  const alreadyDone = progress.completed_days.some((e) => e.day === day);
-  if (alreadyDone) return progress;
-
-  const newEntry: CoupleChallengeDayEntry = {
-    day,
-    completedAt: new Date().toISOString(),
-    completedBy: completedByUserId,
-  };
-
-  const updatedCompletedDays = [...progress.completed_days, newEntry];
-  const newCurrentDay =
-    day === progress.current_day
-      ? Math.min(progress.current_day + 1, 30)
-      : progress.current_day;
-
+): Promise<CoupleChallengeDayCompletion> {
   const { data, error } = await supabase
-    .from("couple_challenge_progress")
-    .update({
-      completed_days: updatedCompletedDays as unknown as import("@/src/types/database").Json,
-      current_day: newCurrentDay,
-      last_completed_at: newEntry.completedAt,
-    })
-    .eq("id", progress.id)
-    .select(
-      "id, couple_key, user_a_id, user_b_id, current_day, completed_days, last_completed_at, started_at",
+    .from("couple_challenge_completions")
+    .upsert(
+      { progress_id: progressId, user_id: userId, day },
+      { onConflict: "progress_id,user_id,day", ignoreDuplicates: true },
     )
-    .single();
+    .select("id, progress_id, user_id, day, completed_at")
+    .maybeSingle();
 
-  if (error || !data) {
-    throw new Error(error?.message ?? "Failed to mark day complete.");
+  if (error) throw new Error(error.message);
+
+  // ignoreDuplicates returns null if row already existed — re-fetch it
+  if (!data) {
+    const { data: existing, error: fetchErr } = await supabase
+      .from("couple_challenge_completions")
+      .select("id, progress_id, user_id, day, completed_at")
+      .eq("progress_id", progressId)
+      .eq("user_id", userId)
+      .eq("day", day)
+      .single();
+
+    if (fetchErr || !existing) throw new Error(fetchErr?.message ?? "Failed to mark day complete.");
+    return rowToCompletion(existing);
   }
 
-  return rowToProgress(data);
+  return rowToCompletion(data);
 }
 
 /**
- * Subscribes to real-time updates on a couple_challenge_progress row.
- * If the subscription channel fails it logs a warning but never throws —
- * the UI degrades gracefully to manual refresh.
+ * Subscribes to real-time INSERT events on couple_challenge_completions
+ * for a given progress row. Calls onNew whenever any partner marks a day done.
  * Returns an unsubscribe function.
  */
-export function subscribeToChallengeProgress(
+export function subscribeToCompletions(
   progressId: string,
-  onUpdate: (progress: CoupleChallengeProgress) => void,
+  onNew: (completion: CoupleChallengeDayCompletion) => void,
 ): () => void {
   let channel: ReturnType<typeof supabase.channel> | null = null;
 
   try {
     channel = supabase
-      .channel(`challenge_progress_${progressId}`)
+      .channel(`challenge_completions_${progressId}`)
       .on(
         "postgres_changes",
         {
-          event: "UPDATE",
+          event: "INSERT",
           schema: "public",
-          table: "couple_challenge_progress",
-          filter: `id=eq.${progressId}`,
+          table: "couple_challenge_completions",
+          filter: `progress_id=eq.${progressId}`,
         },
         (payload) => {
           if (payload.new) {
             try {
-              onUpdate(rowToProgress(payload.new as Parameters<typeof rowToProgress>[0]));
+              onNew(rowToCompletion(payload.new as Parameters<typeof rowToCompletion>[0]));
             } catch (e) {
-              console.warn("[challenge realtime] failed to parse update payload:", e);
+              console.warn("[challenge completions realtime] failed to parse payload:", e);
             }
           }
         },
       )
       .subscribe((status) => {
         if (status === "CHANNEL_ERROR") {
-          console.warn("[challenge realtime] subscription error for", progressId);
+          console.warn("[challenge completions realtime] subscription error for", progressId);
         }
       });
   } catch (e) {
-    console.warn("[challenge realtime] failed to subscribe:", e);
+    console.warn("[challenge completions realtime] failed to subscribe:", e);
   }
 
   return () => {
@@ -223,4 +277,28 @@ export function subscribeToChallengeProgress(
       supabase.removeChannel(channel).catch(() => { });
     }
   };
+}
+
+// ─── Legacy (kept for backward-compat, do not use in new code) ────────────────
+
+/** @deprecated Use markMyDayComplete + subscribeToCompletions instead */
+export async function markDayComplete(
+  progress: CoupleChallengeProgress,
+  day: number,
+  completedByUserId: string,
+): Promise<CoupleChallengeProgress> {
+  // Delegate to the new per-user completion
+  await markMyDayComplete(progress.id, completedByUserId, day);
+  // Return the progress unchanged — current_day is now computed client-side
+  return progress;
+}
+
+/** @deprecated Use subscribeToCompletions instead */
+export function subscribeToChallengeProgress(
+  progressId: string,
+  onUpdate: (progress: CoupleChallengeProgress) => void,
+): () => void {
+  // No-op bridge — callers should migrate to subscribeToCompletions
+  console.warn("[challenge] subscribeToChallengeProgress is deprecated. Use subscribeToCompletions.");
+  return () => { };
 }

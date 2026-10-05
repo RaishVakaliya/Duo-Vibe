@@ -62,6 +62,7 @@ export interface Database {
           user1_id: string;
           user2_id: string | null;
           status: "pending" | "connected";
+          relationship_type: string | null;
           connected_at: string | null;
           created_at: string;
         };
@@ -70,6 +71,7 @@ export interface Database {
           user1_id: string;
           user2_id?: string | null;
           status?: "pending" | "connected";
+          relationship_type?: string | null;
           connected_at?: string | null;
           created_at?: string;
         };
@@ -78,6 +80,7 @@ export interface Database {
           user1_id?: string;
           user2_id?: string | null;
           status?: "pending" | "connected";
+          relationship_type?: string | null;
           connected_at?: string | null;
           created_at?: string;
         };
@@ -415,6 +418,97 @@ export interface Database {
             columns: ["user_b_id"];
             isOneToOne: false;
             referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      couple_challenge_completions: {
+        Row: {
+          id: string;
+          progress_id: string;
+          user_id: string;
+          day: number;
+          completed_at: string;
+        };
+        Insert: {
+          id?: string;
+          progress_id: string;
+          user_id: string;
+          day: number;
+          completed_at?: string;
+        };
+        Update: {
+          id?: string;
+          progress_id?: string;
+          user_id?: string;
+          day?: number;
+          completed_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "couple_challenge_completions_progress_id_fkey";
+            columns: ["progress_id"];
+            isOneToOne: false;
+            referencedRelation: "couple_challenge_progress";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      twenty_one_questions_sessions: {
+        Row: {
+          id: string;
+          couple_key: string;
+          question_ids: Json;
+          created_at: string;
+          reset_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          couple_key: string;
+          question_ids?: Json;
+          created_at?: string;
+          reset_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          couple_key?: string;
+          question_ids?: Json;
+          created_at?: string;
+          reset_at?: string | null;
+        };
+        Relationships: [];
+      };
+      twenty_one_questions_answers: {
+        Row: {
+          id: string;
+          session_id: string;
+          user_id: string;
+          question_id: string;
+          answer: string;
+          answered_at: string;
+        };
+        Insert: {
+          id?: string;
+          session_id: string;
+          user_id: string;
+          question_id: string;
+          answer: string;
+          answered_at?: string;
+        };
+        Update: {
+          id?: string;
+          session_id?: string;
+          user_id?: string;
+          question_id?: string;
+          answer?: string;
+          answered_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "twenty_one_questions_answers_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: false;
+            referencedRelation: "twenty_one_questions_sessions";
             referencedColumns: ["id"];
           },
         ];
