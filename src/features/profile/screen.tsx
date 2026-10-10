@@ -32,6 +32,7 @@ export default function ProfileScreen() {
     avatarUrl,
     hasPartner,
     partnerName,
+    relationshipType,
     isLongDistance,
     pushNotificationsEnabled,
     isActionLoading,
@@ -155,7 +156,9 @@ export default function ProfileScreen() {
               </View>
               <View style={styles.relationTextCol}>
                 <Text style={styles.relationTitle}>
-                  {isLongDistance ? "Long Distance" : "Local"}
+                  {relationshipType
+                    ? (isLongDistance ? "Long Distance" : "Local")
+                    : "Not specified"}
                 </Text>
                 <Text style={styles.relationSubtitle}>
                   {hasPartner

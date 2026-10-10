@@ -8,7 +8,6 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export interface InitialRouteState {
   user: User | null;
   hasPartner: boolean;
-  onboardingComplete?: boolean;
 }
 
 export function resolveInitialRoute(

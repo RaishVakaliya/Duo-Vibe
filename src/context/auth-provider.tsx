@@ -9,7 +9,7 @@ import {
 } from "@/src/types";
 import { AuthContext } from "./auth-context";
 import {
-  performGoogleSignIn,
+  continueWithGoogle as continueWithGoogleLib,
   signOutGoogle,
 } from "@/src/lib/auth/google-signin";
 import {
@@ -322,10 +322,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signInWithGoogle = async (): Promise<AuthSignInResult> => {
+  const continueWithGoogle = async (): Promise<AuthSignInResult> => {
     try {
       setIsLoading(true);
-      const res = await performGoogleSignIn();
+      const res = await continueWithGoogleLib();
+      if (res.cancelled) {
+        return { cancelled: true, hasPartner: false };
+      }
       if (res.error) {
         return { error: res.error, hasPartner: false };
       }
@@ -333,9 +336,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(res.user);
         setSession(res.session);
         await applyProfileSync(res.user);
-        const storedPartner = await AsyncStorage.getItem(HAS_PARTNER_KEY);
         return {
-          hasPartner: storedPartner === "true",
+          hasPartner: res.hasPartner,
           user: res.user,
         };
       }
@@ -344,6 +346,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
     }
   };
+
+  const signInWithGoogle = continueWithGoogle;
 
   const signInWithEmail = async (
     email: string,
@@ -501,6 +505,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       codeExpiresInSeconds,
       codeExpiresAt,
       refreshInviteCode,
+      continueWithGoogle,
       signInWithGoogle,
       signInWithEmail,
       signOut,

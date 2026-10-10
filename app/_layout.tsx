@@ -71,14 +71,10 @@ export default function RootLayout() {
                   <Stack.Screen name="index" options={{ animation: "fade" }} />
                   <Stack.Screen name="welcome" options={{ animation: "fade" }} />
 
-                  {/* Onboarding & Core Flows: Smooth Native iOS/Android slide from right */}
-                  <Stack.Screen name="login" />
-                  <Stack.Screen name="onboarding-name" />
-                  <Stack.Screen name="onboarding" />
+                  {/* Discovery & Auth Flows */}
                   <Stack.Screen name="date-ideas" />
-                  <Stack.Screen name="play-compare" />
                   <Stack.Screen name="memories" />
-                  <Stack.Screen name="ready" />
+                  <Stack.Screen name="auth" />
                   <Stack.Screen name="invite-partner" />
 
                   {/* Main Hubs: Clean crossfade */}

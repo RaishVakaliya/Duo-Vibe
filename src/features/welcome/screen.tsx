@@ -42,7 +42,7 @@ export default function WelcomeScreen() {
       }
       return;
     }
-    router.push(ROUTES.ONBOARDING_NAME);
+    router.push(ROUTES.DATE_IDEAS);
   };
 
   return (
@@ -94,18 +94,6 @@ export default function WelcomeScreen() {
               <Text style={styles.buttonText}>Start Our Journey</Text>
             </LinearGradient>
           </Pressable>
-
-          <View style={styles.footerRow}>
-            <Text style={styles.footerText}>Already have an account?</Text>
-            <Pressable
-              onPress={() => router.push(ROUTES.LOGIN)}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              accessibilityRole="link"
-              accessibilityLabel="Log in"
-            >
-              <Text style={styles.loginLink}>Log in</Text>
-            </Pressable>
-          </View>
         </View>
       </SafeAreaView>
     </View>

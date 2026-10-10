@@ -43,7 +43,7 @@ export const styles = StyleSheet.create({
     height: 56,
     borderRadius: RADIUS.button,
     overflow: "hidden",
-    marginBottom: 18,
+    marginBottom: 8,
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
@@ -61,22 +61,5 @@ export const styles = StyleSheet.create({
     fontSize: 17,
     color: COLORS.white,
     letterSpacing: 0.4,
-  },
-  footerRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 4,
-  },
-  footerText: {
-    fontSize: 14,
-    color: COLORS.textMuted,
-  },
-  loginLink: {
-    fontSize: 14,
-    color: COLORS.white,
-    fontFamily: "Fredoka_700Bold",
-    textDecorationLine: "underline",
-    marginLeft: 5,
   },
 });

@@ -202,7 +202,7 @@ export default function CrushCalculatorResultScreen() {
               animate={{ opacity: 1, translateY: 0 }}
               transition={{ type: "timing", duration: 400, delay: 450 }}
             >
-              <Text style={styles.messageText}>"{message}"</Text>
+              <Text style={styles.messageText}>{`"${message}"`}</Text>
             </MotiView>
           </MotiView>
         </ScrollView>

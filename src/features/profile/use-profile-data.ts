@@ -218,6 +218,7 @@ export function useProfileData() {
     avatarUrl,
     hasPartner,
     partnerName,
+    relationshipType,
     isLongDistance,
     pushNotificationsEnabled,
     isActionLoading,

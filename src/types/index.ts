@@ -57,6 +57,7 @@ export interface OnboardingOption {
 export interface AuthSignInResult {
   error?: string;
   hasPartner: boolean;
+  cancelled?: boolean;
   user?: User | null;
 }
 
@@ -75,6 +76,7 @@ export interface AuthContextType {
   codeExpiresInSeconds: number;
   codeExpiresAt: number;
   refreshInviteCode: () => Promise<string>;
+  continueWithGoogle: () => Promise<AuthSignInResult>;
   signInWithGoogle: () => Promise<AuthSignInResult>;
   signInWithEmail: (
     email: string,

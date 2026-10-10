@@ -2,39 +2,22 @@ import { StyleSheet, Dimensions } from "react-native";
 import { COLORS, RADIUS } from "@/src/constants/colors";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const LOGO_SIZE = Math.min(Math.round(SCREEN_WIDTH * 0.32), 130);
 
-export const loginStyles = StyleSheet.create({
+export const authStyles = StyleSheet.create({
   container: {
     flex: 1,
   },
   gradientBackground: {
     ...StyleSheet.absoluteFillObject,
   },
-  ambientBlobTop: {
-    position: "absolute",
-    top: -60,
-    left: -60,
-    width: 220,
-    height: 220,
-    borderRadius: 110,
-    backgroundColor: "rgba(168, 85, 247, 0.15)",
-  },
-  ambientBlobBottom: {
-    position: "absolute",
-    bottom: -80,
-    right: -60,
-    width: 260,
-    height: 260,
-    borderRadius: 130,
-    backgroundColor: "rgba(56, 189, 248, 0.12)",
-  },
   safeArea: {
     flex: 1,
     paddingHorizontal: 20,
     justifyContent: "space-between",
   },
-  header: {
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
     paddingTop: 8,
     paddingBottom: 12,
   },
@@ -47,26 +30,39 @@ export const loginStyles = StyleSheet.create({
     alignItems: "center",
   },
   content: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 20,
+    flex: 1,
+    paddingTop: 24,
+    justifyContent: "space-between",
   },
-  logo: {
-    width: LOGO_SIZE,
-    height: LOGO_SIZE,
+  headerTextContainer: {
+    alignItems: "flex-start",
   },
   title: {
     fontFamily: "Fredoka_700Bold",
-    fontSize: SCREEN_WIDTH < 360 ? 28 : 34,
+    fontSize: 32,
+    lineHeight: 38,
     color: COLORS.white,
-    marginTop: 16,
-    textAlign: "center",
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 15,
-    color: COLORS.textDim,
-    marginTop: 8,
-    textAlign: "center",
+    lineHeight: 22,
+    color: COLORS.textMuted,
+  },
+  illustrationContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: -20,
+    width: SCREEN_WIDTH,
+    overflow: "hidden",
+  },
+  illustration: {
+    width: SCREEN_WIDTH * 1.15,
+    height: SCREEN_WIDTH * 0.92,
+  },
+  footer: {
+    paddingBottom: 24,
   },
   googleButton: {
     flexDirection: "row",
@@ -83,7 +79,6 @@ export const loginStyles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
-    marginTop: 40,
   },
   googleIconContainer: {
     marginRight: 10,
@@ -94,28 +89,21 @@ export const loginStyles = StyleSheet.create({
     color: COLORS.white,
     letterSpacing: 0.2,
   },
-  footer: {
-    paddingBottom: 24,
-    alignItems: "center",
-  },
-  footerText: {
-    fontSize: 12,
-    color: COLORS.textDim,
-    textAlign: "center",
-    marginBottom: 4,
-  },
-  linksRow: {
-    flexDirection: "row",
+  termsContainer: {
+    marginTop: 16,
+    paddingHorizontal: 8,
     alignItems: "center",
     justifyContent: "center",
   },
-  linkText: {
+  termsText: {
     fontSize: 12,
-    color: COLORS.white,
-    textDecorationLine: "underline",
+    lineHeight: 18,
+    color: "rgba(255, 255, 255, 0.55)",
+    textAlign: "center",
   },
-  andText: {
-    fontSize: 12,
-    color: COLORS.textDim,
+  termsLink: {
+    fontFamily: "Fredoka_600SemiBold",
+    color: COLORS.primaryLight,
+    textDecorationLine: "underline",
   },
 });

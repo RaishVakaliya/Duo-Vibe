@@ -18,6 +18,7 @@ export const styles = StyleSheet.create({
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     paddingTop: 8,
     paddingBottom: 12,
   },
@@ -28,18 +29,6 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.12)",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 16,
-  },
-  progressBarTrack: {
-    flex: 1,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "rgba(255, 255, 255, 0.15)",
-    overflow: "hidden",
-  },
-  progressBarFill: {
-    height: "100%",
-    borderRadius: 3,
   },
   content: {
     flex: 1,

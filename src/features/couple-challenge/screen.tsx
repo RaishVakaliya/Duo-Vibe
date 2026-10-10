@@ -151,7 +151,7 @@ function TodayCard({
         <View style={styles.waitingBanner}>
           <Ionicons name="time-outline" size={20} color="#92400E" />
           <Text style={styles.waitingBannerText}>
-            You're done! Waiting for{" "}
+            {"You're done! Waiting for "}
             {partnerName ?? "your partner"} to complete this challenge too 💕
           </Text>
         </View>

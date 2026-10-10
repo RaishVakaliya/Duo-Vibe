@@ -73,7 +73,7 @@ export default function DateIdeasScreen() {
   };
 
   const handleContinue = (): void => {
-    router.push(ROUTES.PLAY_COMPARE);
+    router.push(ROUTES.MEMORIES);
   };
 
   return (
@@ -97,15 +97,6 @@ export default function DateIdeasScreen() {
           >
             <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
           </Pressable>
-
-          <View style={styles.progressBarTrack}>
-            <LinearGradient
-              colors={[...GRADIENTS.progressBar]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={[styles.progressBarFill, { width: "50%" }]}
-            />
-          </View>
         </View>
 
         <View style={styles.content}>

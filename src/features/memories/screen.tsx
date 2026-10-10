@@ -23,7 +23,7 @@ export default function MemoriesScreen() {
   }, []);
 
   const handleContinue = () => {
-    router.push(ROUTES.READY);
+    router.push(ROUTES.AUTH);
   };
 
   return (
@@ -48,14 +48,6 @@ export default function MemoriesScreen() {
             <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
           </Pressable>
 
-          <View style={styles.progressBarTrack}>
-            <LinearGradient
-              colors={[...GRADIENTS.progressBar]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={[styles.progressBarFill, { width: "85%" }]}
-            />
-          </View>
         </View>
 
         <View style={styles.content}>

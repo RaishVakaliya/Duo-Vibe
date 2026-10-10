@@ -19,6 +19,7 @@ export interface Database {
           invite_code: string | null;
           relationship_type: string | null;
           push_token: string | null;
+          has_completed_onboarding?: boolean | null;
           created_at: string;
           updated_at: string;
         };
@@ -31,6 +32,7 @@ export interface Database {
           invite_code?: string | null;
           relationship_type?: string | null;
           push_token?: string | null;
+          has_completed_onboarding?: boolean | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -43,6 +45,7 @@ export interface Database {
           invite_code?: string | null;
           relationship_type?: string | null;
           push_token?: string | null;
+          has_completed_onboarding?: boolean | null;
           created_at?: string;
           updated_at?: string;
         };

@@ -223,7 +223,7 @@ export default function TwentyOneQuestionsScreen() {
               <Text style={styles.headerTitle}>21 Questions</Text>
             </View>
             <Text style={styles.headerSubtitle}>
-              Answer together — see each other's replies revealed
+              {"Answer together — see each other's replies revealed"}
             </Text>
           </View>
 
