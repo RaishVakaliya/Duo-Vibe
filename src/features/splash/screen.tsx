@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { View, Text, Image, Dimensions } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -111,10 +111,34 @@ export default function SplashScreen() {
   const hasNavigatedRef = useRef<boolean>(false);
   const mountTimeRef = useRef<number>(Date.now());
 
+  const navigateToInitialRoute = useCallback(() => {
+    if (hasNavigatedRef.current) return;
+    hasNavigatedRef.current = true;
+
+    const targetRoute = resolveInitialRoute({ user, hasPartner });
+    if (targetRoute === ROUTES.INVITE_PARTNER) {
+      router.replace({
+        pathname: ROUTES.INVITE_PARTNER,
+        params: { source: "auth" },
+      });
+    } else {
+      router.replace(targetRoute);
+    }
+  }, [user, hasPartner, router]);
+
+  // Hard safety fallback: Ensure app never pauses or stays stuck on splash screen
+  useEffect(() => {
+    const watchdogTimer = setTimeout(() => {
+      navigateToInitialRoute();
+    }, 2800);
+
+    return () => clearTimeout(watchdogTimer);
+  }, [navigateToInitialRoute]);
+
   useEffect(() => {
     if (hasNavigatedRef.current) return;
 
-    // If auth is still loading, do nothing — re-runs when isLoading flips.
+    // If auth is still loading, wait for it or watchdog
     if (isLoading) return;
 
     const MIN_DISPLAY_MS = 1200;
@@ -122,22 +146,11 @@ export default function SplashScreen() {
     const remaining = Math.max(0, MIN_DISPLAY_MS - elapsed);
 
     const timer = setTimeout(() => {
-      if (hasNavigatedRef.current) return;
-      hasNavigatedRef.current = true;
-
-      const targetRoute = resolveInitialRoute({ user, hasPartner });
-      if (targetRoute === ROUTES.INVITE_PARTNER) {
-        router.replace({
-          pathname: ROUTES.INVITE_PARTNER,
-          params: { source: "auth" },
-        });
-      } else {
-        router.replace(targetRoute);
-      }
+      navigateToInitialRoute();
     }, remaining);
 
     return () => clearTimeout(timer);
-  }, [isLoading, user, hasPartner, router]);
+  }, [isLoading, navigateToInitialRoute]);
 
   return (
     <View style={styles.container}>

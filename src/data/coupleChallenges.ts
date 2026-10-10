@@ -8,7 +8,7 @@ export const COUPLE_CHALLENGE_BANK: CoupleChallenge[] = [
   {
     day: 1,
     title: "Day 1",
-    description: "Tell your partner 3 things you genuinely love about them — not just 'you're kind', but the specific little things that make you smile.",
+    description: "Tell your partner 2 things you genuinely love about them — not just 'you're kind', but the specific little things that make you smile.",
   },
   {
     day: 2,

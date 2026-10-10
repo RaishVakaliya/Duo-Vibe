@@ -17,7 +17,6 @@ import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
 import { useCoupleChallengeAll } from "./use-couple-challenge-all";
 import { COUPLE_CHALLENGE_BANK, CoupleChallenge } from "@/src/data/coupleChallenges";
-import { isDayUnlocked } from "@/src/lib/challenge";
 import { CoupleChallengeProgress } from "@/src/types";
 
 // ─── Row item ─────────────────────────────────────────────────────────────────
@@ -104,7 +103,7 @@ function buildRowData(
     }
     const isCompleted = progress.completed_days.some((e) => e.day === challenge.day);
     const isCurrent = challenge.day === progress.current_day;
-    const unlocked = isDayUnlocked(progress, challenge.day);
+    const unlocked = challenge.day <= progress.current_day;
     const isLocked = !isCompleted && !isCurrent && !unlocked;
     return { ...challenge, isCompleted, isCurrent, isLocked };
   });

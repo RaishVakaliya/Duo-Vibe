@@ -17,6 +17,8 @@ import {
   RELATIONSHIP_TYPE_KEY,
   USER_NAME_KEY,
   AVATAR_URL_KEY,
+  INVITE_CODE_VALIDITY_SECONDS,
+  INVITE_CODE_VALIDITY_MS,
   generateInviteCode,
   syncUserProfile,
 } from "@/src/lib/auth/profile-fetch";
@@ -33,10 +35,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useState<RelationshipType | null>(null);
   const [inviteCode, setInviteCode] = useState<string>(generateInviteCode());
   const [codeExpiresAt, setCodeExpiresAt] = useState<number>(
-    Date.now() + 3600 * 1000,
+    Date.now() + INVITE_CODE_VALIDITY_MS,
   );
   const [codeExpiresInSeconds, setCodeExpiresInSeconds] =
-    useState<number>(3600);
+    useState<number>(INVITE_CODE_VALIDITY_SECONDS);
 
   const applyProfileSync = async (currentUser: User): Promise<void> => {
     const synced = await syncUserProfile(currentUser);
@@ -79,11 +81,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setAvatarUrlState(storedAvatar);
         }
 
-        const { data } = await supabase.auth.getSession();
+        const getSessionWithTimeout = async () => {
+          return Promise.race([
+            supabase.auth.getSession(),
+            new Promise<{ data: { session: null }; error: null }>((resolve) =>
+              setTimeout(
+                () => resolve({ data: { session: null }, error: null }),
+                3000,
+              ),
+            ),
+          ]);
+        };
+
+        const { data } = await getSessionWithTimeout();
         if (data?.session) {
           setSession(data.session);
           setUser(data.session.user);
-          await applyProfileSync(data.session.user);
+          // Sync profile non-blockingly so app startup/splash never gets stuck
+          applyProfileSync(data.session.user).catch((syncErr) => {
+            console.warn("Async profile sync error on init:", syncErr);
+          });
         }
       } catch (err: unknown) {
         console.warn("Error initializing auth:", err);
@@ -94,11 +111,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initAuth();
 
-    const unsubscribe = subscribeToAuthState(async (currentSession) => {
+    const unsubscribe = subscribeToAuthState((currentSession) => {
       setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      if (currentSession?.user) {
-        await applyProfileSync(currentSession.user);
+      const currentUser = currentSession?.user ?? null;
+      setUser(currentUser);
+      if (currentUser) {
+        // Run outside the auth state listener stack to prevent Supabase mutex deadlock
+        setTimeout(() => {
+          applyProfileSync(currentUser).catch((err) => {
+            console.warn("Async auth state sync error:", err);
+          });
+        }, 0);
       }
     });
 
@@ -109,10 +132,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const newCode = generateInviteCode();
     const now = new Date();
     const nowIso = now.toISOString();
-    const freshExpires = now.getTime() + 3600 * 1000;
+    const freshExpires = now.getTime() + INVITE_CODE_VALIDITY_MS;
     setInviteCode(newCode);
     setCodeExpiresAt(freshExpires);
-    setCodeExpiresInSeconds(3600);
+    setCodeExpiresInSeconds(INVITE_CODE_VALIDITY_SECONDS);
     if (user) {
       try {
         await supabase
@@ -409,11 +432,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ? new Date(partnerProfile.updated_at).getTime()
         : 0;
       const ageSeconds = Math.floor((Date.now() - lastUpdated) / 1000);
-      if (ageSeconds > 3600) {
+      if (ageSeconds > INVITE_CODE_VALIDITY_SECONDS) {
         return {
           success: false,
           message:
-            "This invite code has expired (valid for 1 hour). Please ask your partner to generate a new code.",
+            "This invite code has expired (valid for 2 days). Please ask your partner to generate a new code.",
         };
       }
 

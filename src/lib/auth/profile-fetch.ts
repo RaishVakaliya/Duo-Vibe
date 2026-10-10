@@ -9,6 +9,9 @@ export const RELATIONSHIP_TYPE_KEY = "@duo_relationship_type";
 export const USER_NAME_KEY = "@duo_user_name";
 export const AVATAR_URL_KEY = "@duo_avatar_url";
 
+export const INVITE_CODE_VALIDITY_SECONDS = 2 * 24 * 3600; // 2 days = 172,800 seconds
+export const INVITE_CODE_VALIDITY_MS = INVITE_CODE_VALIDITY_SECONDS * 1000; // 172,800,000 ms
+
 export function generateInviteCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let result = "";
@@ -51,7 +54,7 @@ export async function syncUserProfile(
     if (!profile) {
       const newCode = generateInviteCode();
       const nowIso = now.toISOString();
-      const expiresTime = now.getTime() + 3600 * 1000;
+      const expiresTime = now.getTime() + INVITE_CODE_VALIDITY_MS;
       const initialName =
         (currentUser.user_metadata?.full_name as string) ||
         (await AsyncStorage.getItem(USER_NAME_KEY)) ||
@@ -82,7 +85,7 @@ export async function syncUserProfile(
         relationshipType: null,
         inviteCode: newCode,
         codeExpiresAt: expiresTime,
-        codeExpiresInSeconds: 3600,
+        codeExpiresInSeconds: INVITE_CODE_VALIDITY_SECONDS,
       };
     }
 
@@ -146,7 +149,7 @@ export async function syncUserProfile(
     const lastUpdated = profile.updated_at
       ? new Date(profile.updated_at).getTime()
       : now.getTime();
-    const expiresTime = lastUpdated + 3600 * 1000;
+    const expiresTime = lastUpdated + INVITE_CODE_VALIDITY_MS;
     const remaining = Math.floor((expiresTime - now.getTime()) / 1000);
 
     let finalCode = profile.invite_code;
@@ -160,14 +163,14 @@ export async function syncUserProfile(
     } else {
       const newCode = generateInviteCode();
       const nowIso = now.toISOString();
-      const freshExpires = now.getTime() + 3600 * 1000;
+      const freshExpires = now.getTime() + INVITE_CODE_VALIDITY_MS;
       await supabase
         .from("profiles")
         .update({ invite_code: newCode, updated_at: nowIso })
         .eq("id", currentUser.id);
       finalCode = newCode;
       finalExpires = freshExpires;
-      finalRemaining = 3600;
+      finalRemaining = INVITE_CODE_VALIDITY_SECONDS;
     }
 
     registerForPushNotificationsAsync(currentUser.id).catch((pushErr) => {
