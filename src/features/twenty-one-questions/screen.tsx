@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -18,6 +18,11 @@ import { ROUTES } from "@/src/constants/routes";
 import { GRADIENTS } from "@/src/constants/colors";
 import { useTwentyOneQuestions } from "./use-twenty-one-questions";
 import { TwentyOneQuestionsReveal } from "@/src/types";
+import { useAuth } from "@/src/context/auth";
+import { useAlert } from "@/src/components/ui/alert-dialog";
+import { getPartnerId } from "@/src/lib/quizSession";
+import { buildCoupleKey } from "@/src/lib/challenge";
+import { createResultMemory } from "@/src/lib/memories";
 
 const TOTAL = 21;
 
@@ -92,6 +97,56 @@ export default function TwentyOneQuestionsScreen() {
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === reveals.length - 1;
   const progressFraction = reveals.length > 0 ? (currentIndex + 1) / reveals.length : 0;
+
+  const { user } = useAuth();
+  const { showAlert } = useAlert();
+  const [isSaved, setIsSaved] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+
+  const handleSaveToMemories = async (): Promise<void> => {
+    if (isSaved || isSaving) return;
+    if (!user) {
+      showAlert({
+        title: "Sign in Required",
+        message: "Please sign in to save memories.",
+      });
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const partnerId = await getPartnerId(user.id);
+      if (!partnerId) {
+        showAlert({
+          title: "Partner Required",
+          message: "Connect with a partner to save shared memories.",
+        });
+        setIsSaving(false);
+        return;
+      }
+      const coupleKey = buildCoupleKey(user.id, partnerId);
+      await createResultMemory({
+        coupleKey,
+        userId: user.id,
+        title: "21 Questions Completed",
+        note: "Completed all 21 questions together! 🎉",
+        payload: {
+          type: "questions_21",
+          score: 21,
+          overall: 100,
+          headline: "21 Questions Completed",
+        },
+      });
+      setIsSaved(true);
+    } catch (err: unknown) {
+      console.warn("Save to memories error:", err);
+      showAlert({
+        title: "Save Failed",
+        message: err instanceof Error ? err.message : "Failed to save to memories.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (loadState === "loading") {
@@ -361,6 +416,37 @@ export default function TwentyOneQuestionsScreen() {
             </MotiView>
           )}
         </ScrollView>
+
+        {isLast && (
+          <Pressable
+            style={[
+              styles.saveMemoryButton,
+              isSaved && styles.saveMemoryButtonSaved,
+            ]}
+            onPress={handleSaveToMemories}
+            disabled={isSaved || isSaving}
+            accessibilityRole="button"
+            accessibilityLabel={isSaved ? "Saved to Memories" : "Save to Memories"}
+          >
+            <Ionicons
+              name={isSaved ? "checkmark-circle" : "sparkles"}
+              size={18}
+              color={isSaved ? "#059669" : "#FF2D55"}
+            />
+            <Text
+              style={[
+                styles.saveMemoryButtonText,
+                isSaved && styles.saveMemoryButtonTextSaved,
+              ]}
+            >
+              {isSaved
+                ? "Saved to Memories"
+                : isSaving
+                  ? "Saving to Memories..."
+                  : "Save to Memories"}
+            </Text>
+          </Pressable>
+        )}
 
         {/* Footer nav */}
         <View style={styles.footer}>

@@ -207,4 +207,28 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     color: COLORS.white,
   },
+  saveMemoryButton: {
+    height: 50,
+    borderRadius: RADIUS.buttonFooter,
+    backgroundColor: "#FFE4E6",
+    borderWidth: 1.5,
+    borderColor: "#FF2D55",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginTop: 12,
+  },
+  saveMemoryButtonSaved: {
+    backgroundColor: "#ECFDF5",
+    borderColor: "#10B981",
+  },
+  saveMemoryButtonText: {
+    fontFamily: "Fredoka_700Bold",
+    fontSize: 15,
+    color: "#FF2D55",
+  },
+  saveMemoryButtonTextSaved: {
+    color: "#059669",
+  },
 });

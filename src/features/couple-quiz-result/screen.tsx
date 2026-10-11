@@ -20,10 +20,19 @@ import {
   subscribeToSessionUpdates,
   ReviewSessionData,
   getScoreHeadline,
+  getPartnerId,
 } from "@/src/lib/quizSession";
+import { useAuth } from "@/src/context/auth";
+import { useAlert } from "@/src/components/ui/alert-dialog";
+import { buildCoupleKey } from "@/src/lib/challenge";
+import { createResultMemory } from "@/src/lib/memories";
 
 export default function CoupleQuizResultScreen() {
   const router = useRouter();
+  const { user } = useAuth();
+  const { showAlert } = useAlert();
+  const [isSaved, setIsSaved] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const params = useLocalSearchParams<{ sessionId?: string; score?: string }>();
   const sessionId = params.sessionId ?? "";
 
@@ -89,6 +98,51 @@ export default function CoupleQuizResultScreen() {
   const score = sessionData?.session.score ?? correctCount;
   const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
   const headline = getScoreHeadline(percentage);
+
+  const handleSaveToMemories = async (): Promise<void> => {
+    if (isSaved || isSaving) return;
+    if (!user) {
+      showAlert({
+        title: "Sign in Required",
+        message: "Please sign in to save memories.",
+      });
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const partnerId = await getPartnerId(user.id);
+      if (!partnerId) {
+        showAlert({
+          title: "Partner Required",
+          message: "Connect with a partner to save shared memories.",
+        });
+        setIsSaving(false);
+        return;
+      }
+      const coupleKey = buildCoupleKey(user.id, partnerId);
+      await createResultMemory({
+        coupleKey,
+        userId: user.id,
+        title: "Couple Quiz Result",
+        note: `Scored ${score}/${total} (${percentage}%) - ${headline}`,
+        payload: {
+          type: "quiz",
+          score,
+          overall: percentage,
+          headline: `${score}/${total} (${percentage}%)`,
+        },
+      });
+      setIsSaved(true);
+    } catch (err: unknown) {
+      console.warn("Save to memories error:", err);
+      showAlert({
+        title: "Save Failed",
+        message: err instanceof Error ? err.message : "Failed to save quiz result.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -217,6 +271,35 @@ export default function CoupleQuizResultScreen() {
         )}
 
         <View style={styles.footer}>
+          <Pressable
+            style={[
+              styles.saveMemoryButton,
+              isSaved && styles.saveMemoryButtonSaved,
+            ]}
+            onPress={handleSaveToMemories}
+            disabled={isSaved || isSaving}
+            accessibilityRole="button"
+            accessibilityLabel={isSaved ? "Saved to Memories" : "Save to Memories"}
+          >
+            <Ionicons
+              name={isSaved ? "checkmark-circle" : "sparkles"}
+              size={18}
+              color={isSaved ? "#059669" : "#FF2D55"}
+            />
+            <Text
+              style={[
+                styles.saveMemoryButtonText,
+                isSaved && styles.saveMemoryButtonTextSaved,
+              ]}
+            >
+              {isSaved
+                ? "Saved to Memories"
+                : isSaving
+                  ? "Saving to Memories..."
+                  : "Save to Memories"}
+            </Text>
+          </Pressable>
+
           <Pressable
             style={styles.doneButton}
             onPress={() => router.replace(ROUTES.HOME)}

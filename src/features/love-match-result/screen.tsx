@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -18,7 +18,11 @@ import { styles } from "./styles";
 import { MatchBarRow } from "./types";
 import { COLORS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
-import { LoveMatchResultScreenParams } from "@/src/types";
+import { useAuth } from "@/src/context/auth";
+import { useAlert } from "@/src/components/ui/alert-dialog";
+import { getPartnerId } from "@/src/lib/quizSession";
+import { buildCoupleKey } from "@/src/lib/challenge";
+import { createResultMemory } from "@/src/lib/memories";
 
 function HeartSvg({
   size = 88,
@@ -39,6 +43,10 @@ function HeartSvg({
 
 export default function LoveMatchResultScreen() {
   const router = useRouter();
+  const { user } = useAuth();
+  const { showAlert } = useAlert();
+  const [isSaved, setIsSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const params = useLocalSearchParams<{
     name1?: string;
     name2?: string;
@@ -112,6 +120,51 @@ export default function LoveMatchResultScreen() {
 
   const handleTryAgain = (): void => {
     router.replace(ROUTES.LOVE_MATCH);
+  };
+
+  const handleSaveToMemories = async (): Promise<void> => {
+    if (isSaved || isSaving) return;
+    if (!user) {
+      showAlert({
+        title: "Sign in Required",
+        message: "Please sign in to save memories.",
+      });
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const partnerId = await getPartnerId(user.id);
+      if (!partnerId) {
+        showAlert({
+          title: "Partner Required",
+          message: "Connect with a partner to save shared memories.",
+        });
+        setIsSaving(false);
+        return;
+      }
+      const coupleKey = buildCoupleKey(user.id, partnerId);
+      await createResultMemory({
+        coupleKey,
+        userId: user.id,
+        title: `${name1} & ${name2} Love Match`,
+        note: `Compatibility score: ${overall}%`,
+        payload: {
+          type: "love_match",
+          score: overall,
+          overall,
+          headline: `${overall}% Compatibility`,
+        },
+      });
+      setIsSaved(true);
+    } catch (err: unknown) {
+      console.warn("Save to memories error:", err);
+      showAlert({
+        title: "Save Failed",
+        message: err instanceof Error ? err.message : "Failed to save result to memories.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -220,6 +273,28 @@ export default function LoveMatchResultScreen() {
             </View>
           </MotiView>
         </ScrollView>
+
+        <Pressable
+          style={[styles.saveMemoryButton, isSaved && styles.saveMemoryButtonSaved]}
+          onPress={handleSaveToMemories}
+          disabled={isSaved || isSaving}
+          accessibilityRole="button"
+          accessibilityLabel={isSaved ? "Saved to Memories" : "Save to Memories"}
+        >
+          <Ionicons
+            name={isSaved ? "checkmark-circle" : "sparkles"}
+            size={18}
+            color={isSaved ? "#059669" : "#FF2D55"}
+          />
+          <Text
+            style={[
+              styles.saveMemoryButtonText,
+              isSaved && styles.saveMemoryButtonTextSaved,
+            ]}
+          >
+            {isSaved ? "Saved to Memories" : isSaving ? "Saving to Memories..." : "Save to Memories"}
+          </Text>
+        </Pressable>
 
         <View style={styles.footerActions}>
           <Pressable
