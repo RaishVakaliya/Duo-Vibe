@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "995172766198",
+    "project_id": "duo-vibe",
+    "storage_bucket": "duo-vibe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:995172766198:android:2a7f089116892e2bd477d7",
+        "android_client_info": {
+          "package_name": "com.duovibe.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDf2I68om0EL3dwuRZ6bUdbwxJIDnW7PGQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
