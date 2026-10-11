@@ -71,6 +71,7 @@ export const GRADIENTS = {
    */
   primary: ["#FF4D6D", "#FF758C", "#FFA07A"] as const,
   primaryLocations: [0, 0.5, 1] as const,
+  buttonCoralAmber: ["#FF4D6D", "#FF758C", "#FFA07A"] as const,
 
   /**
    * Vibrant Pink Action Button Gradient (Used across primary calculate/next/submit actions)

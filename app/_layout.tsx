@@ -117,6 +117,7 @@ export default function RootLayout() {
                   />
                   <Stack.Screen name="couple-challenge" />
                   <Stack.Screen name="couple-challenge-all" />
+                  <Stack.Screen name="red-green-flag" />
 
                   {/* Reveal Result Screens: Fade Transition for Delightful Reveal Moment */}
                   <Stack.Screen

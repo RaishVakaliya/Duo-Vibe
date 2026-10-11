@@ -205,6 +205,9 @@ export function useProfileData() {
       case "chat":
         router.replace(ROUTES.CHAT);
         break;
+      case "memories":
+        router.replace(ROUTES.MEMORIES);
+        break;
       case "profile":
         break;
     }

@@ -31,6 +31,7 @@ export default function HomeScreen() {
     handleReviewPress,
     handleInvitePress,
     handleCardPress,
+    handleRedGreenFlagPress,
   } = useHomeData();
 
   return (
@@ -118,7 +119,7 @@ export default function HomeScreen() {
             </MotiView>
           )}
 
-          <RedGreenFlagBanner />
+          <RedGreenFlagBanner onPress={handleRedGreenFlagPress} />
 
           <LoveToolsGrid onToolPress={handleToolPress} />
 

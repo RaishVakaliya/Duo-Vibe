@@ -270,3 +270,79 @@ export interface ChatMessage {
   /** Client-side only — not persisted to DB */
   status?: ChatMessageStatus;
 }
+
+// ─── Memories ─────────────────────────────────────────────────────────────────
+
+export type MemoryKind = "photo" | "result";
+
+export interface MemoryReaction {
+  memory_id: string;
+  user_id: string;
+  created_at: string;
+}
+
+export interface MemoryCreatorProfile {
+  id: string;
+  fullName: string | null;
+  avatarUrl: string | null;
+}
+
+export interface Memory {
+  id: string;
+  couple_key: string;
+  created_by: string;
+  kind: MemoryKind;
+  title: string;
+  note: string | null;
+  memory_date: string;
+  image_path: string | null;
+  image_url?: string | null;
+  payload: Record<string, unknown> | null;
+  created_at: string;
+  reactions_count: number;
+  has_reacted: boolean;
+  creator?: MemoryCreatorProfile;
+}
+
+export interface GroupedMemories {
+  monthKey: string;
+  data: Memory[];
+}
+
+// ─── Red Flag or Green Flag ──────────────────────────────────────────────────
+
+export type FlagVote = "red" | "green";
+
+export interface FlagStat {
+  statement_id: string;
+  total_votes: number;
+  red_votes: number;
+  green_votes: number;
+  red_percentage: number;
+  green_percentage: number;
+}
+
+export interface FlagSession {
+  id: string;
+  couple_key: string;
+  created_by: string;
+  statement_ids: string[];
+  created_at: string;
+}
+
+export interface FlagAnswer {
+  session_id: string;
+  user_id: string;
+  statement_id: string;
+  vote: FlagVote;
+  created_at?: string;
+}
+
+export interface FlagPartnerResultItem {
+  statement_id: string;
+  my_vote: FlagVote;
+  partner_vote: FlagVote;
+  is_agreement: boolean;
+  partner_id: string;
+}
+

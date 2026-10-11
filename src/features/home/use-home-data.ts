@@ -95,6 +95,9 @@ export function useHomeData() {
         case "chat":
           router.push(ROUTES.CHAT);
           break;
+        case "memories":
+          router.push(ROUTES.MEMORIES);
+          break;
         case "profile":
           router.push(ROUTES.PROFILE);
           break;
@@ -130,6 +133,10 @@ export function useHomeData() {
     router.push(ROUTES.TWENTY_ONE_QUESTIONS);
   };
 
+  const handleRedGreenFlagPress = (): void => {
+    router.push(ROUTES.RED_GREEN_FLAG);
+  };
+
   return {
     hasPartner,
     greetingData,
@@ -141,5 +148,6 @@ export function useHomeData() {
     handleReviewPress,
     handleInvitePress,
     handleCardPress,
+    handleRedGreenFlagPress,
   };
 }

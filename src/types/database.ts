@@ -66,6 +66,7 @@ export interface Database {
           user2_id: string | null;
           status: "pending" | "connected";
           relationship_type: string | null;
+          anniversary_date: string | null;
           connected_at: string | null;
           created_at: string;
         };
@@ -75,6 +76,7 @@ export interface Database {
           user2_id?: string | null;
           status?: "pending" | "connected";
           relationship_type?: string | null;
+          anniversary_date?: string | null;
           connected_at?: string | null;
           created_at?: string;
         };
@@ -84,6 +86,7 @@ export interface Database {
           user2_id?: string | null;
           status?: "pending" | "connected";
           relationship_type?: string | null;
+          anniversary_date?: string | null;
           connected_at?: string | null;
           created_at?: string;
         };
@@ -214,44 +217,79 @@ export interface Database {
       memories: {
         Row: {
           id: string;
-          couple_id: string;
-          user_id: string;
-          image_url: string;
-          caption: string | null;
+          couple_key: string;
+          created_by: string;
+          kind: "photo" | "result";
+          title: string;
+          note: string | null;
           memory_date: string;
+          image_path: string | null;
+          payload: Json | null;
           created_at: string;
         };
         Insert: {
           id?: string;
-          couple_id: string;
-          user_id: string;
-          image_url: string;
-          caption?: string | null;
+          couple_key: string;
+          created_by: string;
+          kind?: "photo" | "result";
+          title: string;
+          note?: string | null;
           memory_date?: string;
+          image_path?: string | null;
+          payload?: Json | null;
           created_at?: string;
         };
         Update: {
           id?: string;
-          couple_id?: string;
-          user_id?: string;
-          image_url?: string;
-          caption?: string | null;
+          couple_key?: string;
+          created_by?: string;
+          kind?: "photo" | "result";
+          title?: string;
+          note?: string | null;
           memory_date?: string;
+          image_path?: string | null;
+          payload?: Json | null;
           created_at?: string;
         };
         Relationships: [
           {
-            foreignKeyName: "memories_couple_id_fkey";
-            columns: ["couple_id"];
+            foreignKeyName: "memories_created_by_fkey";
+            columns: ["created_by"];
             isOneToOne: false;
-            referencedRelation: "couples";
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      memory_reactions: {
+        Row: {
+          memory_id: string;
+          user_id: string;
+          created_at: string;
+        };
+        Insert: {
+          memory_id: string;
+          user_id: string;
+          created_at?: string;
+        };
+        Update: {
+          memory_id?: string;
+          user_id?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "memory_reactions_memory_id_fkey";
+            columns: ["memory_id"];
+            isOneToOne: false;
+            referencedRelation: "memories";
             referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "memories_user_id_fkey";
+            foreignKeyName: "memory_reactions_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
-            referencedRelation: "profiles";
+            referencedRelation: "users";
             referencedColumns: ["id"];
           },
         ];
@@ -551,12 +589,139 @@ export interface Database {
           },
         ];
       };
+      flag_votes: {
+        Row: {
+          id: string;
+          user_id: string;
+          statement_id: string;
+          vote: "red" | "green";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          statement_id: string;
+          vote: "red" | "green";
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          statement_id?: string;
+          vote?: "red" | "green";
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "flag_votes_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      flag_sessions: {
+        Row: {
+          id: string;
+          couple_key: string;
+          created_by: string;
+          statement_ids: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          couple_key: string;
+          created_by: string;
+          statement_ids: Json;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          couple_key?: string;
+          created_by?: string;
+          statement_ids?: Json;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "flag_sessions_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      flag_answers: {
+        Row: {
+          session_id: string;
+          user_id: string;
+          statement_id: string;
+          vote: "red" | "green";
+          created_at: string;
+        };
+        Insert: {
+          session_id: string;
+          user_id: string;
+          statement_id: string;
+          vote: "red" | "green";
+          created_at?: string;
+        };
+        Update: {
+          session_id?: string;
+          user_id?: string;
+          statement_id?: string;
+          vote?: "red" | "green";
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "flag_answers_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: false;
+            referencedRelation: "flag_sessions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "flag_answers_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      get_flag_stats: {
+        Args: {
+          p_statement_ids: string[];
+        };
+        Returns: {
+          statement_id: string;
+          total_votes: number;
+          red_votes: number;
+          green_votes: number;
+          red_percentage: number;
+          green_percentage: number;
+        }[];
+      };
+      get_flag_results: {
+        Args: {
+          p_session_id: string;
+        };
+        Returns: {
+          statement_id: string;
+          my_vote: "red" | "green";
+          partner_vote: "red" | "green";
+          is_agreement: boolean;
+          partner_id: string;
+        }[];
+      };
     };
     Enums: {
       [_ in never]: never;
