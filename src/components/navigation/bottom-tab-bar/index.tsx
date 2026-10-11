@@ -9,11 +9,11 @@ import Animated, {
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { styles } from "./styles";
-import { TabItem, BottomTabBarProps } from "./types";
+import { TabItem, BottomTabBarProps, TabIconName } from "./types";
 
 export const TAB_ITEMS: readonly TabItem[] = [
   { id: "home", name: "Home", icon: "home" },
-  { id: "games", name: "Games", icon: "game-controller" },
+  { id: "connect", name: "Connect", icon: "sparkles" },
   { id: "chat", name: "Spark", icon: "chatbubble-ellipses" },
   { id: "memories", name: "Memories", icon: "heart" },
   { id: "profile", name: "Profile", icon: "person" },
@@ -77,6 +77,12 @@ export function BottomTabBar({ activeTab, onTabPress, badges }: BottomTabBarProp
         {TAB_ITEMS.map((item, index) => {
           const isActive = activeTab === index;
           const badgeCount = badges?.[item.id] ?? 0;
+          const iconName: TabIconName =
+            item.id === "connect"
+              ? isActive
+                ? "sparkles"
+                : "sparkles-outline"
+              : item.icon;
           return (
             <Pressable
               key={item.id}
@@ -87,7 +93,7 @@ export function BottomTabBar({ activeTab, onTabPress, badges }: BottomTabBarProp
               accessibilityState={{ selected: isActive }}
               hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
             >
-              <Ionicons name={item.icon} size={22} color="#FFFFFF" />
+              <Ionicons name={iconName} size={22} color="#FFFFFF" />
               {badgeCount > 0 && (
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>

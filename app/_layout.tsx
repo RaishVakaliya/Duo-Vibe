@@ -78,9 +78,14 @@ export default function RootLayout() {
 
                   {/* Main Hubs: Clean crossfade */}
                   <Stack.Screen name="home" options={{ animation: "fade" }} />
+                  <Stack.Screen name="connect" options={{ animation: "fade" }} />
                   <Stack.Screen name="profile" options={{ animation: "fade" }} />
                   <Stack.Screen name="chat" options={{ animation: "fade" }} />
                   <Stack.Screen name="memories" options={{ animation: "fade" }} />
+
+                  {/* Connect Hub Sub-screens */}
+                  <Stack.Screen name="about-them" />
+                  <Stack.Screen name="upcoming-plans" />
 
                   {/* Modal-style Presentation Screens */}
                   <Stack.Screen

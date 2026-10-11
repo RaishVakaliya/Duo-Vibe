@@ -27,6 +27,9 @@ export const ROUTES = {
   COUPLE_CHALLENGE_ALL: "/couple-challenge-all",
   CHAT: "/chat",
   RED_GREEN_FLAG: "/red-green-flag",
+  CONNECT: "/connect",
+  ABOUT_THEM: "/about-them",
+  UPCOMING_PLANS: "/upcoming-plans",
 } as const;
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];

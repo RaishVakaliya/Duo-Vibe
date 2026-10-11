@@ -92,6 +92,9 @@ export function useHomeData() {
       switch (item.id) {
         case "home":
           break;
+        case "connect":
+          router.push(ROUTES.CONNECT);
+          break;
         case "chat":
           router.push(ROUTES.CHAT);
           break;

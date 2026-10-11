@@ -692,6 +692,82 @@ export interface Database {
           },
         ];
       };
+      partner_notes: {
+        Row: {
+          owner_id: string;
+          field_key: string;
+          value: Json;
+          updated_at: string;
+        };
+        Insert: {
+          owner_id: string;
+          field_key: string;
+          value: Json;
+          updated_at?: string;
+        };
+        Update: {
+          owner_id?: string;
+          field_key?: string;
+          value?: Json;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "partner_notes_owner_id_fkey";
+            columns: ["owner_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      couple_plans: {
+        Row: {
+          id: string;
+          couple_key: string;
+          created_by: string;
+          title: string;
+          kind: "date" | "trip" | "anniversary" | "birthday" | "call" | "other";
+          starts_at: string;
+          all_day: boolean;
+          note: string | null;
+          done_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          couple_key: string;
+          created_by: string;
+          title: string;
+          kind?: "date" | "trip" | "anniversary" | "birthday" | "call" | "other";
+          starts_at: string;
+          all_day?: boolean;
+          note?: string | null;
+          done_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          couple_key?: string;
+          created_by?: string;
+          title?: string;
+          kind?: "date" | "trip" | "anniversary" | "birthday" | "call" | "other";
+          starts_at?: string;
+          all_day?: boolean;
+          note?: string | null;
+          done_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "couple_plans_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;

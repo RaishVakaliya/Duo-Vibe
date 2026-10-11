@@ -346,3 +346,40 @@ export interface FlagPartnerResultItem {
   partner_id: string;
 }
 
+// ─── Partner Notes (About Them) Domain Types ──────────────────────────────────
+export interface PartnerNote {
+  owner_id: string;
+  field_key: string;
+  value: unknown;
+  updated_at: string;
+}
+
+export interface GiftIdeaItem {
+  id: string;
+  text: string;
+  done: boolean;
+}
+
+// ─── Couple Plans (Upcoming) Domain Types ────────────────────────────────────
+export type PlanKind =
+  | "date"
+  | "trip"
+  | "anniversary"
+  | "birthday"
+  | "call"
+  | "other";
+
+export interface CouplePlan {
+  id: string;
+  couple_key: string;
+  created_by: string;
+  title: string;
+  kind: PlanKind;
+  starts_at: string;
+  all_day: boolean;
+  note: string | null;
+  done_at: string | null;
+  created_at: string;
+  is_local_only?: boolean;
+}
+

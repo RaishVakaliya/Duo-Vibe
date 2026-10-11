@@ -87,6 +87,9 @@ export default function MemoriesScreen() {
         case "home":
           router.replace(ROUTES.HOME);
           break;
+        case "connect":
+          router.replace(ROUTES.CONNECT);
+          break;
         case "chat":
           router.replace(ROUTES.CHAT);
           break;
