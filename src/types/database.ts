@@ -722,6 +722,24 @@ export interface Database {
           partner_id: string;
         }[];
       };
+      connect_partner_code: {
+        Args: {
+          p_partner_code: string;
+        };
+        Returns: {
+          success: boolean;
+          message: string;
+          partner_id?: string;
+          partner_name?: string | null;
+        };
+      };
+      delete_user_account: {
+        Args: Record<string, never>;
+        Returns: {
+          success: boolean;
+          error?: string;
+        };
+      };
     };
     Enums: {
       [_ in never]: never;

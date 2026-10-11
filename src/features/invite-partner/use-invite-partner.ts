@@ -12,14 +12,30 @@ export function useInvitePartner() {
   const router = useRouter();
   const params = useLocalSearchParams<{ source?: string }>();
   const isFromHome = params.source === "home";
-  const { inviteCode, codeExpiresAt, refreshInviteCode, connectPartnerCode } =
-    useAuth();
+  const {
+    hasPartner,
+    inviteCode,
+    codeExpiresAt,
+    refreshInviteCode,
+    connectPartnerCode,
+  } = useAuth();
   const { showAlert } = useAlert();
   const [partnerCode, setPartnerCode] = useState<string>("");
   const { timeLeft, reset, formatMinutesSeconds, isFinished } =
     useCountdown(codeExpiresAt);
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
+  // Instant real-time update: automatically transition to Home when partner connects
+  useEffect(() => {
+    if (hasPartner) {
+      showAlert({
+        title: "Connected! 💕",
+        message: "Your partner just connected! Welcome to your shared space.",
+      });
+      router.replace(ROUTES.HOME);
+    }
+  }, [hasPartner, router, showAlert]);
 
   useEffect(() => {
     reset(codeExpiresAt);

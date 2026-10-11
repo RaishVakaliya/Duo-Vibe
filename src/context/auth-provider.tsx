@@ -155,34 +155,99 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    if (!user || !hasPartner) return;
-    const channel = supabase
-      .channel(`couple_rel_${user.id}`)
+    if (!user) return;
+
+    // 1. Listen for real-time changes to the user's profile (including partner linking/unlinking)
+    const profileChannel = supabase
+      .channel(`profile_realtime_${user.id}`)
       .on(
         "postgres_changes",
         {
-          event: "UPDATE",
+          event: "*",
+          schema: "public",
+          table: "profiles",
+          filter: `id=eq.${user.id}`,
+        },
+        (payload) => {
+          if (payload.new) {
+            const row = payload.new as {
+              partner_id?: string | null;
+              relationship_type?: RelationshipType | null;
+              full_name?: string | null;
+              avatar_url?: string | null;
+            };
+
+            const partnerConnected = Boolean(row.partner_id);
+            setHasPartnerState(partnerConnected);
+            AsyncStorage.setItem(
+              HAS_PARTNER_KEY,
+              partnerConnected ? "true" : "false",
+            ).catch(() => { });
+
+            if (row.relationship_type) {
+              setRelationshipTypeState(row.relationship_type);
+              AsyncStorage.setItem(
+                RELATIONSHIP_TYPE_KEY,
+                row.relationship_type,
+              ).catch(() => { });
+            }
+            if (row.full_name) {
+              setUserNameState(row.full_name);
+              AsyncStorage.setItem(USER_NAME_KEY, row.full_name).catch(() => { });
+            }
+            if (row.avatar_url) {
+              setAvatarUrlState(row.avatar_url);
+              AsyncStorage.setItem(AVATAR_URL_KEY, row.avatar_url).catch(() => { });
+            }
+          }
+        },
+      )
+      .subscribe();
+
+    // 2. Listen for couple changes (INSERT or UPDATE) involving this user
+    const couplesChannel = supabase
+      .channel(`couples_realtime_${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
           schema: "public",
           table: "couples",
         },
         (payload) => {
-          if (
-            payload.new &&
-            (payload.new.relationship_type === "local" ||
-              payload.new.relationship_type === "long_distance")
-          ) {
-            const newType = payload.new.relationship_type as RelationshipType;
-            setRelationshipTypeState(newType);
-            AsyncStorage.setItem(RELATIONSHIP_TYPE_KEY, newType).catch(() => { });
+          if (payload.new) {
+            const row = payload.new as {
+              user1_id?: string;
+              user2_id?: string;
+              status?: string;
+              relationship_type?: RelationshipType;
+            };
+            if (row.user1_id === user.id || row.user2_id === user.id) {
+              if (row.status === "connected") {
+                setHasPartnerState(true);
+                AsyncStorage.setItem(HAS_PARTNER_KEY, "true").catch(() => { });
+              }
+              if (
+                row.relationship_type === "local" ||
+                row.relationship_type === "long_distance"
+              ) {
+                setRelationshipTypeState(row.relationship_type);
+                AsyncStorage.setItem(
+                  RELATIONSHIP_TYPE_KEY,
+                  row.relationship_type,
+                ).catch(() => { });
+              }
+            }
           }
         },
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel).catch(() => { });
+      supabase.removeChannel(profileChannel).catch(() => { });
+      supabase.removeChannel(couplesChannel).catch(() => { });
     };
-  }, [user, hasPartner]);
+  }, [user]);
 
   const setRelationshipType = async (type: RelationshipType): Promise<void> => {
     setRelationshipTypeState(type);
@@ -293,17 +358,62 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const deleteAccount = async (): Promise<void> => {
     try {
       if (user) {
-        await supabase
-          .from("profiles")
-          .update({ partner_id: null, updated_at: new Date().toISOString() })
-          .eq("partner_id", user.id);
+        // 1. Try atomic security definer RPC
+        const { data: rpcRes, error: rpcErr } = await supabase.rpc(
+          "delete_user_account",
+        );
 
-        await supabase
-          .from("couples")
-          .delete()
-          .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+        if (rpcErr || (rpcRes && !(rpcRes as { success: boolean }).success)) {
+          console.warn(
+            "delete_user_account RPC failed, running fallback cleanup:",
+            rpcErr,
+          );
 
-        await supabase.from("profiles").delete().eq("id", user.id);
+          // 2. Comprehensive client-side fallback cleanup
+          await supabase
+            .from("profiles")
+            .update({ partner_id: null, updated_at: new Date().toISOString() })
+            .eq("partner_id", user.id);
+
+          await supabase
+            .from("couples")
+            .delete()
+            .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+
+          await supabase
+            .from("memory_reactions")
+            .delete()
+            .eq("user_id", user.id);
+          await supabase.from("memories").delete().eq("created_by", user.id);
+          await supabase.from("flag_answers").delete().eq("user_id", user.id);
+          await supabase.from("flag_votes").delete().eq("user_id", user.id);
+          await supabase
+            .from("flag_sessions")
+            .delete()
+            .or(`user_id.eq.${user.id},partner_id.eq.${user.id}`);
+          await supabase
+            .from("chat_messages")
+            .delete()
+            .eq("sender_id", user.id);
+          await supabase
+            .from("secret_crush_messages")
+            .delete()
+            .eq("sender_id", user.id);
+          await supabase
+            .from("twenty_one_questions_answers")
+            .delete()
+            .eq("user_id", user.id);
+          await supabase
+            .from("couple_challenge_completions")
+            .delete()
+            .eq("user_id", user.id);
+          await supabase
+            .from("couple_challenge_progress")
+            .delete()
+            .or(`user_a_id.eq.${user.id},user_b_id.eq.${user.id}`);
+          await supabase.from("spark_answers").delete().eq("user_id", user.id);
+          await supabase.from("profiles").delete().eq("id", user.id);
+        }
       }
     } catch (err) {
       console.warn("Error during deleteAccount cleanup:", err);
@@ -403,6 +513,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
+      // 1. Try atomic database RPC (bypasses RLS to atomically link both profiles & create couples row)
+      const { data: rpcData, error: rpcError } = await supabase.rpc(
+        "connect_partner_code",
+        { p_partner_code: cleanCode },
+      );
+
+      if (!rpcError && rpcData) {
+        const res = rpcData as { success: boolean; message: string };
+        if (res.success) {
+          await setHasPartner(true);
+          syncUserProfile(user).catch(() => { });
+          return res;
+        } else {
+          return res;
+        }
+      }
+
+      // 2. Client-side fallback if RPC is not yet created
       const { data: partnerProfiles, error: fetchErr } = await supabase
         .from("profiles")
         .select("*")
