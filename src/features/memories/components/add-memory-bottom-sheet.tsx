@@ -19,6 +19,7 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { GRADIENTS } from "@/src/constants/colors";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { createPhotoMemory } from "@/src/lib/memories";
 import { AddMemoryBottomSheetProps } from "../types";
 import { componentStyles } from "./component-styles";
@@ -163,9 +164,22 @@ export function AddMemoryBottomSheet({
       visible={isOpen}
       transparent
       animationType="slide"
+      statusBarTranslucent
       onRequestClose={handleClose}
     >
-      <View style={componentStyles.modalBackdrop}>
+      <KeyboardAvoidingView
+        style={componentStyles.modalBackdrop}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={0}
+      >
+        <Pressable
+          style={componentStyles.backdropTouchable}
+          onPress={handleClose}
+          disabled={isUploading}
+          accessibilityRole="button"
+          accessibilityLabel="Dismiss modal backdrop"
+        />
+
         <View style={componentStyles.sheetContainer}>
           <View style={componentStyles.sheetHandle} />
 
@@ -186,6 +200,7 @@ export function AddMemoryBottomSheet({
           <ScrollView
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
+            contentContainerStyle={componentStyles.sheetScrollContent}
           >
             {/* Photo Picker Box */}
             <Pressable
@@ -308,15 +323,7 @@ export function AddMemoryBottomSheet({
 
             {/* Error Message */}
             {errorMessage ? (
-              <Text
-                style={{
-                  fontFamily: "Fredoka_500Medium",
-                  fontSize: 13,
-                  color: "#FF4D6D",
-                  marginBottom: 12,
-                  textAlign: "center",
-                }}
-              >
+              <Text style={componentStyles.errorText}>
                 {errorMessage}
               </Text>
             ) : null}
@@ -357,7 +364,7 @@ export function AddMemoryBottomSheet({
             </Pressable>
           </ScrollView>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

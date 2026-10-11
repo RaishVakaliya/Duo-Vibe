@@ -1,7 +1,7 @@
 import { StyleSheet, Dimensions } from "react-native";
 import { RADIUS } from "@/src/constants/colors";
 
-const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
+const { width: SCREEN_W } = Dimensions.get("window");
 
 export const componentStyles = StyleSheet.create({
   // ─── Bottom Sheet Modal ────────────────────────────────────────────────────
@@ -10,16 +10,27 @@ export const componentStyles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.7)",
     justifyContent: "flex-end",
   },
+  backdropTouchable: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   sheetContainer: {
+    width: "100%",
     backgroundColor: "#1F1522",
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     paddingHorizontal: 20,
     paddingTop: 12,
-    paddingBottom: 36,
-    maxHeight: SCREEN_H * 0.9,
+    paddingBottom: 28,
+    maxHeight: "88%",
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.15)",
+  },
+  sheetScrollContent: {
+    paddingBottom: 16,
   },
   sheetHandle: {
     width: 44,
@@ -181,6 +192,13 @@ export const componentStyles = StyleSheet.create({
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 16,
     color: "#FFFFFF",
+  },
+  errorText: {
+    fontFamily: "Fredoka_500Medium",
+    fontSize: 13,
+    color: "#FF4D6D",
+    marginBottom: 12,
+    textAlign: "center",
   },
 
   // ─── Detail Modal ──────────────────────────────────────────────────────────

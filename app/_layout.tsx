@@ -73,7 +73,6 @@ export default function RootLayout() {
 
                   {/* Discovery & Auth Flows */}
                   <Stack.Screen name="date-ideas" />
-                  <Stack.Screen name="memories" />
                   <Stack.Screen name="auth" />
                   <Stack.Screen name="invite-partner" />
 
@@ -81,6 +80,7 @@ export default function RootLayout() {
                   <Stack.Screen name="home" options={{ animation: "fade" }} />
                   <Stack.Screen name="profile" options={{ animation: "fade" }} />
                   <Stack.Screen name="chat" options={{ animation: "fade" }} />
+                  <Stack.Screen name="memories" options={{ animation: "fade" }} />
 
                   {/* Modal-style Presentation Screens */}
                   <Stack.Screen

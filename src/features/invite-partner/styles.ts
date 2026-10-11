@@ -207,5 +207,6 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
     color: COLORS.textMuted,
     textAlign: "center",
+    textDecorationLine: "underline",
   },
 });

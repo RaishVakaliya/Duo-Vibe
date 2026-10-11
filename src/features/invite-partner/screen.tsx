@@ -65,7 +65,7 @@ export default function InvitePartnerScreen() {
         )}
 
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={{ flex: 1 }}
         >
           <ScrollView
@@ -87,16 +87,6 @@ export default function InvitePartnerScreen() {
               </Text>
             </MotiView>
 
-            <InviteCodeDisplay
-              inviteCode={inviteCode}
-              timeLeft={timeLeft}
-              isFinished={isFinished}
-              isRefreshing={isRefreshing}
-              onRefreshCode={handleRefreshCode}
-              onShareInvite={handleShareInvite}
-              formatMinutesSeconds={formatMinutesSeconds}
-            />
-
             <PartnerCodeInput
               partnerCode={partnerCode}
               onChangePartnerCode={(text) =>
@@ -105,6 +95,22 @@ export default function InvitePartnerScreen() {
               onPasteCode={handlePasteCode}
               onConnect={handleConnect}
               isConnecting={isConnecting}
+            />
+
+            <View style={styles.dividerRow}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>or</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <InviteCodeDisplay
+              inviteCode={inviteCode}
+              timeLeft={timeLeft}
+              isFinished={isFinished}
+              isRefreshing={isRefreshing}
+              onRefreshCode={handleRefreshCode}
+              onShareInvite={handleShareInvite}
+              formatMinutesSeconds={formatMinutesSeconds}
             />
           </ScrollView>
         </KeyboardAvoidingView>
