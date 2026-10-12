@@ -14,7 +14,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
 import { styles } from "./styles";
-import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
 import { useCoupleChallenge } from "./use-couple-challenge";
 import { COUPLE_CHALLENGE_BANK } from "@/src/data/coupleChallenges";

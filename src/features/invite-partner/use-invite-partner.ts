@@ -3,10 +3,9 @@ import { Share, BackHandler } from "react-native";
 import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 import * as Clipboard from "expo-clipboard";
 import { ROUTES } from "@/src/constants/routes";
-import { useAuth } from "@/src/context/auth";
+import { useAuth } from "@/src/context/auth-context";
 import { useAlert } from "@/src/components/ui/alert-dialog";
 import { useCountdown } from "@/src/hooks/use-countdown";
-import { InvitePartnerParams } from "./types";
 
 export function useInvitePartner() {
   const router = useRouter();

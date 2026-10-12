@@ -1,5 +1,5 @@
 import { supabase } from "@/src/lib/supabase";
-import { getPartnerId } from "@/src/lib/quizSession";
+import { getPartnerId } from "@/src/lib/quiz";
 import { sendExpoPushNotification } from "@/src/lib/notifications";
 
 export async function notifyPartnerOfMemory(

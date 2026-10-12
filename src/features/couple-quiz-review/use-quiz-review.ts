@@ -6,7 +6,7 @@ import {
   getSessionForReview,
   submitReview,
   ReviewSessionData,
-} from "@/src/lib/quizSession";
+} from "@/src/lib/quiz";
 import { GradedAnswerMap } from "./types";
 
 export function useQuizReview() {

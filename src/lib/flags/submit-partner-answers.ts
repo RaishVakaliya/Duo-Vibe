@@ -1,6 +1,6 @@
 import { supabase } from "@/src/lib/supabase";
 import { FlagVote, FlagAnswer } from "@/src/types";
-import { getPartnerId } from "@/src/lib/quizSession";
+import { getPartnerId } from "@/src/lib/quiz";
 import { sendExpoPushNotification } from "@/src/lib/notifications";
 
 export interface SubmitAnswerItem {

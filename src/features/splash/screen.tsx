@@ -6,7 +6,7 @@ import Svg, { Path, Defs, LinearGradient, Stop, Line } from "react-native-svg";
 import { MotiView } from "moti";
 import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
-import { useAuth, resolveInitialRoute } from "@/src/context/auth";
+import { useAuth, resolveInitialRoute } from "@/src/context/auth-context";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 

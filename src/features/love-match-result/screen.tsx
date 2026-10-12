@@ -18,9 +18,9 @@ import { styles } from "./styles";
 import { MatchBarRow } from "./types";
 import { COLORS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
-import { useAuth } from "@/src/context/auth";
+import { useAuth } from "@/src/context/auth-context";
 import { useAlert } from "@/src/components/ui/alert-dialog";
-import { getPartnerId } from "@/src/lib/quizSession";
+import { getPartnerId } from "@/src/lib/quiz";
 import { buildCoupleKey } from "@/src/lib/challenge";
 import { createResultMemory } from "@/src/lib/memories";
 

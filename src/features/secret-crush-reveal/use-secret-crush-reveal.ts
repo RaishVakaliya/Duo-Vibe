@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import * as Clipboard from "expo-clipboard";
 import { supabase } from "@/src/lib/supabase";
-import { useAuth } from "@/src/context/auth";
+import { useAuth } from "@/src/context/auth-context";
 import { UseSecretCrushRevealReturn, RevealViewMode } from "./types";
 
 const APP_SCHEME = "duovibe://";

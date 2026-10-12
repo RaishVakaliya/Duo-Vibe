@@ -1,1 +1,1 @@
-export interface AboutScreenProps {}
+export type AboutScreenProps = Record<string, never>;

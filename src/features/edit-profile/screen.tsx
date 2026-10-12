@@ -19,7 +19,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as Haptics from "expo-haptics";
 import { styles } from "./styles";
 import { GRADIENTS } from "@/src/constants/colors";
-import { useAuth } from "@/src/context/auth";
+import { useAuth } from "@/src/context/auth-context";
 import { useAlert } from "@/src/components/ui/alert-dialog";
 import { getInitial } from "@/src/lib/profile";
 

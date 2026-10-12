@@ -4,7 +4,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { GluestackUIProvider } from "@/src/components/ui/gluestack-ui-provider";
-import { AuthProvider } from "@/src/context/auth";
+import { AuthProvider } from "@/src/context/auth-provider";
 import { AlertProvider } from "@/src/components/ui/alert-dialog";
 import { ErrorBoundary } from "@/src/components/error-boundary";
 import { COLORS } from "@/src/constants/colors";

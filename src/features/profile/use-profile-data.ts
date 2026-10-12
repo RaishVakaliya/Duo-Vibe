@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Constants from "expo-constants";
 import { ROUTES } from "@/src/constants/routes";
-import { useAuth } from "@/src/context/auth";
+import { useAuth } from "@/src/context/auth-context";
 import { useAlert } from "@/src/components/ui/alert-dialog";
 import { supabase } from "@/src/lib/supabase";
 import { registerForPushNotificationsAsync } from "@/src/lib/notifications";

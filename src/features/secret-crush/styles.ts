@@ -2,7 +2,6 @@ import { StyleSheet } from "react-native";
 import { COLORS, RADIUS, SHADOWS } from "@/src/constants/colors";
 
 // ─── Palette ─────────────────────────────────────────────────────────────────
-const CRUSH_PINK = "#FF2D6C";
 const CRUSH_PINK_SOFT = "#FF4D6D";
 const CRUSH_PINK_GLOW = "rgba(255, 45, 108, 0.18)";
 const CRUSH_CARD_BG = "rgba(255, 255, 255, 0.04)";

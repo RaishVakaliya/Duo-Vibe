@@ -23,8 +23,7 @@ try {
       }),
     });
   }
-} catch (nativeErr) {
-  console.log("Push notifications native module check note:", nativeErr);
+} catch {
   Notifications = null;
 }
 
@@ -62,7 +61,6 @@ export async function registerForPushNotificationsAsync(
     }
 
     if (finalStatus !== "granted") {
-      console.log("Push notification permission not granted by user.");
       return null;
     }
 

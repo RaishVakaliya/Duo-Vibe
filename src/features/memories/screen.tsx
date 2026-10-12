@@ -19,7 +19,7 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import * as Haptics from "expo-haptics";
-import { useAuth } from "@/src/context/auth";
+import { useAuth } from "@/src/context/auth-context";
 import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
 import { BottomTabBar, TabItem } from "@/src/components/navigation/bottom-tab-bar";

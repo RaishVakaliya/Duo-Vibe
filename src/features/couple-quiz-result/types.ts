@@ -1,4 +1,4 @@
-import { ReviewSessionData } from "@/src/lib/quizSession";
+import { ReviewSessionData } from "@/src/lib/quiz";
 
 export interface CoupleQuizResultParams {
   sessionId?: string;

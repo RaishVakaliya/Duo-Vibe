@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { useAuth } from "@/src/context/auth";
-import { getPartnerId } from "@/src/lib/quizSession";
+import { useAuth } from "@/src/context/auth-context";
+import { getPartnerId } from "@/src/lib/quiz";
 import { buildCoupleKey } from "@/src/lib/challenge";
 import {
   fetchMemories,

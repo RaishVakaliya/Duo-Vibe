@@ -21,8 +21,8 @@ import {
   ReviewSessionData,
   getScoreHeadline,
   getPartnerId,
-} from "@/src/lib/quizSession";
-import { useAuth } from "@/src/context/auth";
+} from "@/src/lib/quiz";
+import { useAuth } from "@/src/context/auth-context";
 import { useAlert } from "@/src/components/ui/alert-dialog";
 import { buildCoupleKey } from "@/src/lib/challenge";
 import { createResultMemory } from "@/src/lib/memories";

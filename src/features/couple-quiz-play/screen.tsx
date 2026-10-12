@@ -18,7 +18,7 @@ import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
 import { GRADIENTS } from "@/src/constants/colors";
 import { CoupleIllustration } from "@/src/components/couple-illustration";
-import { submitAnswers, selectQuizQuestions } from "@/src/lib/quizSession";
+import { submitAnswers, selectQuizQuestions } from "@/src/lib/quiz";
 import { QuizQuestion } from "@/src/data/quizQuestions";
 
 export default function CoupleQuizPlayScreen() {

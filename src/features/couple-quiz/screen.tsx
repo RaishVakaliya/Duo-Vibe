@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
 import { GRADIENTS } from "@/src/constants/colors";
-import { useAuth } from "@/src/context/auth";
+import { useAuth } from "@/src/context/auth-context";
 import { CoupleIllustration } from "@/src/components/couple-illustration";
 import {
   selectQuizQuestions,
@@ -23,7 +23,7 @@ import {
   getActiveAnswererSession,
   getPartnerId,
   subscribeToSessionUpdates,
-} from "@/src/lib/quizSession";
+} from "@/src/lib/quiz";
 import { QuizSession } from "@/src/types";
 
 export default function CoupleQuizStartScreen() {

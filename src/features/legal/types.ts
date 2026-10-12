@@ -1,1 +1,1 @@
-export interface LegalScreenProps { }
+export type LegalScreenProps = Record<string, never>;

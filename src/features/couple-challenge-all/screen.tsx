@@ -14,7 +14,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./styles";
-import { ROUTES } from "@/src/constants/routes";
 import { useCoupleChallengeAll } from "./use-couple-challenge-all";
 import { COUPLE_CHALLENGE_BANK, CoupleChallenge } from "@/src/data/coupleChallenges";
 import { CoupleChallengeProgress } from "@/src/types";

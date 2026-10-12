@@ -1,6 +1,6 @@
 import React from "react";
 
-export interface ProfileScreenProps { }
+export type ProfileScreenProps = Record<string, never>;
 
 export interface PartnerProfileData {
   id: string;

@@ -1,5 +1,3 @@
-import { QuizQuestion } from "@/src/data/quizQuestions";
-
 export interface CoupleQuizPlayParams {
   sessionId?: string;
   questions?: string;

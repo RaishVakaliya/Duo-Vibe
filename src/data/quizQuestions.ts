@@ -1,6 +1,6 @@
 export type QuizCategory = "preferences" | "habits" | "memories" | "future";
 
-export interface QuizOption {
+interface QuizOption {
   label: string;
   emoji: string;
 }

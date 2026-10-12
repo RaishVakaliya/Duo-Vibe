@@ -1,4 +1,4 @@
-export type PartnerNoteFieldType =
+type PartnerNoteFieldType =
   | "date"
   | "choice"
   | "multi"

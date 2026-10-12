@@ -1,1 +1,1 @@
-export interface EditProfileScreenProps {}
+export type EditProfileScreenProps = Record<string, never>;

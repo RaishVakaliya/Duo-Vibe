@@ -1,9 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
-import { Share, Linking, Platform } from "react-native";
+import { Share, Linking } from "react-native";
 import * as Clipboard from "expo-clipboard";
-import { useRouter } from "expo-router";
 import { supabase } from "@/src/lib/supabase";
-import { useAuth } from "@/src/context/auth";
+import { useAuth } from "@/src/context/auth-context";
 import { UseSecretCrushReturn, SentMessageItem } from "./types";
 
 const APP_SCHEME = "duovibe://";
@@ -14,7 +13,6 @@ function buildRevealLink(messageId: string): string {
 }
 
 export function useSecretCrush(): UseSecretCrushReturn {
-  const router = useRouter();
   const { user } = useAuth();
 
   const [message, setMessage] = useState<string>("");

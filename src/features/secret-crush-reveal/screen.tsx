@@ -17,7 +17,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
 import { styles } from "./styles";
 import { GRADIENTS } from "@/src/constants/colors";
-import { ROUTES } from "@/src/constants/routes";
 import { useSecretCrushReveal } from "./use-secret-crush-reveal";
 import { EnvelopeIllustration } from "@/src/features/secret-crush/components/envelope-illustration";
 

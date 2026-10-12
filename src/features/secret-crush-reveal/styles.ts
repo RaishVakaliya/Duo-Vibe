@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
 import { COLORS, RADIUS, SHADOWS } from "@/src/constants/colors";
 
-const CRUSH_PINK = "#FF2D6C";
 const CRUSH_PINK_SOFT = "#FF4D6D";
 const CRUSH_BORDER = "rgba(255, 77, 109, 0.22)";
 const CARD_BG = "rgba(255, 255, 255, 0.04)";

@@ -19,8 +19,8 @@ try {
     offlineAccess: true,
     forceCodeForRefreshToken: true,
   });
-} catch (e: unknown) {
-  console.log("GoogleSignin configure note:", e);
+} catch {
+  // Silent fallback when running in non-native or test environments
 }
 
 interface AuthErrorLike {

@@ -8,7 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { styles } from "./styles";
 import { GRADIENTS, COLORS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
-import { useAuth, resolveInitialRoute } from "@/src/context/auth";
+import { useAuth, resolveInitialRoute } from "@/src/context/auth-context";
 
 export default function WelcomeScreen() {
   const router = useRouter();
