@@ -4,7 +4,6 @@ import {
   Text,
   Pressable,
   ScrollView,
-  ActivityIndicator,
   BackHandler,
 } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
@@ -20,8 +19,11 @@ import { useTwentyOneQuestions } from "./use-twenty-one-questions";
 import { TwentyOneQuestionsReveal } from "@/src/types";
 import { useAuth } from "@/src/context/auth-context";
 import { useAlert } from "@/src/components/ui/alert-dialog";
+import { ScreenHeader } from "@/src/components/ui/screen-header";
+import { ScreenState } from "@/src/components/ui/screen-state";
+import { LinkPartnerPrompt } from "@/src/components/ui/link-partner-prompt";
 import { getPartnerId } from "@/src/lib/quiz";
-import { buildCoupleKey } from "@/src/lib/challenge";
+import { getCoupleKey } from "@/src/lib/couple/get-couple-key";
 import { createResultMemory } from "@/src/lib/memories";
 
 const TOTAL = 21;
@@ -123,7 +125,7 @@ export default function TwentyOneQuestionsScreen() {
         setIsSaving(false);
         return;
       }
-      const coupleKey = buildCoupleKey(user.id, partnerId);
+      const coupleKey = getCoupleKey(user.id, partnerId);
       await createResultMemory({
         coupleKey,
         userId: user.id,
@@ -157,10 +159,11 @@ export default function TwentyOneQuestionsScreen() {
           locations={[0, 0.5, 1]}
           style={styles.gradientBackground}
         />
-        <View style={styles.centeredContainer}>
-          <ActivityIndicator size="large" color="#FF2D6C" />
-          <Text style={styles.errorText}>Loading your shared session…</Text>
-        </View>
+        <ScreenState
+          variant="loading"
+          theme="light"
+          message="Loading your shared session…"
+        />
       </View>
     );
   }
@@ -176,44 +179,18 @@ export default function TwentyOneQuestionsScreen() {
           style={styles.gradientBackground}
         />
         <SafeAreaView style={styles.safeArea}>
-          <View style={styles.headerRow}>
-            <Pressable
-              style={styles.backButton}
-              onPress={() => router.replace(ROUTES.HOME)}
-              accessibilityRole="button"
-              accessibilityLabel="Go back"
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            >
-              <Ionicons name="chevron-back" size={22} color="#1E1B26" />
-            </Pressable>
-            <View style={styles.headerCenter}>
-              <View style={styles.headerTitleRow}>
-                <Ionicons name="chatbubbles" size={24} color="#FF2D6C" />
-                <Text style={styles.headerTitle}>21 Questions</Text>
-              </View>
-            </View>
-            <View style={styles.headerSpacer} />
-          </View>
-          <View style={styles.centeredContainer}>
-            <View style={styles.blockingCard}>
-              <View style={styles.blockingIconWrap}>
-                <Ionicons name="heart-dislike-outline" size={36} color="#FF2D6C" />
-              </View>
-              <Text style={styles.blockingTitle}>Link Your Partner First</Text>
-              <Text style={styles.blockingText}>
-                21 Questions is a shared experience — connect with your partner first to play together.
-              </Text>
-              <Pressable
-                style={styles.actionButton}
-                onPress={() => router.push(ROUTES.INVITE_PARTNER)}
-                accessibilityRole="button"
-                accessibilityLabel="Invite or connect partner"
-              >
-                <Ionicons name="link-outline" size={18} color="#FFFFFF" />
-                <Text style={styles.actionButtonText}>Invite / Connect Partner</Text>
-              </Pressable>
-            </View>
-          </View>
+          <ScreenHeader
+            title="21 Questions"
+            align="center"
+            theme="light"
+            titleIcon={<Ionicons name="chatbubbles" size={24} color="#FF2D6C" />}
+            onBack={() => router.replace(ROUTES.HOME)}
+          />
+          <LinkPartnerPrompt
+            theme="light"
+            title="Link Your Partner First"
+            description="21 Questions is a shared experience — connect with your partner first to play together."
+          />
         </SafeAreaView>
       </View>
     );
@@ -229,21 +206,12 @@ export default function TwentyOneQuestionsScreen() {
           locations={[0, 0.5, 1]}
           style={styles.gradientBackground}
         />
-        <View style={styles.centeredContainer}>
-          <Ionicons name="cloud-offline-outline" size={52} color="#CBD5E1" />
-          <Text style={styles.errorText}>
-            Couldn{"'"}t load your session. Check your connection and try again.
-          </Text>
-          <Pressable
-            style={styles.actionButton}
-            onPress={handleRetry}
-            accessibilityRole="button"
-            accessibilityLabel="Retry"
-          >
-            <Ionicons name="refresh" size={18} color="#FFFFFF" />
-            <Text style={styles.actionButtonText}>Try Again</Text>
-          </Pressable>
-        </View>
+        <ScreenState
+          variant="error"
+          theme="light"
+          message="Couldn't load your session. Check your connection and try again."
+          onRetry={handleRetry}
+        />
       </View>
     );
   }
@@ -261,29 +229,14 @@ export default function TwentyOneQuestionsScreen() {
 
       <SafeAreaView style={styles.safeArea}>
         {/* Header */}
-        <View style={styles.headerRow}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => router.replace(ROUTES.HOME)}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          >
-            <Ionicons name="chevron-back" size={22} color="#1E1B26" />
-          </Pressable>
-
-          <View style={styles.headerCenter}>
-            <View style={styles.headerTitleRow}>
-              <Ionicons name="chatbubbles" size={24} color="#FF2D6C" />
-              <Text style={styles.headerTitle}>21 Questions</Text>
-            </View>
-            <Text style={styles.headerSubtitle}>
-              {"Answer together — see each other's replies revealed"}
-            </Text>
-          </View>
-
-          <View style={styles.headerSpacer} />
-        </View>
+        <ScreenHeader
+          title="21 Questions"
+          subtitle="Answer together — see each other's replies revealed"
+          align="center"
+          theme="light"
+          titleIcon={<Ionicons name="chatbubbles" size={24} color="#FF2D6C" />}
+          onBack={() => router.replace(ROUTES.HOME)}
+        />
 
         {/* Progress bar */}
         <View style={styles.progressBarContainer}>

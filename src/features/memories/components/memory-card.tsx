@@ -6,6 +6,8 @@ import * as Haptics from "expo-haptics";
 import { MemoryCardProps } from "../types";
 import { styles } from "../styles";
 
+import { formatShortDate } from "@/src/utils/date";
+
 export const MemoryCard = React.memo(function MemoryCard({
   memory,
   index,
@@ -24,13 +26,7 @@ export const MemoryCard = React.memo(function MemoryCard({
     onPress(memory);
   };
 
-  const formattedDate = new Date(
-    memory.memory_date + "T00:00:00",
-  ).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+  const formattedDate = formatShortDate(memory.memory_date);
 
   return (
     <View style={styles.cardWrapper}>

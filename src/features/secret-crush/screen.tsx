@@ -15,6 +15,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
+import { formatRelativeTime } from "@/src/utils/date";
 import { styles } from "./styles";
 import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
@@ -23,15 +24,6 @@ import { EnvelopeIllustration } from "./components/envelope-illustration";
 import { SentMessageItem } from "./types";
 
 const MAX_CHARS = 500;
-
-function formatRelativeTime(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
-}
 
 function SentCard({ item }: { item: SentMessageItem }) {
   return (

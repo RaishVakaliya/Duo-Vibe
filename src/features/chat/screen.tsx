@@ -15,7 +15,6 @@ import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { MotiView } from "moti";
 import * as ImagePicker from "expo-image-picker";
 import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
@@ -26,55 +25,10 @@ import { ImageViewerModal } from "./components/image-viewer-modal";
 import { getBgColors, getBubbleColors } from "./chat-themes";
 import { ChatMessage } from "@/src/types";
 import { useAlert } from "@/src/components/ui/alert-dialog";
+import { ScreenState } from "@/src/components/ui/screen-state";
+import { LinkPartnerPrompt } from "@/src/components/ui/link-partner-prompt";
 
-// ─── Helpers ───────────────────────────────────────────────────────────────────
-
-function isSameDay(iso1: string, iso2: string): boolean {
-  try {
-    const d1 = new Date(iso1);
-    const d2 = new Date(iso2);
-    return (
-      d1.getFullYear() === d2.getFullYear() &&
-      d1.getMonth() === d2.getMonth() &&
-      d1.getDate() === d2.getDate()
-    );
-  } catch {
-    return true;
-  }
-}
-
-function formatDateChip(isoString: string): string {
-  try {
-    const d = new Date(isoString);
-    const now = new Date();
-    const isToday =
-      d.getDate() === now.getDate() &&
-      d.getMonth() === now.getMonth() &&
-      d.getFullYear() === now.getFullYear();
-    if (isToday) return "Today";
-
-    const yesterday = new Date(now);
-    yesterday.setDate(now.getDate() - 1);
-    const isYesterday =
-      d.getDate() === yesterday.getDate() &&
-      d.getMonth() === yesterday.getMonth() &&
-      d.getFullYear() === yesterday.getFullYear();
-    if (isYesterday) return "Yesterday";
-
-    const diffDays = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
-    if (diffDays < 7) {
-      return d.toLocaleDateString("en-US", { weekday: "long" });
-    }
-
-    return d.toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  } catch {
-    return "";
-  }
-}
+import { isSameDay, formatDateChip } from "@/src/utils/date";
 
 // ─── Screen ────────────────────────────────────────────────────────────────────
 
@@ -284,57 +238,23 @@ export default function ChatScreen() {
 
         {/* ── Content States ──────────────────────────────────────── */}
         {loadState === "loading" && (
-          <View style={styles.centeredContainer}>
-            <ActivityIndicator size="large" color="#00A884" />
-          </View>
+          <ScreenState variant="loading" />
         )}
 
         {loadState === "error" && (
-          <View style={styles.centeredContainer}>
-            <Ionicons name="cloud-offline-outline" size={52} color="#8696A0" />
-            <Text style={styles.centeredText}>
-              Couldn{"'"}t connect to chat. Check your connection.
-            </Text>
-            <Pressable
-              style={styles.actionButton}
-              onPress={handleRetry}
-              accessibilityRole="button"
-              accessibilityLabel="Retry loading chat"
-            >
-              <Ionicons name="refresh" size={18} color="#FFFFFF" />
-              <Text style={styles.actionButtonText}>Try Again</Text>
-            </Pressable>
-          </View>
+          <ScreenState
+            variant="error"
+            message="Couldn't connect to chat. Check your connection."
+            onRetry={handleRetry}
+          />
         )}
 
         {loadState === "no_partner" && (
-          <MotiView
-            from={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "spring", damping: 14 }}
-            style={styles.blockingCard}
-          >
-            <View style={styles.blockingIconWrap}>
-              <Ionicons
-                name="chatbubble-ellipses-outline"
-                size={34}
-                color="#00A884"
-              />
-            </View>
-            <Text style={styles.blockingTitle}>Link Your Partner</Text>
-            <Text style={styles.blockingText}>
-              Connect with your partner first to chat privately on WhatsApp style Duo Spark.
-            </Text>
-            <Pressable
-              style={styles.actionButton}
-              onPress={() => router.push(ROUTES.INVITE_PARTNER)}
-              accessibilityRole="button"
-              accessibilityLabel="Invite or connect partner"
-            >
-              <Ionicons name="link-outline" size={18} color="#FFFFFF" />
-              <Text style={styles.actionButtonText}>Connect Partner</Text>
-            </Pressable>
-          </MotiView>
+          <LinkPartnerPrompt
+            title="Link Your Partner"
+            description="Connect with your partner first to chat privately."
+            icon="chatbubble-ellipses-outline"
+          />
         )}
 
         {loadState === "ready" && (

@@ -19,6 +19,7 @@ import { styles } from "./styles";
 import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
 import { calculateCrush } from "@/src/lib/crushCalculator";
+import { GradientButton } from "@/src/components/ui/gradient-button";
 
 export default function CrushCalculatorScreen() {
   const router = useRouter();
@@ -176,29 +177,12 @@ export default function CrushCalculatorScreen() {
                 </MotiView>
               </View>
 
-              <Pressable
-                style={[
-                  styles.calculateButton,
-                  !isFormValid && styles.calculateButtonDisabled,
-                ]}
+              <GradientButton
+                label="Calculate"
                 onPress={handleCalculate}
                 disabled={!isFormValid}
-                accessibilityRole="button"
                 accessibilityLabel="Calculate crush compatibility"
-              >
-                <LinearGradient
-                  colors={
-                    isFormValid
-                      ? [...GRADIENTS.primaryAction]
-                      : [...GRADIENTS.buttonDisabled]
-                  }
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.calculateGradient}
-                >
-                  <Text style={styles.calculateText}>Calculate</Text>
-                </LinearGradient>
-              </Pressable>
+              />
             </ScrollView>
           </KeyboardAvoidingView>
         </View>

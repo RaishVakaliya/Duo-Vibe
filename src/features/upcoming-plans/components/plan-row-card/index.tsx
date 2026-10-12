@@ -5,6 +5,8 @@ import { COLORS } from "@/src/constants/colors";
 import { PlanRowCardProps } from "./types";
 import { styles } from "./styles";
 
+import { formatPlanDate } from "@/src/utils/date";
+
 export const PlanRowCard: React.FC<PlanRowCardProps> = ({
   plan,
   currentUserId,
@@ -14,16 +16,7 @@ export const PlanRowCard: React.FC<PlanRowCardProps> = ({
 }) => {
   const isDone = Boolean(plan.done_at);
   const canDelete = !plan.is_local_only && plan.created_by === currentUserId;
-
-  const startsAt = new Date(plan.starts_at);
-  const formattedDate = startsAt.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    ...(plan.all_day
-      ? {}
-      : { hour: "numeric", minute: "2-digit" }),
-  });
+  const formattedDate = formatPlanDate(plan.starts_at, plan.all_day);
 
   return (
     <View style={[styles.card, isDone && styles.cardDone]}>

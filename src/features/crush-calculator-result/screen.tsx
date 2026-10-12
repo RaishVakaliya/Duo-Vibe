@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import Svg, { Path } from "react-native-svg";
 import { MotiView } from "moti";
+import { ScreenHeader } from "@/src/components/ui/screen-header";
 import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
 
@@ -115,29 +116,20 @@ export default function CrushCalculatorResultScreen() {
       />
 
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.headerRow}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => router.replace(ROUTES.HOME)}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          >
-            <Ionicons name="chevron-back" size={22} color="#1E1B26" />
-          </Pressable>
-
-          <View style={styles.headerTitleContainer}>
+        <ScreenHeader
+          title="Crush Calculator"
+          align="center"
+          theme="light"
+          titleIcon={
             <Ionicons
               name="flame"
               size={22}
               color="#FF7A00"
               style={styles.headerHeartIcon}
             />
-            <Text style={styles.headerTitle}>Crush Calculator</Text>
-          </View>
-
-          <View style={styles.headerSpacer} />
-        </View>
+          }
+          onBack={() => router.replace(ROUTES.HOME)}
+        />
 
         <ScrollView
           contentContainerStyle={styles.scrollContent}

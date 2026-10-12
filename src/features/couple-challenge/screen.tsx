@@ -4,7 +4,6 @@ import {
   Text,
   Pressable,
   ScrollView,
-  ActivityIndicator,
   BackHandler,
 } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
@@ -13,13 +12,16 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
+import { ScreenHeader } from "@/src/components/ui/screen-header";
+import { ScreenState } from "@/src/components/ui/screen-state";
+import { LinkPartnerPrompt } from "@/src/components/ui/link-partner-prompt";
+import { GradientButton } from "@/src/components/ui/gradient-button";
 import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
 import { useCoupleChallenge } from "./use-couple-challenge";
 import { COUPLE_CHALLENGE_BANK } from "@/src/data/coupleChallenges";
 import { CoupleChallengeState } from "@/src/types";
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function ProgressBar({ state }: { state: CoupleChallengeState }) {
   // Count days where BOTH partners have completed
@@ -156,29 +158,15 @@ function TodayCard({
         </View>
       ) : (
         /* Not done yet — show button */
-        <Pressable
-          style={[styles.doneButton, isMarkingDone && styles.doneButtonDisabled]}
-          onPress={onMarkDone}
+        <GradientButton
+          label="I did it! ✓"
+          loading={isMarkingDone}
           disabled={isMarkingDone}
-          accessibilityRole="button"
+          icon={<Ionicons name="checkmark-circle-outline" size={20} color="#FFFFFF" />}
+          onPress={onMarkDone}
           accessibilityLabel={`Mark Day ${day} as done`}
-        >
-          <LinearGradient
-            colors={["#FF2D6C", "#FF4D6D", "#FF758C"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.doneGradient}
-          >
-            {isMarkingDone ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
-            ) : (
-              <>
-                <Ionicons name="checkmark-circle-outline" size={20} color="#FFFFFF" />
-                <Text style={styles.doneButtonText}>I did it! ✓</Text>
-              </>
-            )}
-          </LinearGradient>
-        </Pressable>
+          colors={["#FF2D6C", "#FF4D6D", "#FF758C"]}
+        />
       )}
     </MotiView>
   );
@@ -248,84 +236,35 @@ export default function CoupleChallengeScreen() {
 
       <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
         {/* ── Header ─────────────────────────────────────────────────── */}
-        <View style={styles.headerRow}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => router.replace(ROUTES.HOME)}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          >
-            <Ionicons name="chevron-back" size={22} color="#1E1B26" />
-          </Pressable>
-
-          <View style={styles.headerCenter}>
-            <View style={styles.headerTitleRow}>
-              <Ionicons name="calendar" size={22} color="#10B981" />
-              <Text style={styles.headerTitle}>Couple Challenge</Text>
-            </View>
-            <Text style={styles.headerSubtitle}>
-              Daily challenges to strengthen your bond
-            </Text>
-          </View>
-
-          <View style={styles.headerSpacer} />
-        </View>
+        <ScreenHeader
+          title="Couple Challenge"
+          subtitle="Daily challenges to strengthen your bond"
+          align="center"
+          theme="light"
+          titleIcon={<Ionicons name="calendar" size={22} color="#10B981" />}
+          onBack={() => router.replace(ROUTES.HOME)}
+        />
 
         {/* ── Content ────────────────────────────────────────────────── */}
         {loadState === "loading" && (
-          <View style={styles.centeredContainer}>
-            <ActivityIndicator size="large" color="#FF2D6C" />
-          </View>
+          <ScreenState variant="loading" theme="light" />
         )}
 
         {loadState === "error" && (
-          <View style={styles.centeredContainer}>
-            <Ionicons name="cloud-offline-outline" size={52} color="#CBD5E1" />
-            <Text style={styles.errorText}>
-              Couldn{"'"}t load your challenge progress. Check your connection and try again.
-            </Text>
-            <Pressable
-              style={styles.actionButton}
-              onPress={handleRetry}
-              accessibilityRole="button"
-              accessibilityLabel="Retry loading challenges"
-            >
-              <Ionicons name="refresh" size={18} color="#FFFFFF" />
-              <Text style={styles.actionButtonText}>Try Again</Text>
-            </Pressable>
-          </View>
+          <ScreenState
+            variant="error"
+            theme="light"
+            message="Couldn't load your challenge progress. Check your connection and try again."
+            onRetry={handleRetry}
+          />
         )}
 
         {loadState === "no_partner" && (
-          <ScrollView
-            contentContainerStyle={[styles.scrollContent, { paddingTop: 20 }]}
-            showsVerticalScrollIndicator={false}
-          >
-            <MotiView
-              from={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", damping: 14 }}
-              style={styles.blockingCard}
-            >
-              <View style={styles.blockingIconWrap}>
-                <Ionicons name="heart-dislike-outline" size={36} color="#FF2D6C" />
-              </View>
-              <Text style={styles.blockingTitle}>Link Your Partner First</Text>
-              <Text style={styles.blockingText}>
-                Couple Challenges are a shared journey — you need your partner linked to start the 30-day experience together.
-              </Text>
-              <Pressable
-                style={styles.actionButton}
-                onPress={() => router.push(ROUTES.INVITE_PARTNER)}
-                accessibilityRole="button"
-                accessibilityLabel="Invite or connect partner"
-              >
-                <Ionicons name="link-outline" size={18} color="#FFFFFF" />
-                <Text style={styles.actionButtonText}>Invite / Connect Partner</Text>
-              </Pressable>
-            </MotiView>
-          </ScrollView>
+          <LinkPartnerPrompt
+            theme="light"
+            title="Link Your Partner First"
+            description="Couple Challenges are a shared journey — you need your partner linked to start the 30-day experience together."
+          />
         )}
 
         {loadState === "ready" && challengeState && (

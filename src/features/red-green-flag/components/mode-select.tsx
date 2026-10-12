@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Pressable, ScrollView } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { ScreenHeader } from "@/src/components/ui/screen-header";
 import { styles } from "../styles";
 import { ModeSelectProps } from "../types";
 
@@ -32,18 +33,11 @@ export const ModeSelect = React.memo(function ModeSelect({
   return (
     <View style={{ flex: 1 }}>
       {/* Top Header */}
-      <View style={styles.headerRow}>
-        <Pressable
-          style={styles.headerBackButton}
-          onPress={onBack}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-        >
-          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
-        </Pressable>
-        <Text style={styles.headerTitle}>Red Flag or Green Flag</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+      <ScreenHeader
+        title="Red Flag or Green Flag"
+        align="center"
+        onBack={onBack}
+      />
 
       <ScrollView
         contentContainerStyle={styles.modeSelectScroll}

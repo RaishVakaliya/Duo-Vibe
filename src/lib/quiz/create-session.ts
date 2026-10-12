@@ -4,7 +4,7 @@ import {
   QuizCategory,
   QuizQuestion,
 } from "@/src/data/quizQuestions";
-import { selectBalancedRandom } from "@/src/lib/questionSelector";
+import { pickBalanced } from "@/src/utils/pick-balanced";
 
 export function selectQuizQuestions(): QuizQuestion[] {
   const categories: readonly QuizCategory[] = [
@@ -13,7 +13,7 @@ export function selectQuizQuestions(): QuizQuestion[] {
     "memories",
     "future",
   ];
-  return selectBalancedRandom(
+  return pickBalanced(
     QUIZ_QUESTION_BANK,
     categories,
     (q) => q.category,

@@ -6,34 +6,16 @@ import { COLORS } from "@/src/constants/colors";
 import { HeroPlanCardProps } from "./types";
 import { styles } from "./styles";
 
+import { formatCountdown, formatPlanDate } from "@/src/utils/date";
+
 export const HeroPlanCard: React.FC<HeroPlanCardProps> = ({
   plan,
   onMarkDone,
   onDelete,
   canDelete = false,
 }) => {
-  const startsAt = new Date(plan.starts_at);
-  const now = new Date();
-  const diffMs = startsAt.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-
-  let countdownLabel = "";
-  if (diffDays <= 0) {
-    countdownLabel = "Today";
-  } else if (diffDays === 1) {
-    countdownLabel = "Tomorrow";
-  } else {
-    countdownLabel = `in ${diffDays} days`;
-  }
-
-  const formattedDate = startsAt.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    ...(plan.all_day
-      ? {}
-      : { hour: "numeric", minute: "2-digit" }),
-  });
+  const countdownLabel = formatCountdown(plan.starts_at);
+  const formattedDate = formatPlanDate(plan.starts_at, plan.all_day);
 
   return (
     <LinearGradient

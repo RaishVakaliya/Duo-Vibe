@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from "react";
 import {
-  Modal,
   View,
   Text,
   Pressable,
   TextInput,
-  ScrollView,
   Platform,
-  KeyboardAvoidingView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
+import { AppBottomSheet } from "@/src/components/ui/app-bottom-sheet";
 import { COLORS } from "@/src/constants/colors";
 import { GiftIdeaItem } from "@/src/types";
 import { FieldBottomSheetProps } from "./types";
@@ -173,41 +171,32 @@ export const FieldBottomSheet: React.FC<FieldBottomSheetProps> = ({
   };
 
   return (
-    <Modal
+    <AppBottomSheet
       visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.modalOverlay}
-      >
-        <Pressable style={styles.backdropTouchable} onPress={onClose} />
-        <View style={styles.sheetContainer}>
-          <View style={styles.handleBar} />
-
-          {/* Header */}
-          <View style={styles.headerRow}>
-            <View style={styles.titleContainer}>
-              <Text style={styles.sheetTitle}>{field.label}</Text>
-              <Text style={styles.sheetSubtitle}>{field.group}</Text>
-            </View>
-            <Pressable
-              onPress={onClose}
-              style={styles.closeButton}
-              hitSlop={10}
-            >
-              <Ionicons name="close" size={18} color={COLORS.white} />
+      onClose={onClose}
+      title={field.label}
+      subtitle={field.group}
+      scrollable
+      footer={
+        <View style={styles.actionsRow}>
+          {currentValue !== undefined && currentValue !== null && (
+            <Pressable style={styles.clearButton} onPress={handleClear}>
+              <Ionicons name="trash-outline" size={16} color={COLORS.error} />
+              <Text style={styles.clearButtonText}>Clear</Text>
             </Pressable>
-          </View>
-
-          {/* Content Body */}
-          <ScrollView
-            style={styles.bodyContent}
-            keyboardShouldPersistTaps="handled"
-          >
-            {/* Single Choice Field */}
+          )}
+          <Pressable style={styles.saveButton} onPress={handleSave}>
+            <Ionicons
+              name="checkmark-circle-outline"
+              size={18}
+              color={COLORS.white}
+            />
+            <Text style={styles.saveButtonText}>Save Details</Text>
+          </Pressable>
+        </View>
+      }
+    >
+      {/* Single Choice Field */}
             {field.type === "choice" && (
               <View>
                 <View style={styles.chipsWrap}>
@@ -449,27 +438,6 @@ export const FieldBottomSheet: React.FC<FieldBottomSheetProps> = ({
                 ))}
               </View>
             )}
-          </ScrollView>
-
-          {/* Action Buttons */}
-          <View style={styles.actionsRow}>
-            {currentValue !== undefined && currentValue !== null && (
-              <Pressable style={styles.clearButton} onPress={handleClear}>
-                <Ionicons name="trash-outline" size={16} color={COLORS.error} />
-                <Text style={styles.clearButtonText}>Clear</Text>
-              </Pressable>
-            )}
-            <Pressable style={styles.saveButton} onPress={handleSave}>
-              <Ionicons
-                name="checkmark-circle-outline"
-                size={18}
-                color={COLORS.white}
-              />
-              <Text style={styles.saveButtonText}>Save Details</Text>
-            </Pressable>
-          </View>
-        </View>
-      </KeyboardAvoidingView>
-    </Modal>
+    </AppBottomSheet>
   );
 };

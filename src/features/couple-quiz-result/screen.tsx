@@ -12,6 +12,7 @@ import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { ScreenHeader } from "@/src/components/ui/screen-header";
 import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
 import { GRADIENTS } from "@/src/constants/colors";
@@ -155,31 +156,18 @@ export default function CoupleQuizResultScreen() {
       />
 
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.headerRow}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => router.replace(ROUTES.HOME)}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          >
-            <Ionicons name="chevron-back" size={22} color="#1E1B26" />
-          </Pressable>
-
-          <View style={styles.headerCenter}>
-            <View style={styles.headerTitleRow}>
-              <Ionicons name="trophy" size={22} color="#FF2D6C" />
-              <Text style={styles.headerTitle}>Quiz Results</Text>
-            </View>
-            <Text style={styles.headerSubtitle}>
-              {isCompleted
-                ? "Here is how you scored!"
-                : "Awaiting partner review"}
-            </Text>
-          </View>
-
-          <View style={styles.headerSpacer} />
-        </View>
+        <ScreenHeader
+          title="Quiz Results"
+          subtitle={
+            isCompleted
+              ? "Here is how you scored!"
+              : "Awaiting partner review"
+          }
+          align="center"
+          theme="light"
+          titleIcon={<Ionicons name="trophy" size={22} color="#FF2D6C" />}
+          onBack={() => router.replace(ROUTES.HOME)}
+        />
 
         {isLoading ? (
           <View

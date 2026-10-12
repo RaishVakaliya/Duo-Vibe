@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { useAuth } from "@/src/context/auth-context";
-import { getPartnerId } from "@/src/lib/quiz";
+import { usePartnerGuard } from "@/src/hooks/use-partner-guard";
 import {
   getOrCreateCoupleProgress,
   subscribeToChallengeProgress,
@@ -10,7 +9,12 @@ import type { ChallengeLoadState } from "@/src/types";
 import { UseCoupleChallengAll } from "./types";
 
 export function useCoupleChallengeAll(): UseCoupleChallengAll {
-  const { user, hasPartner } = useAuth();
+  const {
+    user,
+    hasPartner,
+    partnerId,
+    isLoading: partnerLoading,
+  } = usePartnerGuard();
 
   const [loadState, setLoadState] = useState<ChallengeLoadState>("loading");
   const [progress, setProgress] = useState<CoupleChallengeProgress | null>(null);
@@ -18,21 +22,17 @@ export function useCoupleChallengeAll(): UseCoupleChallengAll {
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
   const load = useCallback(async () => {
+    if (partnerLoading) return;
+
     if (!user) return;
 
-    if (!hasPartner) {
+    if (!hasPartner || !partnerId) {
       setLoadState("no_partner");
       return;
     }
 
     setLoadState("loading");
     try {
-      const partnerId = await getPartnerId(user.id);
-      if (!partnerId) {
-        setLoadState("no_partner");
-        return;
-      }
-
       const p = await getOrCreateCoupleProgress(user.id, partnerId);
       setProgress(p);
       setLoadState("ready");
@@ -45,7 +45,7 @@ export function useCoupleChallengeAll(): UseCoupleChallengAll {
       console.error("[useCoupleChallengeAll] load error:", err);
       setLoadState("error");
     }
-  }, [user, hasPartner]);
+  }, [user, hasPartner, partnerId, partnerLoading]);
 
   useEffect(() => {
     load();

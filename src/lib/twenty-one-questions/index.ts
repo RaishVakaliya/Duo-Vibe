@@ -1,14 +1,5 @@
-/**
- * Library for the 21 Questions shared session feature.
- *
- * Flow:
- *  1. getOrCreateSession(coupleKey, questionIds) — fetches or creates the shared session row.
- *  2. submitAnswer(sessionId, userId, questionId, answer) — upserts the user's answer.
- *  3. fetchAnswers(sessionId) — loads all answers for the session (both partners).
- *  4. subscribeToAnswers(sessionId, onNew) — realtime listener for partner answers.
- */
-
 import { supabase } from "@/src/lib/supabase";
+import { createRealtimeChannel } from "@/src/lib/realtime/create-realtime-channel";
 import {
   TwentyOneQuestionsSession,
   TwentyOneQuestionsAnswer,
@@ -57,11 +48,6 @@ function rowToAnswer(row: {
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
-/**
- * Fetches the shared session for a couple_key, creating one if needed.
- * If the session already exists, returns it as-is (preserving the original
- * question set so both partners always see the same questions).
- */
 export async function getOrCreateSession(
   coupleKey: string,
   questionIds: string[],
@@ -86,10 +72,6 @@ export async function getOrCreateSession(
   return rowToSession(data);
 }
 
-/**
- * Upserts the current user's answer for a given question in a session.
- * Idempotent: calling again with a different answer updates the existing row.
- */
 export async function submitAnswer(
   sessionId: string,
   userId: string,
@@ -109,9 +91,6 @@ export async function submitAnswer(
   return rowToAnswer(data);
 }
 
-/**
- * Fetches all answers for a session (both partners).
- */
 export async function fetchAnswers(sessionId: string): Promise<TwentyOneQuestionsAnswer[]> {
   const { data, error } = await supabase
     .from("twenty_one_questions_answers")
@@ -122,59 +101,29 @@ export async function fetchAnswers(sessionId: string): Promise<TwentyOneQuestion
   return (data ?? []).map(rowToAnswer);
 }
 
-/**
- * Subscribes to realtime INSERTs/UPDATEs on twenty_one_questions_answers
- * for a given session. Calls onNew for each new/updated answer.
- * Returns an unsubscribe function.
- */
 export function subscribeToAnswers(
   sessionId: string,
   onNew: (answer: TwentyOneQuestionsAnswer) => void,
 ): () => void {
-  let channel: ReturnType<typeof supabase.channel> | null = null;
-
-  try {
-    channel = supabase
-      .channel(`21q_answers_${sessionId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "twenty_one_questions_answers",
-          filter: `session_id=eq.${sessionId}`,
-        },
-        (payload) => {
-          if (payload.new) {
-            try {
-              onNew(rowToAnswer(payload.new as Parameters<typeof rowToAnswer>[0]));
-            } catch (e) {
-              console.warn("[21Q realtime] failed to parse answer payload:", e);
-            }
+  return createRealtimeChannel({
+    channelName: `21q_answers_${sessionId}`,
+    changes: {
+      event: "*",
+      table: "twenty_one_questions_answers",
+      filter: `session_id=eq.${sessionId}`,
+      callback: (payload: { new?: unknown }) => {
+        if (payload.new) {
+          try {
+            onNew(rowToAnswer(payload.new as Parameters<typeof rowToAnswer>[0]));
+          } catch (e) {
+            console.warn("[21Q realtime] failed to parse answer payload:", e);
           }
-        },
-      )
-      .subscribe((status) => {
-        if (status === "CHANNEL_ERROR") {
-          console.warn("[21Q realtime] subscription error for session", sessionId);
         }
-      });
-  } catch (e) {
-    console.warn("[21Q realtime] failed to subscribe:", e);
-  }
-
-  return () => {
-    if (channel) {
-      supabase.removeChannel(channel).catch(() => { });
-    }
-  };
+      },
+    },
+  });
 }
 
-/**
- * Given the session question IDs and all answers for both partners,
- * builds the reveal view — one entry per question showing both answers
- * (or null if not yet answered).
- */
 export function buildRevealList(
   questionIds: string[],
   myUserId: string,

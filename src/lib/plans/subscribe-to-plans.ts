@@ -1,4 +1,4 @@
-import { supabase } from "@/src/lib/supabase";
+import { createRealtimeChannel } from "@/src/lib/realtime/create-realtime-channel";
 
 export interface SubscribeToPlansParams {
   coupleKey: string;
@@ -9,25 +9,13 @@ export function subscribeToPlans({
   coupleKey,
   onPlanChange,
 }: SubscribeToPlansParams): () => void {
-  const channelName = `couple_plans_${coupleKey}_${Date.now()}`;
-
-  const channel = supabase
-    .channel(channelName)
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "couple_plans",
-        filter: `couple_key=eq.${coupleKey}`,
-      },
-      () => {
-        onPlanChange();
-      },
-    )
-    .subscribe();
-
-  return () => {
-    supabase.removeChannel(channel);
-  };
+  return createRealtimeChannel({
+    channelName: `couple_plans_${coupleKey}_${Date.now()}`,
+    changes: {
+      event: "*",
+      table: "couple_plans",
+      filter: `couple_key=eq.${coupleKey}`,
+      callback: () => onPlanChange(),
+    },
+  });
 }

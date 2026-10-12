@@ -2,24 +2,21 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  Modal,
   Pressable,
   TextInput,
-  ScrollView,
-  ActivityIndicator,
   Platform,
   Alert,
 } from "react-native";
 import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import * as Haptics from "expo-haptics";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
+import { AppBottomSheet } from "@/src/components/ui/app-bottom-sheet";
+import { GradientButton } from "@/src/components/ui/gradient-button";
 import { GRADIENTS } from "@/src/constants/colors";
-import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { createPhotoMemory } from "@/src/lib/memories";
 import { AddMemoryBottomSheetProps } from "../types";
 import { componentStyles } from "./component-styles";
@@ -160,49 +157,24 @@ export function AddMemoryBottomSheet({
     isUploading || !photoUri || title.trim().length === 0;
 
   return (
-    <Modal
+    <AppBottomSheet
       visible={isOpen}
-      transparent
-      animationType="slide"
-      statusBarTranslucent
-      onRequestClose={handleClose}
-    >
-      <KeyboardAvoidingView
-        style={componentStyles.modalBackdrop}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={0}
-      >
-        <Pressable
-          style={componentStyles.backdropTouchable}
-          onPress={handleClose}
-          disabled={isUploading}
-          accessibilityRole="button"
-          accessibilityLabel="Dismiss modal backdrop"
+      onClose={handleClose}
+      title="New Memory"
+      scrollable
+      footer={
+        <GradientButton
+          label="Save Memory"
+          rightIcon={<Ionicons name="sparkles" size={18} color="#FFFFFF" />}
+          loading={isUploading}
+          disabled={isSaveDisabled}
+          colors={GRADIENTS.buttonCoralAmber}
+          onPress={handleSave}
+          accessibilityLabel="Save memory"
         />
-
-        <View style={componentStyles.sheetContainer}>
-          <View style={componentStyles.sheetHandle} />
-
-          <View style={componentStyles.sheetHeaderRow}>
-            <Text style={componentStyles.sheetTitle}>New Memory</Text>
-            <Pressable
-              style={componentStyles.closeIconButton}
-              onPress={handleClose}
-              disabled={isUploading}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              accessibilityRole="button"
-              accessibilityLabel="Close"
-            >
-              <Ionicons name="close" size={20} color="#FFFFFF" />
-            </Pressable>
-          </View>
-
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={componentStyles.sheetScrollContent}
-          >
-            {/* Photo Picker Box */}
+      }
+    >
+      {/* Photo Picker Box */}
             <Pressable
               style={[
                 componentStyles.photoPickerBox,
@@ -328,43 +300,6 @@ export function AddMemoryBottomSheet({
               </Text>
             ) : null}
 
-            {/* Save Button */}
-            <Pressable
-              style={[
-                componentStyles.saveButton,
-                isSaveDisabled && componentStyles.saveButtonDisabled,
-              ]}
-              onPress={handleSave}
-              disabled={isSaveDisabled}
-              accessibilityRole="button"
-              accessibilityLabel="Save memory"
-            >
-              <LinearGradient
-                colors={GRADIENTS.buttonCoralAmber}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={componentStyles.saveButtonGradient}
-              >
-                {isUploading ? (
-                  <>
-                    <ActivityIndicator size="small" color="#FFFFFF" />
-                    <Text style={componentStyles.saveButtonText}>
-                      Saving your moment...
-                    </Text>
-                  </>
-                ) : (
-                  <>
-                    <Text style={componentStyles.saveButtonText}>
-                      Save Memory
-                    </Text>
-                    <Ionicons name="sparkles" size={18} color="#FFFFFF" />
-                  </>
-                )}
-              </LinearGradient>
-            </Pressable>
-          </ScrollView>
-        </View>
-      </KeyboardAvoidingView>
-    </Modal>
+    </AppBottomSheet>
   );
 }

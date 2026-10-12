@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useIsFocused } from "@react-navigation/native";
 import { ROUTES } from "@/src/constants/routes";
 import { BottomTabBar } from "@/src/components/navigation/bottom-tab-bar";
+import { ScreenHeader } from "@/src/components/ui/screen-header";
 import { ConnectGridCard } from "./components/connect-grid-card";
 import { AboutThemCard } from "./components/about-them-card";
 import { useConnectData } from "./use-connect-data";
@@ -47,10 +48,13 @@ export default function ConnectHubScreen() {
           showsVerticalScrollIndicator={false}
         >
           {/* Header */}
-          <View style={styles.headerContainer}>
-            <Text style={styles.title}>Connect</Text>
-            <Text style={styles.subtitle}>More ways to connect</Text>
-          </View>
+          <ScreenHeader
+            title="Connect"
+            subtitle="More ways to connect"
+            hideBackButton
+            align="start"
+            style={{ paddingHorizontal: 0 }}
+          />
 
           {/* 2-Column Grid */}
           <View style={styles.gridRow}>

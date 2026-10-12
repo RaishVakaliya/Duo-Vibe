@@ -1,16 +1,13 @@
 import React from "react";
-import { View, Text, ScrollView, Pressable } from "react-native";
-import { useRouter } from "expo-router";
+import { View, Text, ScrollView } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
+import { ScreenHeader } from "@/src/components/ui/screen-header";
 import { styles } from "./styles";
 import { GRADIENTS } from "@/src/constants/colors";
 
 export default function TermsScreen() {
-  const router = useRouter();
-
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -22,21 +19,7 @@ export default function TermsScreen() {
       />
 
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.header}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => router.back()}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-          >
-            <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
-          </Pressable>
-
-          <Text style={styles.headerTitle}>Terms of Service</Text>
-
-          <View style={styles.headerPlaceholder} />
-        </View>
+        <ScreenHeader title="Terms of Service" align="center" />
 
         <ScrollView
           contentContainerStyle={styles.scrollContent}

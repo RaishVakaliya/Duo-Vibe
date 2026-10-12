@@ -14,21 +14,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
-import { GRADIENTS } from "@/src/constants/colors";
-import { useAuth } from "@/src/context/auth-context";
+import { usePartnerGuard } from "@/src/hooks/use-partner-guard";
+import { ScreenHeader } from "@/src/components/ui/screen-header";
+import { LinkPartnerPrompt } from "@/src/components/ui/link-partner-prompt";
+import { GradientButton } from "@/src/components/ui/gradient-button";
 import { CoupleIllustration } from "@/src/components/couple-illustration";
 import {
   selectQuizQuestions,
   createQuizSession,
   getActiveAnswererSession,
-  getPartnerId,
   subscribeToSessionUpdates,
 } from "@/src/lib/quiz";
 import { QuizSession } from "@/src/types";
 
 export default function CoupleQuizStartScreen() {
   const router = useRouter();
-  const { user, hasPartner } = useAuth();
+  const { user, hasPartner, partnerId } = usePartnerGuard();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isStarting, setIsStarting] = useState<boolean>(false);
@@ -95,8 +96,8 @@ export default function CoupleQuizStartScreen() {
       setIsStarting(true);
       setErrorMessage(null);
 
-      const partnerId = await getPartnerId(user.id);
-      if (!partnerId) {
+      const targetPartnerId = partnerId;
+      if (!targetPartnerId) {
         setErrorMessage(
           "Could not detect your partner. Please verify your partner connection.",
         );
@@ -104,7 +105,7 @@ export default function CoupleQuizStartScreen() {
       }
 
       const questions = selectQuizQuestions();
-      const sessionId = await createQuizSession(user.id, partnerId, questions);
+      const sessionId = await createQuizSession(user.id, targetPartnerId, questions);
 
       router.replace({
         pathname: ROUTES.COUPLE_QUIZ_PLAY,
@@ -133,29 +134,14 @@ export default function CoupleQuizStartScreen() {
       />
 
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.headerRow}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => router.replace(ROUTES.HOME)}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          >
-            <Ionicons name="chevron-back" size={22} color="#1E1B26" />
-          </Pressable>
-
-          <View style={styles.headerCenter}>
-            <View style={styles.headerTitleRow}>
-              <Ionicons name="people" size={22} color="#FF2D6C" />
-              <Text style={styles.headerTitle}>Couple Quiz</Text>
-            </View>
-            <Text style={styles.headerSubtitle}>
-              How well do you know your partner?
-            </Text>
-          </View>
-
-          <View style={styles.headerSpacer} />
-        </View>
+        <ScreenHeader
+          title="Couple Quiz"
+          subtitle="How well do you know your partner?"
+          align="center"
+          theme="light"
+          titleIcon={<Ionicons name="people" size={22} color="#FF2D6C" />}
+          onBack={() => router.replace(ROUTES.HOME)}
+        />
 
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -166,29 +152,12 @@ export default function CoupleQuizStartScreen() {
               <ActivityIndicator size="large" color="#FF2D6C" />
             </View>
           ) : !hasPartner ? (
-            <View style={styles.blockingCard}>
-              <View style={styles.blockingIconWrap}>
-                <Ionicons
-                  name="heart-dislike-outline"
-                  size={36}
-                  color="#FF2D6C"
-                />
-              </View>
-              <Text style={styles.blockingTitle}>Link Your Partner First</Text>
-              <Text style={styles.blockingText}>
-                Link your partner first to play Couple Quiz together and test
-                how well you know each other!
-              </Text>
-              <Pressable
-                style={styles.actionButton}
-                onPress={() => router.push(ROUTES.INVITE_PARTNER)}
-              >
-                <Ionicons name="link-outline" size={18} color="#FFFFFF" />
-                <Text style={styles.actionButtonText}>
-                  Invite / Connect Partner
-                </Text>
-              </Pressable>
-            </View>
+            <LinkPartnerPrompt
+              theme="light"
+              style={{ paddingHorizontal: 0 }}
+              title="Link Your Partner First"
+              description="Link your partner first to play Couple Quiz together and test how well you know each other!"
+            />
           ) : activeSession ? (
             <View style={styles.blockingCard}>
               <View style={styles.pendingPulseBadge}>
@@ -254,36 +223,14 @@ export default function CoupleQuizStartScreen() {
                 </Text>
               </View>
 
-              <Pressable
-                style={[
-                  styles.actionButton,
-                  isStarting && styles.actionButtonDisabled,
-                ]}
-                onPress={handleStartQuiz}
+              <GradientButton
+                label="Start Quiz"
+                loading={isStarting}
                 disabled={isStarting}
-                accessibilityRole="button"
+                rightIcon={<Ionicons name="arrow-forward" size={18} color="#FFFFFF" />}
+                onPress={handleStartQuiz}
                 accessibilityLabel="Start Quiz"
-              >
-                <LinearGradient
-                  colors={
-                    isStarting
-                      ? [...GRADIENTS.buttonDisabled]
-                      : [...GRADIENTS.primaryAction]
-                  }
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.actionButtonGradient}
-                >
-                  {isStarting ? (
-                    <ActivityIndicator size="small" color="#FFFFFF" />
-                  ) : (
-                    <>
-                      <Text style={styles.actionButtonText}>Start Quiz</Text>
-                      <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
-                    </>
-                  )}
-                </LinearGradient>
-              </Pressable>
+              />
             </View>
           )}
         </ScrollView>

@@ -1,4 +1,5 @@
 import { supabase } from "@/src/lib/supabase";
+import { createRealtimeChannel } from "@/src/lib/realtime/create-realtime-channel";
 import {
   CoupleChallengeProgress,
   CoupleChallengeDayEntry,
@@ -8,14 +9,8 @@ import {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/**
- * Deterministically build a couple_key from two user IDs.
- * Always sorts them alphabetically so the key is identical regardless of
- * which partner initiates.
- */
-export function buildCoupleKey(userId: string, partnerId: string): string {
-  return [userId, partnerId].sort().join("_");
-}
+import { getCoupleKey, buildCoupleKey } from "@/src/lib/couple/get-couple-key";
+export { getCoupleKey, buildCoupleKey };
 
 /**
  * Safely parse completed_days from raw JSONB. Defaults to [] on any error
@@ -74,11 +69,6 @@ function rowToCompletion(row: {
   };
 }
 
-/**
- * Compute the active current_day from per-user completion rows.
- * current_day = first day 1–30 where BOTH partners have NOT yet completed it.
- * Returns 31 when all 30 days are finished by both.
- */
 export function computeCurrentDay(
   myCompletions: CoupleChallengeDayCompletion[],
   partnerCompletions: CoupleChallengeDayCompletion[],
@@ -93,10 +83,6 @@ export function computeCurrentDay(
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
-/**
- * Fetches the shared couple_challenge_progress row for this user pair,
- * creating one via upsert (on conflict: couple_key) if it doesn't exist yet.
- */
 export async function getOrCreateCoupleProgress(
   userId: string,
   partnerId: string,
@@ -144,10 +130,6 @@ export async function getOrCreateCoupleProgress(
   return rowToProgress(data);
 }
 
-/**
- * Fetches all completion rows for a given progress record.
- * Returns both arrays so the caller can distinguish "my" vs "partner" completions.
- */
 export async function fetchCompletions(progressId: string): Promise<CoupleChallengeDayCompletion[]> {
   const { data, error } = await supabase
     .from("couple_challenge_completions")
@@ -159,10 +141,6 @@ export async function fetchCompletions(progressId: string): Promise<CoupleChalle
   return (data ?? []).map(rowToCompletion);
 }
 
-/**
- * Loads the full CoupleChallengeState for a given user pair.
- * Creates the progress row if it doesn't exist, then fetches all completions.
- */
 export async function loadChallengeState(
   userId: string,
   partnerId: string,
@@ -177,11 +155,6 @@ export async function loadChallengeState(
   return { progress, myCompletions, partnerCompletions, currentDay };
 }
 
-/**
- * Returns true if the given day is unlocked for the current user.
- * Day 1 is always unlocked.
- * Day N+1 unlocks only after BOTH partners have completed day N.
- */
 export function isDayUnlocked(
   state: CoupleChallengeState,
   day: number,
@@ -193,11 +166,6 @@ export function isDayUnlocked(
   return myDone && partnerDone;
 }
 
-/**
- * Marks a specific day as complete for the current user.
- * Inserts a new row into couple_challenge_completions (unique constraint prevents duplicates).
- * Returns the updated completion that was inserted, or the existing one if already done.
- */
 export async function markMyDayComplete(
   progressId: string,
   userId: string,
@@ -231,52 +199,27 @@ export async function markMyDayComplete(
   return rowToCompletion(data);
 }
 
-/**
- * Subscribes to real-time INSERT events on couple_challenge_completions
- * for a given progress row. Calls onNew whenever any partner marks a day done.
- * Returns an unsubscribe function.
- */
 export function subscribeToCompletions(
   progressId: string,
   onNew: (completion: CoupleChallengeDayCompletion) => void,
 ): () => void {
-  let channel: ReturnType<typeof supabase.channel> | null = null;
-
-  try {
-    channel = supabase
-      .channel(`challenge_completions_${progressId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "couple_challenge_completions",
-          filter: `progress_id=eq.${progressId}`,
-        },
-        (payload) => {
-          if (payload.new) {
-            try {
-              onNew(rowToCompletion(payload.new as Parameters<typeof rowToCompletion>[0]));
-            } catch (e) {
-              console.warn("[challenge completions realtime] failed to parse payload:", e);
-            }
+  return createRealtimeChannel({
+    channelName: `challenge_completions_${progressId}`,
+    changes: {
+      event: "INSERT",
+      table: "couple_challenge_completions",
+      filter: `progress_id=eq.${progressId}`,
+      callback: (payload: { new?: unknown }) => {
+        if (payload.new) {
+          try {
+            onNew(rowToCompletion(payload.new as Parameters<typeof rowToCompletion>[0]));
+          } catch (e) {
+            console.warn("[challenge completions realtime] failed to parse payload:", e);
           }
-        },
-      )
-      .subscribe((status) => {
-        if (status === "CHANNEL_ERROR") {
-          console.warn("[challenge completions realtime] subscription error for", progressId);
         }
-      });
-  } catch (e) {
-    console.warn("[challenge completions realtime] failed to subscribe:", e);
-  }
-
-  return () => {
-    if (channel) {
-      supabase.removeChannel(channel).catch(() => { });
-    }
-  };
+      },
+    },
+  });
 }
 
 // ─── Legacy (kept for backward-compat, do not use in new code) ────────────────

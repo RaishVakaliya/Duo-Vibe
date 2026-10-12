@@ -1,4 +1,4 @@
-import { supabase } from "@/src/lib/supabase";
+import { createRealtimeChannel } from "@/src/lib/realtime/create-realtime-channel";
 
 export interface SubscribeToMemoriesParams {
   coupleKey: string;
@@ -11,36 +11,20 @@ export function subscribeToMemories({
   onMemoryChange,
   onReactionChange,
 }: SubscribeToMemoriesParams): () => void {
-  const channelName = `memories_channel_${coupleKey}_${Date.now()}`;
-
-  const channel = supabase
-    .channel(channelName)
-    .on(
-      "postgres_changes",
+  return createRealtimeChannel({
+    channelName: `memories_channel_${coupleKey}_${Date.now()}`,
+    changes: [
       {
         event: "*",
-        schema: "public",
         table: "memories",
         filter: `couple_key=eq.${coupleKey}`,
+        callback: () => onMemoryChange(),
       },
-      () => {
-        onMemoryChange();
-      },
-    )
-    .on(
-      "postgres_changes",
       {
         event: "*",
-        schema: "public",
         table: "memory_reactions",
+        callback: () => onReactionChange(),
       },
-      () => {
-        onReactionChange();
-      },
-    )
-    .subscribe();
-
-  return () => {
-    supabase.removeChannel(channel);
-  };
+    ],
+  });
 }

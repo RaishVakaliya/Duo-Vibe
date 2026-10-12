@@ -6,6 +6,8 @@ import * as Haptics from "expo-haptics";
 import { ResultCardProps } from "../types";
 import { styles } from "../styles";
 
+import { formatShortDate } from "@/src/utils/date";
+
 export const ResultCard = React.memo(function ResultCard({
   memory,
   index,
@@ -24,13 +26,7 @@ export const ResultCard = React.memo(function ResultCard({
     onPress(memory);
   };
 
-  const formattedDate = new Date(
-    memory.memory_date + "T00:00:00",
-  ).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+  const formattedDate = formatShortDate(memory.memory_date);
 
   const payload = memory.payload || {};
   const score =

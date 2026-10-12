@@ -23,6 +23,8 @@ import { useAuth } from "@/src/context/auth-context";
 import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
 import { BottomTabBar, TabItem } from "@/src/components/navigation/bottom-tab-bar";
+import { ScreenState } from "@/src/components/ui/screen-state";
+import { LinkPartnerPrompt } from "@/src/components/ui/link-partner-prompt";
 import { Memory } from "@/src/types";
 import { styles } from "./styles";
 import { useMemoriesData } from "./use-memories-data";
@@ -289,36 +291,17 @@ export default function MemoriesScreen() {
           style={styles.gradientBackground}
         />
         <SafeAreaView style={styles.safeArea}>
-          <View style={styles.blockingContainer}>
-            <View style={styles.blockingIconCircle}>
-              <Ionicons name="heart-half-outline" size={44} color="#FFE2E6" />
-            </View>
-            <Text style={styles.blockingTitle}>Connect with Partner</Text>
-            <Text style={styles.blockingSubtitle}>
-              Link your partner to start your shared scrapbook
-            </Text>
-            <Pressable
-              style={styles.inviteButton}
-              onPress={() =>
-                router.push({
-                  pathname: ROUTES.INVITE_PARTNER,
-                  params: { source: "memories" },
-                })
-              }
-              accessibilityRole="button"
-              accessibilityLabel="Link partner"
-            >
-              <LinearGradient
-                colors={GRADIENTS.buttonCoralAmber}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.inviteButtonGradient}
-              >
-                <Ionicons name="link-outline" size={18} color="#FFFFFF" />
-                <Text style={styles.inviteButtonText}>Link Your Partner</Text>
-              </LinearGradient>
-            </Pressable>
-          </View>
+          <LinkPartnerPrompt
+            title="Connect with Partner"
+            description="Link your partner to start your shared scrapbook"
+            buttonLabel="Link Your Partner"
+            onPress={() =>
+              router.push({
+                pathname: ROUTES.INVITE_PARTNER,
+                params: { source: "memories" },
+              })
+            }
+          />
         </SafeAreaView>
 
         <BottomTabBar activeTab={3} onTabPress={handleTabPress} />
@@ -401,29 +384,20 @@ export default function MemoriesScreen() {
 
         {/* Timeline Content */}
         {loadState === "loading" && memories.length === 0 ? (
-          <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-            <ActivityIndicator size="large" color="#FFE2E6" />
-          </View>
+          <ScreenState variant="loading" />
         ) : loadState === "error" && memories.length === 0 ? (
-          <View style={styles.errorContainer}>
-            <Ionicons name="cloud-offline-outline" size={48} color="#FF4D6D" />
-            <Text style={styles.errorText}>
-              {errorMessage || "Unable to load memories."}
-            </Text>
-            <Pressable style={styles.retryButton} onPress={retry}>
-              <Text style={styles.retryButtonText}>Try Again</Text>
-            </Pressable>
-          </View>
+          <ScreenState
+            variant="error"
+            message={errorMessage || "Unable to load memories."}
+            onRetry={retry}
+          />
         ) : memories.length === 0 ? (
-          <View style={styles.emptyStateContainer}>
-            <View style={styles.emptyHeartCircle}>
-              <Ionicons name="heart-outline" size={40} color="#FFE2E6" />
-            </View>
-            <Text style={styles.emptyTitle}>A moment worth keeping?</Text>
-            <Text style={styles.emptySubtitle}>
-              Capture your first shared memory together
-            </Text>
-          </View>
+          <ScreenState
+            variant="empty"
+            title="A moment worth keeping?"
+            message="Capture your first shared memory together"
+            icon="heart-outline"
+          />
         ) : (
           <FlatList
             data={timelineItems}

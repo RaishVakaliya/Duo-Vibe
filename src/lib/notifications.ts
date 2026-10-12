@@ -8,6 +8,7 @@ const EAS_PROJECT_ID = "e03ddfb4-b07e-49a0-9661-5fbf95d81273";
 let Notifications: typeof import("expo-notifications") | null = null;
 
 try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   Notifications = require("expo-notifications");
   if (
     Notifications &&

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "expo-router";
-import { useAuth } from "@/src/context/auth-context";
+import { usePartnerGuard } from "@/src/hooks/use-partner-guard";
 import { fetchPartnerNotes } from "@/src/lib/about-them";
 import { PARTNER_NOTE_FIELDS } from "@/src/data/partnerNoteFields";
 import { ROUTES } from "@/src/constants/routes";
@@ -8,7 +8,7 @@ import { TabItem } from "@/src/components/navigation/bottom-tab-bar";
 
 export function useConnectData() {
   const router = useRouter();
-  const { hasPartner, user } = useAuth();
+  const { hasPartner, user } = usePartnerGuard();
   const [filledNotesCount, setFilledNotesCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
 

@@ -1,4 +1,5 @@
 import { supabase } from "@/src/lib/supabase";
+import { getErrorMessage } from "@/src/utils/error-message";
 import { CouplePlan } from "@/src/types";
 import { Database } from "@/src/types/database";
 import { PlanOperationResult, UpdatePlanInput } from "./types";
@@ -27,12 +28,11 @@ export async function updatePlan(
       .single();
 
     if (error) {
-      return { data: null, error: error.message };
+      return { data: null, error: getErrorMessage(error) };
     }
 
     return { data: data as CouplePlan, error: null };
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return { data: null, error: message };
+    return { data: null, error: getErrorMessage(err) };
   }
 }

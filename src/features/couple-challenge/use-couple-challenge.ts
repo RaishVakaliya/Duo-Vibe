@@ -1,13 +1,11 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { useAuth } from "@/src/context/auth-context";
-import { getPartnerId } from "@/src/lib/quiz";
+import { usePartnerGuard } from "@/src/hooks/use-partner-guard";
 import {
   loadChallengeState,
   markMyDayComplete,
   subscribeToCompletions,
   computeCurrentDay,
 } from "@/src/lib/challenge";
-import { supabase } from "@/src/lib/supabase";
 import {
   CoupleChallengeState,
   CoupleChallengeDayCompletion,
@@ -15,23 +13,29 @@ import {
 import { UseCoupleChallenge, ChallengeLoadState } from "./types";
 
 export function useCoupleChallenge(): UseCoupleChallenge {
-  const { user, hasPartner } = useAuth();
+  const {
+    user,
+    hasPartner,
+    partnerId,
+    partnerName,
+    isLoading: partnerLoading,
+  } = usePartnerGuard();
 
   const [loadState, setLoadState] = useState<ChallengeLoadState>("loading");
   const [challengeState, setChallengeState] = useState<CoupleChallengeState | null>(null);
-  const [partnerName, setPartnerName] = useState<string | null>(null);
   const [isMarkingDone, setIsMarkingDone] = useState<boolean>(false);
 
-  const partnerIdRef = useRef<string | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
   const load = useCallback(async () => {
+    if (partnerLoading) return;
+
     if (!user) {
       setLoadState("loading");
       return;
     }
 
-    if (!hasPartner) {
+    if (!hasPartner || !partnerId) {
       setLoadState("no_partner");
       return;
     }
@@ -39,22 +43,6 @@ export function useCoupleChallenge(): UseCoupleChallenge {
     setLoadState("loading");
 
     try {
-      const partnerId = await getPartnerId(user.id);
-      if (!partnerId) {
-        setLoadState("no_partner");
-        return;
-      }
-
-      partnerIdRef.current = partnerId;
-
-      // Fetch partner display name
-      const { data: partnerProfile } = await supabase
-        .from("profiles")
-        .select("full_name")
-        .eq("id", partnerId)
-        .maybeSingle();
-      setPartnerName(partnerProfile?.full_name ?? null);
-
       // Load full state (progress + per-user completions)
       const state = await loadChallengeState(user.id, partnerId);
       setChallengeState(state);
@@ -69,7 +57,7 @@ export function useCoupleChallenge(): UseCoupleChallenge {
             if (!prev) return prev;
 
             const isMe = newCompletion.userId === user.id;
-            const isPartner = newCompletion.userId === partnerIdRef.current;
+            const isPartner = newCompletion.userId === partnerId;
 
             // Avoid duplicate entries in local state
             const targetList = isMe ? prev.myCompletions : isPartner ? prev.partnerCompletions : null;
@@ -96,7 +84,7 @@ export function useCoupleChallenge(): UseCoupleChallenge {
       console.error("[useCoupleChallenge] load error:", err);
       setLoadState("error");
     }
-  }, [user, hasPartner]);
+  }, [user, hasPartner, partnerId, partnerLoading]);
 
   useEffect(() => {
     load();

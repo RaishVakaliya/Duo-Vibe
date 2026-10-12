@@ -4,6 +4,7 @@ import { CouplePlan } from "@/src/types";
 
 let Notifications: typeof import("expo-notifications") | null = null;
 try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   Notifications = require("expo-notifications");
 } catch {
   Notifications = null;

@@ -1,4 +1,5 @@
 import { supabase } from "@/src/lib/supabase";
+import { getErrorMessage } from "@/src/utils/error-message";
 import { SaveNoteResult } from "./types";
 
 export async function savePartnerNote(
@@ -25,12 +26,11 @@ export async function savePartnerNote(
     );
 
     if (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: getErrorMessage(error) };
     }
 
     return { success: true };
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return { success: false, error: message };
+    return { success: false, error: getErrorMessage(err) };
   }
 }

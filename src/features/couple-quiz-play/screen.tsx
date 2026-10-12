@@ -17,6 +17,7 @@ import { MotiView } from "moti";
 import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
 import { GRADIENTS } from "@/src/constants/colors";
+import { ScreenHeader } from "@/src/components/ui/screen-header";
 import { CoupleIllustration } from "@/src/components/couple-illustration";
 import { submitAnswers, selectQuizQuestions } from "@/src/lib/quiz";
 import { QuizQuestion } from "@/src/data/quizQuestions";
@@ -128,42 +129,27 @@ export default function CoupleQuizPlayScreen() {
       />
 
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.headerRow}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => {
-              Alert.alert(
-                "Leave Quiz?",
-                "Your current quiz answers won't be saved if you leave now.",
-                [
-                  { text: "Cancel", style: "cancel" },
-                  {
-                    text: "Leave",
-                    style: "destructive",
-                    onPress: () => router.replace(ROUTES.HOME),
-                  },
-                ],
-              );
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          >
-            <Ionicons name="chevron-back" size={22} color="#1E1B26" />
-          </Pressable>
-
-          <View style={styles.headerCenter}>
-            <View style={styles.headerTitleRow}>
-              <Ionicons name="people" size={22} color="#FF2D6C" />
-              <Text style={styles.headerTitle}>Couple Quiz</Text>
-            </View>
-            <Text style={styles.headerSubtitle}>
-              How well do you know your partner?
-            </Text>
-          </View>
-
-          <View style={styles.headerSpacer} />
-        </View>
+        <ScreenHeader
+          title="Couple Quiz"
+          subtitle="How well do you know your partner?"
+          align="center"
+          theme="light"
+          titleIcon={<Ionicons name="people" size={22} color="#FF2D6C" />}
+          onBack={() => {
+            Alert.alert(
+              "Leave Quiz?",
+              "Your current quiz answers won't be saved if you leave now.",
+              [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Leave",
+                  style: "destructive",
+                  onPress: () => router.replace(ROUTES.HOME),
+                },
+              ],
+            );
+          }}
+        />
 
         <View style={styles.progressBarContainer}>
           <View style={styles.progressBarTrack}>

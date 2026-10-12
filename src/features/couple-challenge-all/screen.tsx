@@ -4,7 +4,6 @@ import {
   Text,
   Pressable,
   FlatList,
-  ActivityIndicator,
   Alert,
   BackHandler,
 } from "react-native";
@@ -13,6 +12,8 @@ import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { ScreenHeader } from "@/src/components/ui/screen-header";
+import { ScreenState } from "@/src/components/ui/screen-state";
 import { styles } from "./styles";
 import { useCoupleChallengeAll } from "./use-couple-challenge-all";
 import { COUPLE_CHALLENGE_BANK, CoupleChallenge } from "@/src/data/coupleChallenges";
@@ -147,48 +148,26 @@ export default function CoupleChallengeAllScreen() {
 
       <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
         {/* ── Header ─────────────────────────────────────────────────── */}
-        <View style={styles.headerRow}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => router.back()}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          >
-            <Ionicons name="chevron-back" size={22} color="#1E1B26" />
-          </Pressable>
-
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>All Challenges</Text>
-            <Text style={styles.headerSubtitle}>30-day couple journey</Text>
-          </View>
-
-          <View style={styles.headerSpacer} />
-        </View>
+        <ScreenHeader
+          title="All Challenges"
+          subtitle="30-day couple journey"
+          align="center"
+          theme="light"
+          onBack={() => router.back()}
+        />
 
         {/* ── States ─────────────────────────────────────────────────── */}
         {loadState === "loading" && (
-          <View style={styles.centeredContainer}>
-            <ActivityIndicator size="large" color="#FF2D6C" />
-          </View>
+          <ScreenState variant="loading" theme="light" />
         )}
 
         {loadState === "error" && (
-          <View style={styles.centeredContainer}>
-            <Ionicons name="cloud-offline-outline" size={52} color="#CBD5E1" />
-            <Text style={styles.errorText}>
-              Couldn{"'"}t load challenge data. Check your connection.
-            </Text>
-            <Pressable
-              style={styles.retryButton}
-              onPress={handleRetry}
-              accessibilityRole="button"
-              accessibilityLabel="Retry"
-            >
-              <Ionicons name="refresh" size={16} color="#FFFFFF" />
-              <Text style={styles.retryButtonText}>Try Again</Text>
-            </Pressable>
-          </View>
+          <ScreenState
+            variant="error"
+            theme="light"
+            message="Couldn't load challenge data. Check your connection."
+            onRetry={handleRetry}
+          />
         )}
 
         {(loadState === "ready" || loadState === "no_partner") && (

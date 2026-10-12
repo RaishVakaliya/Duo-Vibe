@@ -2,7 +2,6 @@ import React from "react";
 import {
   View,
   Text,
-  Pressable,
   ScrollView,
   Platform,
 } from "react-native";
@@ -13,7 +12,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
 import { styles } from "./styles";
-import { GRADIENTS } from "@/src/constants/colors";
+import { ScreenHeader } from "@/src/components/ui/screen-header";
+import { GradientButton } from "@/src/components/ui/gradient-button";
 import { useLoveMatchForm } from "./use-love-match-form";
 import { PartnerAvatarInput } from "./components/partner-avatar-input";
 import { DobInput } from "./components/dob-input";
@@ -59,29 +59,20 @@ export default function LoveMatchScreen() {
       />
 
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.headerRow}>
-          <Pressable
-            style={styles.backButton}
-            onPress={handleBack}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          >
-            <Ionicons name="chevron-back" size={22} color="#1E1B26" />
-          </Pressable>
-
-          <View style={styles.headerTitleContainer}>
+        <ScreenHeader
+          title="Love Match"
+          align="center"
+          theme="light"
+          titleIcon={
             <Ionicons
               name="heart"
               size={24}
               color="#FF2D55"
               style={styles.headerHeartIcon}
             />
-            <Text style={styles.headerTitle}>Love Match</Text>
-          </View>
-
-          <View style={styles.headerSpacer} />
-        </View>
+          }
+          onBack={handleBack}
+        />
 
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -145,29 +136,13 @@ export default function LoveMatchScreen() {
               />
             </View>
 
-            <Pressable
-              style={[
-                styles.calculateButton,
-                !isFormValid && styles.calculateButtonDisabled,
-              ]}
+            <GradientButton
+              label="Calculate"
               onPress={handleCalculate}
               disabled={!isFormValid}
-              accessibilityRole="button"
               accessibilityLabel="Calculate love compatibility"
-            >
-              <LinearGradient
-                colors={
-                  isFormValid
-                    ? [...GRADIENTS.primaryAction]
-                    : [...GRADIENTS.buttonDisabled]
-                }
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.calculateGradient}
-              >
-                <Text style={styles.calculateText}>Calculate</Text>
-              </LinearGradient>
-            </Pressable>
+              style={{ marginTop: 20 }}
+            />
           </ScrollView>
         </KeyboardAvoidingView>
 

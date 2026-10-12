@@ -1,4 +1,4 @@
-import { supabase } from "@/src/lib/supabase";
+import { createRealtimeChannel } from "@/src/lib/realtime/create-realtime-channel";
 import { QuizSession } from "@/src/types";
 import { Database } from "@/src/types/database";
 
@@ -6,17 +6,13 @@ export function subscribeToSessionUpdates(
   sessionId: string,
   onUpdate: (session: QuizSession) => void,
 ): () => void {
-  const channel = supabase
-    .channel(`quiz_session_${sessionId}`)
-    .on(
-      "postgres_changes",
-      {
-        event: "UPDATE",
-        schema: "public",
-        table: "quiz_sessions",
-        filter: `id=eq.${sessionId}`,
-      },
-      (payload) => {
+  return createRealtimeChannel({
+    channelName: `quiz_session_${sessionId}`,
+    changes: {
+      event: "UPDATE",
+      table: "quiz_sessions",
+      filter: `id=eq.${sessionId}`,
+      callback: (payload) => {
         if (payload.new) {
           const row =
             payload.new as Database["public"]["Tables"]["quiz_sessions"]["Row"];
@@ -34,10 +30,6 @@ export function subscribeToSessionUpdates(
           });
         }
       },
-    )
-    .subscribe();
-
-  return () => {
-    supabase.removeChannel(channel);
-  };
+    },
+  });
 }

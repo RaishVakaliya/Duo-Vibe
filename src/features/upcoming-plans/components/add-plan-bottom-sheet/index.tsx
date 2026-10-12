@@ -1,18 +1,16 @@
 import React, { useState } from "react";
 import {
-  Modal,
   View,
   Text,
   Pressable,
   TextInput,
-  ScrollView,
   Platform,
-  KeyboardAvoidingView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
+import { AppBottomSheet } from "@/src/components/ui/app-bottom-sheet";
 import { COLORS } from "@/src/constants/colors";
 import { PlanKind } from "@/src/types";
 import { AddPlanBottomSheetProps } from "./types";
@@ -92,37 +90,13 @@ export const AddPlanBottomSheet: React.FC<AddPlanBottomSheetProps> = ({
   };
 
   return (
-    <Modal
+    <AppBottomSheet
       visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={handleClose}
+      onClose={handleClose}
+      title="Plan Something Together"
+      scrollable
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.modalOverlay}
-      >
-        <Pressable style={styles.backdropTouchable} onPress={handleClose} />
-        <View style={styles.sheetContainer}>
-          <View style={styles.handleBar} />
-
-          {/* Header */}
-          <View style={styles.headerRow}>
-            <Text style={styles.headerTitle}>Plan Something Together</Text>
-            <Pressable
-              onPress={handleClose}
-              style={styles.closeButton}
-              hitSlop={10}
-            >
-              <Ionicons name="close" size={18} color={COLORS.white} />
-            </Pressable>
-          </View>
-
-          <ScrollView
-            style={styles.scrollContent}
-            keyboardShouldPersistTaps="handled"
-          >
-            {/* Quick Start Chips */}
+      {/* Quick Start Chips */}
             <Text style={styles.sectionLabel}>Quick starts</Text>
             <View style={styles.quickStartRow}>
               {QUICK_STARTS.map((qs) => (
@@ -263,9 +237,6 @@ export const AddPlanBottomSheet: React.FC<AddPlanBottomSheetProps> = ({
               />
               <Text style={styles.submitButtonText}>Create Plan</Text>
             </Pressable>
-          </ScrollView>
-        </View>
-      </KeyboardAvoidingView>
-    </Modal>
+    </AppBottomSheet>
   );
 };

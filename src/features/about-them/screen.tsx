@@ -16,6 +16,8 @@ import {
   PartnerNoteFieldDef,
 } from "@/src/data/partnerNoteFields";
 import { GiftIdeaItem } from "@/src/types";
+import { ScreenHeader } from "@/src/components/ui/screen-header";
+import { ScreenState } from "@/src/components/ui/screen-state";
 import { ProgressRing } from "./components/progress-ring";
 import { FieldBottomSheet } from "./components/field-bottom-sheet";
 import { useAboutThem } from "./use-about-them";
@@ -74,29 +76,13 @@ export default function AboutThemScreen() {
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
         {/* Header */}
-        <View style={styles.headerRow}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => router.back()}
-            hitSlop={10}
-          >
-            <Ionicons name="arrow-back" size={20} color={COLORS.white} />
-          </Pressable>
-
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>About Them</Text>
-            <View style={styles.privacyRow}>
-              <Ionicons
-                name="lock-closed"
-                size={13}
-                color={COLORS.primaryLight}
-              />
-              <Text style={styles.privacyText}>Only you can see this</Text>
-            </View>
-          </View>
-
-          <ProgressRing filled={filledCount} total={totalCount} />
-        </View>
+        <ScreenHeader
+          title="About Them"
+          subtitle="Only you can see this"
+          backIcon="arrow-back"
+          onBack={() => router.back()}
+          rightElement={<ProgressRing filled={filledCount} total={totalCount} />}
+        />
 
         {/* Retry Banner if offline/error */}
         {failedSave && (
@@ -123,15 +109,7 @@ export default function AboutThemScreen() {
         )}
 
         {loading ? (
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <ActivityIndicator size="large" color={COLORS.primary} />
-          </View>
+          <ScreenState variant="loading" />
         ) : (
           <ScrollView
             contentContainerStyle={styles.scrollContent}

@@ -16,6 +16,7 @@ import Svg, { Path } from "react-native-svg";
 import { MotiView } from "moti";
 import { styles } from "./styles";
 import { MatchBarRow } from "./types";
+import { ScreenHeader } from "@/src/components/ui/screen-header";
 import { COLORS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
 import { useAuth } from "@/src/context/auth-context";
@@ -178,29 +179,20 @@ export default function LoveMatchResultScreen() {
       />
 
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.headerRow}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => router.replace(ROUTES.HOME)}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          >
-            <Ionicons name="chevron-back" size={22} color="#1E1B26" />
-          </Pressable>
-
-          <View style={styles.headerTitleContainer}>
+        <ScreenHeader
+          title="Love Match"
+          align="center"
+          theme="light"
+          titleIcon={
             <Ionicons
               name="heart"
               size={24}
               color="#FF2D55"
               style={styles.headerHeartIcon}
             />
-            <Text style={styles.headerTitle}>Love Match</Text>
-          </View>
-
-          <View style={styles.headerSpacer} />
-        </View>
+          }
+          onBack={() => router.replace(ROUTES.HOME)}
+        />
 
         <ScrollView
           contentContainerStyle={styles.scrollContent}

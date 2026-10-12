@@ -2,10 +2,8 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { Share } from "react-native";
 import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
-import { useAuth } from "@/src/context/auth-context";
+import { usePartnerGuard } from "@/src/hooks/use-partner-guard";
 import { supabase } from "@/src/lib/supabase";
-import { getPartnerId } from "@/src/lib/quiz";
-import { buildCoupleKey } from "@/src/lib/challenge";
 import { ROUTES } from "@/src/constants/routes";
 import { FlagStatement } from "@/src/data/flagStatements";
 import {
@@ -52,12 +50,19 @@ function computeSoloVerdict(redCount: number, greenCount: number): string {
 
 export function useRedGreenFlag(): UseRedGreenFlagReturn {
   const router = useRouter();
-  const { user, hasPartner } = useAuth();
+  const {
+    user,
+    hasPartner,
+    partnerId: pId,
+    partnerName: guardPartnerName,
+    coupleKey: cKey,
+    isLoading: partnerLoading,
+  } = usePartnerGuard();
 
   const [step, setStep] = useState<RedGreenFlagStep>("mode_select");
   const [mode, setMode] = useState<RedGreenFlagMode>("solo");
-  const [partnerName, setPartnerName] = useState<string>("your partner");
-  const [coupleKey, setCoupleKey] = useState<string | null>(null);
+  const partnerName = guardPartnerName || "your partner";
+  const coupleKey = cKey;
 
   const [activeSession, setActiveSession] = useState<FlagSession | null>(null);
   const [partnerSessionStatus, setPartnerSessionStatus] = useState<
@@ -91,34 +96,20 @@ export function useRedGreenFlag(): UseRedGreenFlagReturn {
 
   // ── Initial Partner & Active Session Discovery ─────────────────────────────
   useEffect(() => {
+    if (partnerLoading) return;
+
     if (!user) return;
 
     let isMounted = true;
 
     async function loadPartnerInfo() {
       if (!user) return;
-      if (!hasPartner) {
+      if (!hasPartner || !cKey || !pId) {
         if (isMounted) setPartnerSessionStatus("none");
         return;
       }
 
       try {
-        const pId = await getPartnerId(user.id);
-        if (!pId || !isMounted) return;
-
-        const cKey = buildCoupleKey(user.id, pId);
-        setCoupleKey(cKey);
-
-        const { data: pProfile } = await supabase
-          .from("profiles")
-          .select("full_name")
-          .eq("id", pId)
-          .maybeSingle();
-
-        if (pProfile?.full_name && isMounted) {
-          setPartnerName(pProfile.full_name.trim());
-        }
-
         // Check if an in-progress or finished session already exists
         const { data: latest } = await supabase
           .from("flag_sessions")
@@ -177,7 +168,7 @@ export function useRedGreenFlag(): UseRedGreenFlagReturn {
     return () => {
       isMounted = false;
     };
-  }, [user, hasPartner]);
+  }, [user, hasPartner, cKey, pId, partnerLoading]);
 
   // ── Realtime listener when on waiting screen ───────────────────────────────
   const checkPartnerStatusLive = useCallback(async () => {

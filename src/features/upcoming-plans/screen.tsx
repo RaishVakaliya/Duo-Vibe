@@ -4,13 +4,13 @@ import {
   Text,
   ScrollView,
   Pressable,
-  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import { COLORS } from "@/src/constants/colors";
-import { ROUTES } from "@/src/constants/routes";
+import { ScreenHeader } from "@/src/components/ui/screen-header";
+import { LinkPartnerPrompt } from "@/src/components/ui/link-partner-prompt";
+import { ScreenState } from "@/src/components/ui/screen-state";
 import { HeroPlanCard } from "./components/hero-plan-card";
 import { PlanRowCard } from "./components/plan-row-card";
 import { AddPlanBottomSheet } from "./components/add-plan-bottom-sheet";
@@ -18,7 +18,6 @@ import { useUpcomingPlans } from "./use-upcoming-plans";
 import { styles } from "./styles";
 
 export default function UpcomingPlansScreen() {
-  const router = useRouter();
   const {
     loading,
     hasPartner,
@@ -44,82 +43,38 @@ export default function UpcomingPlansScreen() {
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
         {/* Header */}
-        <View style={styles.headerRow}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => router.back()}
-            hitSlop={10}
-          >
-            <Ionicons name="arrow-back" size={20} color={COLORS.white} />
-          </Pressable>
-
-          <View style={styles.headerTitles}>
-            <Text style={styles.headerTitle}>Upcoming Plans</Text>
-            <Text style={styles.headerSubtitle}>
-              Special moments on your calendar
-            </Text>
-          </View>
-
-          {hasPartner && (
-            <Pressable
-              style={styles.addButton}
-              onPress={() => setAddSheetVisible(true)}
-              hitSlop={10}
-            >
-              <Ionicons name="add" size={24} color={COLORS.white} />
-            </Pressable>
-          )}
-        </View>
+        <ScreenHeader
+          title="Upcoming Plans"
+          subtitle="Special moments on your calendar"
+          backIcon="arrow-back"
+          rightElement={
+            hasPartner ? (
+              <Pressable
+                style={styles.addButton}
+                onPress={() => setAddSheetVisible(true)}
+                hitSlop={10}
+              >
+                <Ionicons name="add" size={24} color={COLORS.white} />
+              </Pressable>
+            ) : undefined
+          }
+        />
 
         {loading ? (
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <ActivityIndicator size="large" color={COLORS.primary} />
-          </View>
+          <ScreenState variant="loading" />
         ) : !hasPartner ? (
-          <View style={styles.emptyContainer}>
-            <View style={styles.emptyIconContainer}>
-              <Ionicons name="people-outline" size={32} color={COLORS.primary} />
-            </View>
-            <Text style={styles.emptyTitle}>Link your partner</Text>
-            <Text style={styles.emptySubtitle}>
-              Connect with your partner to plan dates, trips, and romantic
-              adventures together.
-            </Text>
-            <Pressable
-              style={styles.emptyCta}
-              onPress={() => router.push(ROUTES.INVITE_PARTNER)}
-            >
-              <Ionicons name="heart" size={16} color={COLORS.white} />
-              <Text style={styles.emptyCtaText}>Link Partner Now</Text>
-            </Pressable>
-          </View>
+          <LinkPartnerPrompt
+            description="Connect with your partner to plan dates, trips, and romantic adventures together."
+          />
         ) : !hasAnyPlans ? (
-          <View style={styles.emptyContainer}>
-            <View style={styles.emptyIconContainer}>
-              <Ionicons
-                name="calendar-clear-outline"
-                size={34}
-                color={COLORS.primary}
-              />
-            </View>
-            <Text style={styles.emptyTitle}>No plans scheduled yet</Text>
-            <Text style={styles.emptySubtitle}>
-              Plan your next movie night, romantic dinner, or weekend getaway!
-            </Text>
-            <Pressable
-              style={styles.emptyCta}
-              onPress={() => setAddSheetVisible(true)}
-            >
-              <Ionicons name="add-circle" size={18} color={COLORS.white} />
-              <Text style={styles.emptyCtaText}>Plan Something Special</Text>
-            </Pressable>
-          </View>
+          <ScreenState
+            variant="empty"
+            icon="calendar-clear-outline"
+            title="No plans scheduled yet"
+            message="Plan your next movie night, romantic dinner, or weekend getaway!"
+            actionLabel="Plan Something Special"
+            onAction={() => setAddSheetVisible(true)}
+          />
         ) : (
           <ScrollView
             contentContainerStyle={styles.scrollContent}
