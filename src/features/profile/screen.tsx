@@ -1,13 +1,12 @@
-import React from "react";
 import {
   View,
   Text,
-  Image,
   ScrollView,
   Pressable,
   Switch,
   ActivityIndicator,
 } from "react-native";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
@@ -54,7 +53,10 @@ export default function ProfileScreen() {
         <Image
           source={{ uri: avatarUrl }}
           style={styles.avatarImage}
-          resizeMode="cover"
+          contentFit="cover"
+          cachePolicy="memory-disk"
+          transition={150}
+          placeholder="rgba(255, 255, 255, 0.1)"
         />
       );
     }

@@ -50,10 +50,11 @@ export default function WelcomeScreen() {
       <StatusBar style="light" />
 
       <Image
-        source={require("@/assets/images/welcome_bg.png")}
+        source={require("@/assets/images/welcome_bg.webp")}
         style={styles.backgroundImage}
         contentFit="cover"
-        cachePolicy="disk"
+        cachePolicy="memory-disk"
+        transition={150}
       />
 
       <LinearGradient

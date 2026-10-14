@@ -191,6 +191,8 @@ export function AddMemoryBottomSheet({
                     source={{ uri: photoUri }}
                     style={componentStyles.pickedPhoto}
                     contentFit="cover"
+                    cachePolicy="memory-disk"
+                    transition={150}
                   />
                   <View style={componentStyles.changePhotoButton}>
                     <Ionicons name="camera" size={14} color="#FFFFFF" />

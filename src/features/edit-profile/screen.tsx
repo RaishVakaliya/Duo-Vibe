@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  Image,
   ScrollView,
   Pressable,
   TextInput,
   ActivityIndicator,
   Platform,
 } from "react-native";
+import { Image } from "expo-image";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -22,10 +22,11 @@ import { GRADIENTS } from "@/src/constants/colors";
 import { useAuth } from "@/src/context/auth-context";
 import { useAlert } from "@/src/components/ui/alert-dialog";
 import { getInitial } from "@/src/lib/profile";
+import { uploadAvatarImage } from "@/src/lib/profile/upload-avatar";
 
 export default function EditProfileScreen() {
   const router = useRouter();
-  const { userName, avatarUrl, updateProfile } = useAuth();
+  const { user, userName, avatarUrl, updateProfile } = useAuth();
   const { showAlert } = useAlert();
 
   const [name, setName] = useState<string>(userName ?? "");
@@ -81,9 +82,25 @@ export default function EditProfileScreen() {
 
     try {
       setIsSaving(true);
+      let finalAvatarUrl: string | undefined = undefined;
+
+      if (pickedImageUri && pickedImageUri !== avatarUrl) {
+        if (
+          pickedImageUri.startsWith("file:") ||
+          pickedImageUri.startsWith("content:") ||
+          pickedImageUri.startsWith("data:")
+        ) {
+          if (user?.id) {
+            finalAvatarUrl = await uploadAvatarImage(pickedImageUri, user.id);
+          }
+        } else {
+          finalAvatarUrl = pickedImageUri;
+        }
+      }
+
       await updateProfile({
         fullName: trimmedName,
-        avatarUrl: pickedImageUri ?? undefined,
+        avatarUrl: finalAvatarUrl ?? (pickedImageUri ? pickedImageUri : undefined),
       });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.back();
@@ -146,7 +163,10 @@ export default function EditProfileScreen() {
                     <Image
                       source={{ uri: pickedImageUri }}
                       style={styles.avatarImage}
-                      resizeMode="cover"
+                      contentFit="cover"
+                      cachePolicy="memory-disk"
+                      transition={150}
+                      placeholder="rgba(255, 255, 255, 0.1)"
                     />
                   ) : (
                     <Text style={styles.avatarLetter}>{getInitial(name)}</Text>

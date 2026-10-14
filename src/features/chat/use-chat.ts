@@ -19,8 +19,28 @@ import {
   saveChatTheme,
 } from "./chat-themes";
 import { clearAppBadge } from "@/src/lib/notifications";
+import { uploadChatImage } from "@/src/lib/chat/upload-chat-image";
+import {
+  getSignedUrlsBatch,
+  setCachedSignedUrl,
+} from "@/src/lib/memories/signed-url-cache";
 
 const PAGE_SIZE = 50;
+
+function extractImagePaths(messageList: ChatMessage[]): string[] {
+  return messageList
+    .map((m) => m.content.replace(/^\[image\]/, "").trim())
+    .filter(
+      (c) =>
+        Boolean(c) &&
+        !c.startsWith("data:") &&
+        !c.startsWith("file:") &&
+        !c.startsWith("content:") &&
+        !c.startsWith("http://") &&
+        !c.startsWith("https://") &&
+        c.includes("/"),
+    );
+}
 
 // Generate a temporary client-side id for optimistic messages
 function tempId(): string {
@@ -100,9 +120,21 @@ export function useChat(): UseChat {
       setHasMore(msgs.length === PAGE_SIZE);
       setLoadState("ready");
 
+      // Batch pre-warm signed URLs for any image messages
+      const imagePaths = extractImagePaths(msgs);
+      if (imagePaths.length > 0) {
+        getSignedUrlsBatch(imagePaths, "chat-images").catch(() => {});
+      }
+
       // Subscribe to realtime messages
       if (unsubscribeRef.current) unsubscribeRef.current();
       unsubscribeRef.current = subscribeToNewMessages(key, (incoming) => {
+        // Pre-warm signed URL if incoming is a storage image
+        const incomingPaths = extractImagePaths([incoming]);
+        if (incomingPaths.length > 0) {
+          getSignedUrlsBatch(incomingPaths, "chat-images").catch(() => {});
+        }
+
         setMessages((prev) => {
           if (prev.some((m) => m.id === incoming.id)) return prev;
           const optimisticIdx = prev.findIndex(
@@ -215,13 +247,20 @@ export function useChat(): UseChat {
       if (!user || !coupleKeyRef.current || isSending) return;
 
       const key = coupleKeyRef.current;
-      const content = uri.startsWith("[image]") ? uri : `[image]${uri}`;
+      const messageId = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+        /[xy]/g,
+        (c) => {
+          const r = (Math.random() * 16) | 0;
+          const v = c === "x" ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        },
+      );
 
       const optimisticMsg: ChatMessage = {
         id: tempId(),
         couple_key: key,
         sender_id: user.id,
-        content,
+        content: `[image]${uri}`,
         created_at: new Date().toISOString(),
         read_at: null,
         status: "sending",
@@ -231,7 +270,19 @@ export function useChat(): UseChat {
       setMessages((prev) => [optimisticMsg, ...prev]);
 
       try {
-        const myName = (user.user_metadata?.full_name as string | undefined) ?? undefined;
+        // Compress & upload image to private 'chat-images' bucket
+        const { storagePath, localUri } = await uploadChatImage(
+          uri,
+          key,
+          messageId,
+        );
+
+        // Store path in the message row: [image]{couple_key}/{message_id}.jpg
+        const content = `[image]${storagePath}`;
+        setCachedSignedUrl(storagePath, localUri, "chat-images");
+
+        const myName =
+          (user.user_metadata?.full_name as string | undefined) ?? undefined;
         const saved = await sendMessage(key, user.id, content, myName);
         setMessages((prev) =>
           prev.map((m) =>
@@ -296,6 +347,11 @@ export function useChat(): UseChat {
       );
       setMessages((prev) => [...prev, ...older]);
       setHasMore(older.length === PAGE_SIZE);
+
+      const olderImagePaths = extractImagePaths(older);
+      if (olderImagePaths.length > 0) {
+        getSignedUrlsBatch(olderImagePaths, "chat-images").catch(() => {});
+      }
     } catch (err) {
       console.warn("[useChat] loadMore error:", err);
     } finally {

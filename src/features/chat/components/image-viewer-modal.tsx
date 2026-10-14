@@ -4,15 +4,16 @@ import {
   Text,
   Modal,
   Pressable,
-  Image,
   Platform,
   StatusBar as RNStatusBar,
 } from "react-native";
+import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "../styles";
 import { ImageViewerModalProps } from "../types";
+import { useStorageImageUrl } from "@/src/hooks/use-storage-image-url";
 
 export function ImageViewerModal({
   isVisible,
@@ -20,6 +21,7 @@ export function ImageViewerModal({
   onClose,
 }: ImageViewerModalProps) {
   const insets = useSafeAreaInsets();
+  const resolvedUri = useStorageImageUrl(imageUri, "chat-images");
   if (!imageUri) return null;
 
   const topInset = Math.max(
@@ -59,9 +61,11 @@ export function ImageViewerModal({
         {/* Full Screen Image View */}
         <Pressable style={styles.imageViewerBody} onPress={onClose}>
           <Image
-            source={{ uri: imageUri }}
+            source={{ uri: resolvedUri || imageUri }}
             style={styles.imageViewerFullImage}
-            resizeMode="contain"
+            contentFit="contain"
+            cachePolicy="memory-disk"
+            transition={150}
           />
         </Pressable>
       </View>

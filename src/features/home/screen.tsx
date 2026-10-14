@@ -1,11 +1,10 @@
-import React from "react";
 import {
   View,
   Text,
-  Image,
   ScrollView,
   Pressable,
 } from "react-native";
+import { Image } from "expo-image";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -63,7 +62,9 @@ export default function HomeScreen() {
           <Image
             source={require("@/assets/images/icon-nobg.png")}
             style={styles.headerLogo}
-            resizeMode="contain"
+            contentFit="contain"
+            cachePolicy="memory-disk"
+            transition={150}
             accessibilityLabel="Duo Vibe Logo"
           />
         </View>

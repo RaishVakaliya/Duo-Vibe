@@ -1,9 +1,11 @@
 import React from "react";
-import { View, Text, Pressable, Image } from "react-native";
+import { View, Text, Pressable } from "react-native";
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "../styles";
 import { ChatBubbleProps } from "../types";
+import { useStorageImageUrl } from "@/src/hooks/use-storage-image-url";
 
 function formatMessageTime(isoString: string): string {
   try {
@@ -38,7 +40,8 @@ export function ChatBubble({
         message.content.endsWith(".png") ||
         message.content.includes("supabase.co/storage")));
 
-  const imageUrl = isImage ? message.content.replace(/^\[image\]/, "") : "";
+  const rawImagePath = isImage ? message.content.replace(/^\[image\]/, "") : "";
+  const displayImageUrl = useStorageImageUrl(rawImagePath, "chat-images");
 
   if (isMine) {
     return (
@@ -54,14 +57,17 @@ export function ChatBubble({
               {isImage ? (
                 <Pressable
                   style={styles.imageContainer}
-                  onPress={() => onOpenImage?.(imageUrl)}
+                  onPress={() => onOpenImage?.(displayImageUrl || rawImagePath)}
                   accessibilityRole="imagebutton"
                   accessibilityLabel="View full screen photo"
                 >
                   <Image
-                    source={{ uri: imageUrl }}
+                    source={{ uri: displayImageUrl || undefined }}
                     style={styles.bubbleImage}
-                    resizeMode="cover"
+                    contentFit="cover"
+                    cachePolicy="memory-disk"
+                    transition={150}
+                    placeholder="rgba(255, 255, 255, 0.08)"
                   />
                   <View style={styles.imageTimeBadgeMine}>
                     <Text style={styles.timeMineText} numberOfLines={1}>
@@ -140,14 +146,17 @@ export function ChatBubble({
           {isImage ? (
             <Pressable
               style={styles.imageContainer}
-              onPress={() => onOpenImage?.(imageUrl)}
+              onPress={() => onOpenImage?.(displayImageUrl || rawImagePath)}
               accessibilityRole="imagebutton"
               accessibilityLabel="View full screen photo"
             >
               <Image
-                source={{ uri: imageUrl }}
+                source={{ uri: displayImageUrl || undefined }}
                 style={styles.bubbleImage}
-                resizeMode="cover"
+                contentFit="cover"
+                cachePolicy="memory-disk"
+                transition={150}
+                placeholder="rgba(255, 255, 255, 0.08)"
               />
               <View style={styles.imageTimeBadgePartner}>
                 <Text style={styles.timePartnerText} numberOfLines={1}>

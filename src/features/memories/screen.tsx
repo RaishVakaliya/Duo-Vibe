@@ -201,10 +201,11 @@ export default function MemoriesScreen() {
                 style={[styles.previewCard, styles.previewLeft]}
               >
                 <Image
-                  source={require("@/assets/images/memory_beach.jpg")}
+                  source={require("@/assets/images/memory_beach.webp")}
                   style={styles.previewImage}
                   contentFit="cover"
                   cachePolicy="memory-disk"
+                  transition={150}
                 />
               </MotiView>
 
@@ -224,10 +225,11 @@ export default function MemoriesScreen() {
                 style={[styles.previewCard, styles.previewRight]}
               >
                 <Image
-                  source={require("@/assets/images/memory_stargazing.jpg")}
+                  source={require("@/assets/images/memory_stargazing.webp")}
                   style={styles.previewImage}
                   contentFit="cover"
                   cachePolicy="memory-disk"
+                  transition={150}
                 />
               </MotiView>
 
@@ -247,10 +249,11 @@ export default function MemoriesScreen() {
                 style={[styles.previewCard, styles.previewCenter]}
               >
                 <Image
-                  source={require("@/assets/images/memory_cafe.jpg")}
+                  source={require("@/assets/images/memory_cafe.webp")}
                   style={styles.previewImage}
                   contentFit="cover"
                   cachePolicy="memory-disk"
+                  transition={150}
                 />
               </MotiView>
             </View>

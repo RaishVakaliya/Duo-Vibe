@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, Image, Pressable, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, ActivityIndicator } from "react-native";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
@@ -97,9 +98,11 @@ export default function AuthScreen() {
             style={authStyles.illustrationContainer}
           >
             <Image
-              source={require("@/assets/images/heart_in_cloud.png")}
+              source={require("@/assets/images/heart_in_cloud.webp")}
               style={authStyles.illustration}
-              resizeMode="contain"
+              contentFit="contain"
+              cachePolicy="memory-disk"
+              transition={150}
             />
           </MotiView>
         </View>

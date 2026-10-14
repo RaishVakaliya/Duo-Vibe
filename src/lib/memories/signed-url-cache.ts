@@ -5,14 +5,20 @@ interface CachedUrl {
   expiresAt: number;
 }
 
-const memoryUrlCache = new Map<string, CachedUrl>();
+const urlCache = new Map<string, CachedUrl>();
+
+function getCacheKey(bucket: string, path: string): string {
+  return `${bucket}:${path}`;
+}
 
 /**
- * Batch resolve signed URLs for an array of storage paths.
+ * Batch resolve signed URLs for an array of storage paths in any private bucket.
  * Cached in memory with 1-hour expiry (with 5-minute safety margin).
+ * Defaults to 'memories' bucket for backward compatibility.
  */
 export async function getSignedUrlsBatch(
   paths: string[],
+  bucket: string = "memories",
 ): Promise<Map<string, string>> {
   const result = new Map<string, string>();
   const now = Date.now();
@@ -20,7 +26,8 @@ export async function getSignedUrlsBatch(
 
   for (const path of paths) {
     if (!path) continue;
-    const cached = memoryUrlCache.get(path);
+    const key = getCacheKey(bucket, path);
+    const cached = urlCache.get(key);
     if (cached && cached.expiresAt > now + 5 * 60 * 1000) {
       result.set(path, cached.url);
     } else {
@@ -37,13 +44,14 @@ export async function getSignedUrlsBatch(
 
   try {
     const { data, error } = await supabase.storage
-      .from("memories")
+      .from(bucket)
       .createSignedUrls(uniqueToFetch, 3600);
 
     if (!error && data) {
       for (const item of data) {
         if (item.path && item.signedUrl && !item.error) {
-          memoryUrlCache.set(item.path, {
+          const key = getCacheKey(bucket, item.path);
+          urlCache.set(key, {
             url: item.signedUrl,
             expiresAt: now + 3500 * 1000,
           });
@@ -52,26 +60,36 @@ export async function getSignedUrlsBatch(
       }
     }
   } catch (err) {
-    console.warn("[memories] Failed to batch create signed URLs:", err);
+    console.warn(`[storage:${bucket}] Failed to batch create signed URLs:`, err);
   }
 
   return result;
 }
 
 /** Get signed URL for single path from in-memory cache if valid */
-export function getCachedSignedUrl(path: string | null): string | null {
+export function getCachedSignedUrl(
+  path: string | null,
+  bucket: string = "memories",
+): string | null {
   if (!path) return null;
-  const cached = memoryUrlCache.get(path);
+  const key = getCacheKey(bucket, path);
+  const cached = urlCache.get(key);
   if (cached && cached.expiresAt > Date.now()) {
     return cached.url;
   }
   return null;
 }
 
-/** Cache a freshly acquired signed URL manually */
-export function setCachedSignedUrl(path: string, url: string): void {
-  memoryUrlCache.set(path, {
+/** Cache a freshly acquired or local signed URL manually */
+export function setCachedSignedUrl(
+  path: string,
+  url: string,
+  bucket: string = "memories",
+): void {
+  const key = getCacheKey(bucket, path);
+  urlCache.set(key, {
     url,
     expiresAt: Date.now() + 3500 * 1000,
   });
 }
+

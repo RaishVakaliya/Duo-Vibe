@@ -35,10 +35,11 @@ export async function sendMessage(
           .maybeSingle();
 
         if (pProfile?.push_token) {
+          const pushBody = content.startsWith("[image]") ? "📷 Photo" : content;
           await sendExpoPushNotification({
             to: pProfile.push_token,
             title: senderName || "New Message 💕",
-            body: content,
+            body: pushBody,
             data: { route: "/chat", coupleKey },
           });
         }

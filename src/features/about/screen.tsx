@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, Image, ScrollView, Pressable } from "react-native";
+import { View, Text, ScrollView, Pressable } from "react-native";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
@@ -52,7 +53,9 @@ export default function AboutScreen() {
             <Image
               source={require("@/assets/images/icon-nobg.png")}
               style={styles.logo}
-              resizeMode="contain"
+              contentFit="contain"
+              cachePolicy="memory-disk"
+              transition={150}
             />
             <Text style={styles.title}>Duo Vibe</Text>
             <Text style={styles.tagline}>Better Connections, Bigger Smiles</Text>

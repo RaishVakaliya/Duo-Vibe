@@ -118,6 +118,8 @@ export function MemoryDetailModal({
                   style={componentStyles.detailImage}
                   contentFit="cover"
                   cachePolicy="memory-disk"
+                  transition={150}
+                  placeholder="rgba(255, 255, 255, 0.08)"
                 />
               </View>
             ) : memory.kind === "result" ? (
@@ -167,6 +169,9 @@ export function MemoryDetailModal({
                       source={{ uri: memory.creator.avatarUrl }}
                       style={componentStyles.detailCreatorAvatar}
                       contentFit="cover"
+                      cachePolicy="memory-disk"
+                      transition={150}
+                      placeholder="rgba(255, 255, 255, 0.1)"
                     />
                   ) : (
                     <View

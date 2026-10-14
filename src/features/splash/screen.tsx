@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useCallback } from "react";
-import { View, Text, Image, Dimensions } from "react-native";
+import { View, Text, Dimensions } from "react-native";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import Svg, { Path, Defs, LinearGradient, Stop, Line } from "react-native-svg";
@@ -176,7 +177,9 @@ export default function SplashScreen() {
           <Image
             source={require("@/assets/images/icon-nobg.png")}
             style={styles.logo}
-            resizeMode="contain"
+            contentFit="contain"
+            cachePolicy="memory-disk"
+            transition={150}
           />
         </MotiView>
 

@@ -76,6 +76,9 @@ export const MemoryCard = React.memo(function MemoryCard({
                   source={{ uri: memory.creator.avatarUrl }}
                   style={styles.creatorAvatar}
                   contentFit="cover"
+                  cachePolicy="memory-disk"
+                  transition={150}
+                  placeholder="rgba(255, 255, 255, 0.1)"
                 />
               ) : (
                 <View

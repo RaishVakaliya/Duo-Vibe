@@ -7,8 +7,8 @@ import {
   Pressable,
   ActivityIndicator,
   Platform,
-  Image,
 } from "react-native";
+import { Image } from "expo-image";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -95,19 +95,13 @@ export default function ChatScreen() {
 
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
-        quality: 0.7,
-        base64: true,
+        quality: 0.8,
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const asset = result.assets[0];
-        if (asset) {
-          const imageUri = asset.base64
-            ? `data:image/jpeg;base64,${asset.base64}`
-            : asset.uri;
-          if (imageUri) {
-            await handleSendImage(imageUri);
-          }
+        if (asset && asset.uri) {
+          await handleSendImage(asset.uri);
         }
       }
     } catch (err) {
@@ -201,7 +195,10 @@ export default function ChatScreen() {
                 <Image
                   source={{ uri: partnerAvatarUrl }}
                   style={styles.avatarImage}
-                  resizeMode="cover"
+                  contentFit="cover"
+                  cachePolicy="memory-disk"
+                  transition={150}
+                  placeholder="rgba(255, 255, 255, 0.1)"
                 />
               ) : (
                 <Text style={styles.avatarLetter}>{partnerInitial}</Text>
