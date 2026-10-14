@@ -23,7 +23,7 @@ export function subscribeToNewMessages(
   return createRealtimeChannel({
     channelName: `chat_messages_${coupleKey}`,
     changes: {
-      event: "*",
+      event: "INSERT",
       table: "chat_messages",
       filter: `couple_key=eq.${coupleKey}`,
       callback: (payload) => {

@@ -29,7 +29,7 @@ export async function fetchMemories({
   // 1. Fetch memories slice
   const { data: rows, error } = await supabase
     .from("memories")
-    .select("*")
+    .select("id, couple_key, created_by, kind, title, note, memory_date, image_path, payload, created_at")
     .eq("couple_key", coupleKey)
     .order("memory_date", { ascending: false })
     .order("created_at", { ascending: false })

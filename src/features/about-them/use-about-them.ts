@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth } from "@/src/context/auth-context";
-import { supabase } from "@/src/lib/supabase";
 import { getPartnerId } from "@/src/lib/quiz/pending-sessions";
+import { usePartnerProfile } from "@/src/lib/shared/profileCache";
 import { PARTNER_NOTE_FIELDS } from "@/src/data/partnerNoteFields";
 import {
   fetchPartnerNotes,
@@ -17,37 +17,18 @@ export function useAboutThem() {
   const [loading, setLoading] = useState<boolean>(true);
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const [savedKey, setSavedKey] = useState<string | null>(null);
-  const [partnerName, setPartnerName] = useState<string | null>(null);
+  const [partnerId, setPartnerId] = useState<string | null>(null);
+  const partnerProfile = usePartnerProfile(partnerId ?? undefined);
+  const partnerName = partnerProfile?.full_name ?? null;
   const [failedSave, setFailedSave] = useState<{
     key: string;
     value: unknown;
   } | null>(null);
 
-  // Fetch partner name
+  // Resolve partner id once on mount
   useEffect(() => {
-    let isMounted = true;
-    async function loadPartner() {
-      if (!user) return;
-      try {
-        const pId = await getPartnerId(user.id);
-        if (pId && isMounted) {
-          const { data } = await supabase
-            .from("profiles")
-            .select("full_name")
-            .eq("id", pId)
-            .maybeSingle();
-          if (data?.full_name && isMounted) {
-            setPartnerName(data.full_name);
-          }
-        }
-      } catch (e) {
-        console.warn("Could not load partner name:", e);
-      }
-    }
-    loadPartner();
-    return () => {
-      isMounted = false;
-    };
+    if (!user) return;
+    getPartnerId(user.id).then((pid) => setPartnerId(pid)).catch(() => {});
   }, [user]);
 
   // Fetch notes on mount

@@ -2,6 +2,13 @@
 
 import { ChatMessage } from "@/src/types";
 
+export interface PartnerProfile {
+  id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  updated_at: string | null;
+}
+
 export type ChatLoadState = "loading" | "error" | "no_partner" | "ready";
 
 export interface ChatTheme {
@@ -47,10 +54,8 @@ export interface UseChat {
   userId: string | undefined;
   loadState: ChatLoadState;
   messages: ChatMessage[];
-  partnerName: string | null;
-  partnerAvatarUrl: string | null;
+  partnerProfile: PartnerProfile | null;
   isPartnerOnline: boolean;
-  partnerLastSeen: string | null;
   draftText: string;
   isSending: boolean;
   isLoadingMore: boolean;
@@ -59,6 +64,7 @@ export interface UseChat {
   chatTheme: ChatTheme;
   isThemeModalOpen: boolean;
   fullScreenImageUri: string | null;
+  unreadChatCount: number;
   setFullScreenImageUri: (uri: string | null) => void;
   setIsThemeModalOpen: (open: boolean) => void;
   updateChatTheme: (newTheme: ChatTheme) => void;

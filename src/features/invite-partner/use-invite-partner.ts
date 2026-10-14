@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Share, BackHandler } from "react-native";
 import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 import * as Clipboard from "expo-clipboard";
@@ -24,16 +24,21 @@ export function useInvitePartner() {
     useCountdown(codeExpiresAt);
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const selfInitiatedConnectRef = useRef(false);
+  const didNavigateOnConnectRef = useRef(false);
 
-  // Instant real-time update: automatically transition to Home when partner connects
+  // Instant real-time update: waiting partner auto-navigates when linked
   useEffect(() => {
-    if (hasPartner) {
+    if (!hasPartner || didNavigateOnConnectRef.current) return;
+    didNavigateOnConnectRef.current = true;
+
+    if (!selfInitiatedConnectRef.current) {
       showAlert({
         title: "Connected! 💕",
         message: "Your partner just connected! Welcome to your shared space.",
       });
-      router.replace(ROUTES.HOME);
     }
+    router.replace(ROUTES.HOME);
   }, [hasPartner, router, showAlert]);
 
   useEffect(() => {
@@ -114,11 +119,14 @@ export function useInvitePartner() {
       return;
     }
     setIsConnecting(true);
+    selfInitiatedConnectRef.current = true;
     try {
       const result = await connectPartnerCode(partnerCode);
       if (result.success) {
+        didNavigateOnConnectRef.current = true;
         router.replace(ROUTES.HOME);
       } else {
+        selfInitiatedConnectRef.current = false;
         showAlert({
           title: "Connection Failed",
           message:
@@ -127,6 +135,7 @@ export function useInvitePartner() {
         });
       }
     } catch (err: unknown) {
+      selfInitiatedConnectRef.current = false;
       const msg =
         err instanceof Error ? err.message : "An unexpected error occurred.";
       showAlert({

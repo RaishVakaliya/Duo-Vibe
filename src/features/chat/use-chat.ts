@@ -2,6 +2,8 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { useFocusEffect } from "expo-router";
 import { useAuth } from "@/src/context/auth-context";
 import { getPartnerId } from "@/src/lib/quiz";
+import { usePartnerProfile } from "@/src/lib/shared/profileCache";
+import { useUnreadBadge } from "@/src/lib/shared/unreadBadge";
 import {
   buildCoupleKey,
   fetchMessages,
@@ -10,7 +12,6 @@ import {
   subscribeToNewMessages,
   subscribeToPartnerPresence,
 } from "@/src/lib/chat";
-import { supabase } from "@/src/lib/supabase";
 import { ChatMessage } from "@/src/types";
 import { UseChat, ChatLoadState, ChatTheme } from "./types";
 import {
@@ -52,11 +53,10 @@ export function useChat(): UseChat {
 
   const [loadState, setLoadState] = useState<ChatLoadState>("loading");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [partnerName, setPartnerName] = useState<string | null>(null);
-  const [partnerAvatarUrl, setPartnerAvatarUrl] = useState<string | null>(null);
-  const [isPartnerOnline, setIsPartnerOnline] = useState<boolean>(false);
-  const [partnerLastSeen, setPartnerLastSeen] = useState<string | null>(null);
+  const [partnerId, setPartnerId] = useState<string | null>(null);
   const [coupleKey, setCoupleKey] = useState<string | null>(null);
+  const partnerProfile = usePartnerProfile(partnerId ?? undefined);
+  const unreadChatCount = useUnreadBadge(coupleKey, user?.id ?? null);
   const [draftText, setDraftText] = useState<string>("");
   const [isSending, setIsSending] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
@@ -69,6 +69,7 @@ export function useChat(): UseChat {
   const unsubscribePresenceRef = useRef<(() => void) | null>(null);
   const partnerIdRef = useRef<string | null>(null);
   const coupleKeyRef = useRef<string | null>(null);
+  const lastMarkReadRef = useRef<number>(0);
 
   // ─── Load saved theme on mount ─────────────────────────────────────────
   useEffect(() => {
@@ -95,32 +96,20 @@ export function useChat(): UseChat {
         setLoadState("no_partner");
         return;
       }
-
+      setPartnerId(partnerId);
       partnerIdRef.current = partnerId;
       const key = buildCoupleKey(user.id, partnerId);
-      coupleKeyRef.current = key;
       setCoupleKey(key);
+      coupleKeyRef.current = key;
 
-      // Fetch partner profile name, avatar & last activity
-      const { data: pProfile } = await supabase
-        .from("profiles")
-        .select("full_name, avatar_url, updated_at")
-        .eq("id", partnerId)
-        .maybeSingle();
-
-      setPartnerName(pProfile?.full_name ?? null);
-      setPartnerAvatarUrl(pProfile?.avatar_url ?? null);
-      if (pProfile?.updated_at) {
-        setPartnerLastSeen(pProfile.updated_at);
-      }
-
+      setLoadState("loading");
       // Fetch initial messages
       const msgs = await fetchMessages(key, PAGE_SIZE);
       setMessages(msgs);
       setHasMore(msgs.length === PAGE_SIZE);
       setLoadState("ready");
 
-      // Batch pre-warm signed URLs for any image messages
+      // Pre-warm signed URLs
       const imagePaths = extractImagePaths(msgs);
       if (imagePaths.length > 0) {
         getSignedUrlsBatch(imagePaths, "chat-images").catch(() => {});
@@ -129,12 +118,10 @@ export function useChat(): UseChat {
       // Subscribe to realtime messages
       if (unsubscribeRef.current) unsubscribeRef.current();
       unsubscribeRef.current = subscribeToNewMessages(key, (incoming) => {
-        // Pre-warm signed URL if incoming is a storage image
         const incomingPaths = extractImagePaths([incoming]);
         if (incomingPaths.length > 0) {
           getSignedUrlsBatch(incomingPaths, "chat-images").catch(() => {});
         }
-
         setMessages((prev) => {
           if (prev.some((m) => m.id === incoming.id)) return prev;
           const optimisticIdx = prev.findIndex(
@@ -152,17 +139,14 @@ export function useChat(): UseChat {
         });
       });
 
-      // Subscribe to real-time presence (LIVE online / offline status)
+      // Subscribe to presence
       if (unsubscribePresenceRef.current) unsubscribePresenceRef.current();
       unsubscribePresenceRef.current = subscribeToPartnerPresence(
         key,
         user.id,
         partnerId,
         (isOnline, lastSeen) => {
-          setIsPartnerOnline(isOnline);
-          if (lastSeen) {
-            setPartnerLastSeen(lastSeen);
-          }
+          // No longer storing locally; UI can read from presence channel if needed
         },
       );
     } catch (err) {
@@ -190,11 +174,11 @@ export function useChat(): UseChat {
     useCallback(() => {
       const key = coupleKeyRef.current;
       const uid = user?.id;
-      if (key && uid) {
-        // Mark partner messages as read in the DB
-        markMessagesRead(key, uid).catch(() => { });
-        // Clear the OS badge counter
-        clearAppBadge().catch(() => { });
+      const now = Date.now();
+      if (key && uid && now - lastMarkReadRef.current > 60_000) {
+        lastMarkReadRef.current = now;
+        markMessagesRead(key, uid).catch(() => {});
+        clearAppBadge().catch(() => {});
       }
     }, [user?.id]),
   );
@@ -363,10 +347,8 @@ export function useChat(): UseChat {
     userId: user?.id,
     loadState,
     messages,
-    partnerName,
-    partnerAvatarUrl,
-    isPartnerOnline,
-    partnerLastSeen,
+    partnerProfile,
+    isPartnerOnline: false,
     draftText,
     isSending,
     isLoadingMore,
@@ -384,5 +366,6 @@ export function useChat(): UseChat {
     handleRetry: load,
     handleLoadMore,
     handleRetryMessage,
+    unreadChatCount,
   };
 }

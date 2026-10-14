@@ -1,5 +1,6 @@
 -- =====================================================================
 -- CHAT-IMAGES PRIVATE STORAGE BUCKET & AVATARS STORAGE BUCKET MIGRATION
+-- Idempotent: safe to re-run
 -- =====================================================================
 
 -- 1. Create 'chat-images' private storage bucket
@@ -11,9 +12,17 @@ values (
   10485760, -- 10MB
   array['image/jpeg', 'image/png', 'image/webp', 'image/jpg']
 )
-on conflict (id) do update set public = false;
+on conflict (id) do update set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
 
 -- 2. 'chat-images' RLS Policies (couple members only, folder = couple_key)
+drop policy if exists "Couple members can read chat images" on storage.objects;
+drop policy if exists "Couple members can insert chat images" on storage.objects;
+drop policy if exists "Uploader can update chat images" on storage.objects;
+drop policy if exists "Uploader can delete chat images" on storage.objects;
+
 create policy "Couple members can read chat images"
   on storage.objects for select
   to authenticated
@@ -55,9 +64,17 @@ values (
   5242880, -- 5MB
   array['image/jpeg', 'image/png', 'image/webp', 'image/jpg']
 )
-on conflict (id) do update set public = true;
+on conflict (id) do update set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
 
 -- 4. 'avatars' RLS Policies
+drop policy if exists "Public can read avatars" on storage.objects;
+drop policy if exists "Users can upload their own avatar" on storage.objects;
+drop policy if exists "Users can update their own avatar" on storage.objects;
+drop policy if exists "Users can delete their own avatar" on storage.objects;
+
 create policy "Public can read avatars"
   on storage.objects for select
   to authenticated, anon

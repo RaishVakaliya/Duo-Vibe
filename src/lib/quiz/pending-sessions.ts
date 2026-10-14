@@ -6,7 +6,7 @@ export async function getPendingReviewSessions(
 ): Promise<QuizSession[]> {
   const { data, error } = await supabase
     .from("quiz_sessions")
-    .select("*")
+    .select("id, answerer_id, reviewer_id, question_ids, status, score, created_at, completed_at")
     .eq("reviewer_id", userId)
     .eq("status", "awaiting_review")
     .order("created_at", { ascending: false });
@@ -60,7 +60,7 @@ export async function getActiveAnswererSession(
 ): Promise<QuizSession | null> {
   const { data, error } = await supabase
     .from("quiz_sessions")
-    .select("*")
+    .select("id, answerer_id, reviewer_id, question_ids, status, score, created_at, completed_at")
     .eq("answerer_id", userId)
     .eq("status", "awaiting_review")
     .order("created_at", { ascending: false })
@@ -88,7 +88,7 @@ export async function getSessionById(
 ): Promise<QuizSession | null> {
   const { data, error } = await supabase
     .from("quiz_sessions")
-    .select("*")
+    .select("id, answerer_id, reviewer_id, question_ids, status, score, created_at, completed_at")
     .eq("id", sessionId)
     .maybeSingle();
 

@@ -6,7 +6,8 @@ import Constants from "expo-constants";
 import { ROUTES } from "@/src/constants/routes";
 import { useAuth } from "@/src/context/auth-context";
 import { useAlert } from "@/src/components/ui/alert-dialog";
-import { supabase } from "@/src/lib/supabase";
+import { getPartnerId } from "@/src/lib/quiz";
+import { usePartnerProfile } from "@/src/lib/shared/profileCache";
 import { registerForPushNotificationsAsync } from "@/src/lib/notifications";
 import { TabItem } from "@/src/components/navigation/bottom-tab-bar";
 
@@ -28,7 +29,9 @@ export function useProfileData() {
     useState<boolean>(true);
   const [isActionLoading, setIsActionLoading] = useState<boolean>(false);
   const [actionLoadingMessage, setActionLoadingMessage] = useState<string>("");
-  const [partnerName, setPartnerName] = useState<string | null>(null);
+  const [partnerId, setPartnerId] = useState<string | null>(null);
+  const partnerProfile = usePartnerProfile(partnerId ?? undefined);
+  const partnerName = partnerProfile?.full_name ?? null;
 
   const appVersion = Constants?.expoConfig?.version ?? "1.0.0";
   const appBuildNumber =
@@ -36,46 +39,10 @@ export function useProfileData() {
     Constants?.expoConfig?.ios?.buildNumber ??
     "1";
 
-  // Fetch actual partner name if connected
+  // Resolve partner id once; profile is cached by usePartnerProfile
   useEffect(() => {
-    if (!user || !hasPartner) return;
-    const fetchPartnerProfile = async () => {
-      try {
-        const { data: myProfile } = await supabase
-          .from("profiles")
-          .select("partner_id")
-          .eq("id", user.id)
-          .maybeSingle();
-
-        let partnerId = myProfile?.partner_id;
-        if (!partnerId) {
-          const { data: couple } = await supabase
-            .from("couples")
-            .select("user1_id, user2_id")
-            .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
-            .eq("status", "connected")
-            .maybeSingle();
-          if (couple) {
-            partnerId =
-              couple.user1_id === user.id ? couple.user2_id : couple.user1_id;
-          }
-        }
-
-        if (partnerId) {
-          const { data: pProfile } = await supabase
-            .from("profiles")
-            .select("full_name")
-            .eq("id", partnerId)
-            .maybeSingle();
-          if (pProfile?.full_name) {
-            setPartnerName(pProfile.full_name);
-          }
-        }
-      } catch (err) {
-        console.warn("Failed to fetch partner info:", err);
-      }
-    };
-    fetchPartnerProfile();
+    if (!user || !hasPartner) { setPartnerId(null); return; }
+    getPartnerId(user.id).then((pid) => setPartnerId(pid)).catch(() => {});
   }, [user, hasPartner]);
 
   const handleToggleRelationship = async (

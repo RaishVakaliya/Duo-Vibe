@@ -41,8 +41,7 @@ export default function ChatScreen() {
     userId,
     loadState,
     messages,
-    partnerName,
-    partnerAvatarUrl,
+    partnerProfile,
     isPartnerOnline,
     draftText,
     isSending,
@@ -61,6 +60,9 @@ export default function ChatScreen() {
     handleLoadMore,
     handleRetryMessage,
   } = useChat();
+
+  const partnerName = partnerProfile?.full_name ?? null;
+  const partnerAvatarUrl = partnerProfile?.avatar_url ?? null;
 
   const inputRef = useRef<TextInput>(null);
 

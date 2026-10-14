@@ -157,7 +157,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!user) return;
 
-    // 1. Listen for real-time changes to the user's profile (including partner linking/unlinking)
+    const markPartnerConnected = (connected: boolean) => {
+      setHasPartnerState(connected);
+      AsyncStorage.setItem(
+        HAS_PARTNER_KEY,
+        connected ? "true" : "false",
+      ).catch(() => {});
+    };
+
+    // 1. Own profile changes (partner_id set/cleared on BOTH devices via connect_partner_code)
     const profileChannel = supabase
       .channel(`profile_realtime_${user.id}`)
       .on(
@@ -169,6 +177,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           filter: `id=eq.${user.id}`,
         },
         (payload) => {
+          if (payload.eventType === "DELETE") {
+            markPartnerConnected(false);
+            return;
+          }
           if (payload.new) {
             const row = payload.new as {
               partner_id?: string | null;
@@ -177,34 +189,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               avatar_url?: string | null;
             };
 
-            const partnerConnected = Boolean(row.partner_id);
-            setHasPartnerState(partnerConnected);
-            AsyncStorage.setItem(
-              HAS_PARTNER_KEY,
-              partnerConnected ? "true" : "false",
-            ).catch(() => { });
+            markPartnerConnected(Boolean(row.partner_id));
 
             if (row.relationship_type) {
               setRelationshipTypeState(row.relationship_type);
               AsyncStorage.setItem(
                 RELATIONSHIP_TYPE_KEY,
                 row.relationship_type,
-              ).catch(() => { });
+              ).catch(() => {});
             }
             if (row.full_name) {
               setUserNameState(row.full_name);
-              AsyncStorage.setItem(USER_NAME_KEY, row.full_name).catch(() => { });
+              AsyncStorage.setItem(USER_NAME_KEY, row.full_name).catch(() => {});
             }
             if (row.avatar_url) {
               setAvatarUrlState(row.avatar_url);
-              AsyncStorage.setItem(AVATAR_URL_KEY, row.avatar_url).catch(() => { });
+              AsyncStorage.setItem(AVATAR_URL_KEY, row.avatar_url).catch(() => {});
             }
           }
         },
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "CHANNEL_ERROR") {
+          console.warn("[realtime] profile channel error");
+        }
+      });
 
-    // 2. Listen for couple changes (INSERT or UPDATE) involving this user
+    // 2. Couples row INSERT/UPDATE — backup signal so both partners flip to Connected
     const couplesChannel = supabase
       .channel(`couples_realtime_${user.id}`)
       .on(
@@ -215,6 +226,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           table: "couples",
         },
         (payload) => {
+          if (payload.eventType === "DELETE" && payload.old) {
+            const old = payload.old as {
+              user1_id?: string;
+              user2_id?: string;
+            };
+            if (old.user1_id === user.id || old.user2_id === user.id) {
+              markPartnerConnected(false);
+            }
+            return;
+          }
+
           if (payload.new) {
             const row = payload.new as {
               user1_id?: string;
@@ -224,8 +246,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             };
             if (row.user1_id === user.id || row.user2_id === user.id) {
               if (row.status === "connected") {
-                setHasPartnerState(true);
-                AsyncStorage.setItem(HAS_PARTNER_KEY, "true").catch(() => { });
+                markPartnerConnected(true);
               }
               if (
                 row.relationship_type === "local" ||
@@ -235,19 +256,69 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 AsyncStorage.setItem(
                   RELATIONSHIP_TYPE_KEY,
                   row.relationship_type,
-                ).catch(() => { });
+                ).catch(() => {});
               }
             }
           }
         },
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "CHANNEL_ERROR") {
+          console.warn("[realtime] couples channel error");
+        }
+      });
 
     return () => {
-      supabase.removeChannel(profileChannel).catch(() => { });
-      supabase.removeChannel(couplesChannel).catch(() => { });
+      supabase.removeChannel(profileChannel).catch(() => {});
+      supabase.removeChannel(couplesChannel).catch(() => {});
     };
   }, [user]);
+
+  // Backup poll while partner is pending — keeps Home + Invite in sync if a realtime event is missed
+  useEffect(() => {
+    if (!user || hasPartner) return;
+
+    let cancelled = false;
+
+    const pollPartnerStatus = async () => {
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("partner_id")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (cancelled) return;
+
+        if (profile?.partner_id) {
+          setHasPartnerState(true);
+          AsyncStorage.setItem(HAS_PARTNER_KEY, "true").catch(() => {});
+          return;
+        }
+
+        const { data: couple } = await supabase
+          .from("couples")
+          .select("id")
+          .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
+          .eq("status", "connected")
+          .maybeSingle();
+
+        if (!cancelled && couple) {
+          setHasPartnerState(true);
+          AsyncStorage.setItem(HAS_PARTNER_KEY, "true").catch(() => {});
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    pollPartnerStatus();
+    const interval = setInterval(pollPartnerStatus, 4000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [user, hasPartner]);
 
   const setRelationshipType = async (type: RelationshipType): Promise<void> => {
     setRelationshipTypeState(type);
@@ -581,6 +652,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const nowIso = new Date().toISOString();
 
+      // Client fallback cannot update the other user's profile (RLS). Prefer RPC.
+      // Still link self + create couples row so this device connects; partner
+      // must have connect_partner_code migration for mutual realtime link.
       const { error: updateSelfErr } = await supabase
         .from("profiles")
         .update({ partner_id: partnerProfile.id, updated_at: nowIso })
@@ -588,6 +662,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (updateSelfErr) {
         console.error("Error updating user profile:", updateSelfErr);
+        return {
+          success: false,
+          message: "Could not link your profile. Please try again.",
+        };
       }
 
       const { error: updatePartnerErr } = await supabase
@@ -596,21 +674,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq("id", partnerProfile.id);
 
       if (updatePartnerErr) {
-        console.error("Error updating partner profile:", updatePartnerErr);
+        console.warn(
+          "Partner profile update blocked by RLS (expected without RPC):",
+          updatePartnerErr,
+        );
       }
 
-      try {
-        await supabase.from("couples").upsert({
-          user1_id: user.id,
-          user2_id: partnerProfile.id,
-          status: "connected",
-          connected_at: nowIso,
-        });
-      } catch (coupleErr) {
+      const { error: coupleErr } = await supabase.from("couples").upsert({
+        user1_id: user.id,
+        user2_id: partnerProfile.id,
+        status: "connected",
+        connected_at: nowIso,
+      });
+
+      if (coupleErr) {
         console.warn("Couples upsert note:", coupleErr);
       }
 
       await setHasPartner(true);
+
+      if (updatePartnerErr) {
+        return {
+          success: true,
+          message:
+            "Connected on your side. Ask your partner to open the app — if they stay on Partner Pending, run the partner-connect SQL migration on Supabase.",
+        };
+      }
+
       return {
         success: true,
         message: "Successfully connected with your partner! 💕",

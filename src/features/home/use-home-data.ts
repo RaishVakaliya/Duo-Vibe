@@ -1,10 +1,14 @@
 import { useState, useCallback, useMemo, useRef } from "react";
+
 import { BackHandler } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { ROUTES } from "@/src/constants/routes";
 import { useAuth } from "@/src/context/auth-context";
 import { getPendingReviewSessions, getPartnerId } from "@/src/lib/quiz";
-import { buildCoupleKey, getUnreadCount, subscribeToUnreadBadge } from "@/src/lib/chat";
+import { usePartnerProfile } from "@/src/lib/shared/profileCache";
+import { useUnreadBadge } from "@/src/lib/shared/unreadBadge";
+import { buildCoupleKey } from "@/src/lib/chat";
+
 import { QuizSession } from "@/src/types";
 import { TabItem } from "@/src/components/navigation/bottom-tab-bar";
 import { LoveToolItem } from "./types";
@@ -30,7 +34,10 @@ export function useHomeData() {
   const { user, hasPartner } = useAuth();
   const [activeTab, setActiveTab] = useState<number>(0);
   const [pendingReviews, setPendingReviews] = useState<QuizSession[]>([]);
-  const [unreadChatCount, setUnreadChatCount] = useState<number>(0);
+  const [partnerId, setPartnerId] = useState<string | null>(null);
+  const [coupleKey, setCoupleKey] = useState<string | null>(null);
+  const partnerProfile = usePartnerProfile(partnerId ?? undefined);
+  const unreadChatCount = useUnreadBadge(coupleKey, user?.id ?? null);
 
   const greetingData = useMemo(() => getGreetingData(), []);
   const unsubscribeChatBadgeRef = useRef<(() => void) | null>(null);
@@ -44,26 +51,13 @@ export function useHomeData() {
           .catch((err) => console.warn("Pending reviews note:", err));
 
         if (hasPartner) {
-          getPartnerId(user.id).then((partnerId) => {
-            if (!partnerId) return;
-            const coupleKey = buildCoupleKey(user.id, partnerId);
-            getUnreadCount(coupleKey, user.id)
-              .then(setUnreadChatCount)
-              .catch(() => { });
-
-            if (unsubscribeChatBadgeRef.current) {
-              unsubscribeChatBadgeRef.current();
-            }
-            unsubscribeChatBadgeRef.current = subscribeToUnreadBadge(
-              coupleKey,
-              () => {
-                getUnreadCount(coupleKey, user.id)
-                  .then(setUnreadChatCount)
-                  .catch(() => { });
-              },
-            );
-          });
-        }
+            getPartnerId(user.id).then((pid) => {
+              if (!pid) return;
+              setPartnerId(pid);
+              const key = buildCoupleKey(user.id, pid);
+              setCoupleKey(key);
+            });
+          }
       }
 
       const onBackPress = () => {
@@ -72,17 +66,13 @@ export function useHomeData() {
       };
 
       const subscription = BackHandler.addEventListener(
-        "hardwareBackPress",
-        onBackPress,
-      );
+          "hardwareBackPress",
+          onBackPress,
+        );
 
-      return () => {
-        subscription.remove();
-        if (unsubscribeChatBadgeRef.current) {
-          unsubscribeChatBadgeRef.current();
-          unsubscribeChatBadgeRef.current = null;
-        }
-      };
+        return () => {
+          subscription.remove();
+        };
     }, [user, hasPartner]),
   );
 
@@ -146,6 +136,7 @@ export function useHomeData() {
     pendingReviews,
     activeTab,
     unreadChatCount,
+    partnerProfile,
     handleTabPress,
     handleToolPress,
     handleReviewPress,
