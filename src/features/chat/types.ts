@@ -37,6 +37,16 @@ export interface ChatBubbleProps {
   onOpenImage?: (imageUrl: string) => void;
 }
 
+export interface ChatMessageRowProps {
+  message: ChatMessage;
+  isMine: boolean;
+  bubbleColors: readonly [string, string];
+  showDateChip: boolean;
+  dateLabel: string;
+  onRetry?: (messageId: string) => void;
+  onOpenImage?: (imageUrl: string) => void;
+}
+
 export interface ThemeModalProps {
   isVisible: boolean;
   currentTheme: ChatTheme;

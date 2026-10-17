@@ -19,14 +19,14 @@ import * as ImagePicker from "expo-image-picker";
 import * as Haptics from "expo-haptics";
 import { styles } from "./styles";
 import { GRADIENTS } from "@/src/constants/colors";
-import { useAuth } from "@/src/context/auth-context";
+import { useSessionAuth } from "@/src/context/auth-context";
 import { useAlert } from "@/src/components/ui/alert-dialog";
 import { getInitial } from "@/src/lib/profile";
 import { uploadAvatarImage } from "@/src/lib/profile/upload-avatar";
 
 export default function EditProfileScreen() {
   const router = useRouter();
-  const { user, userName, avatarUrl, updateProfile } = useAuth();
+  const { user, userName, avatarUrl, updateProfile } = useSessionAuth();
   const { showAlert } = useAlert();
 
   const [name, setName] = useState<string>(userName ?? "");

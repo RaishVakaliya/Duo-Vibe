@@ -131,3 +131,8 @@ create policy "Users can insert couples"
   on public.couples for insert
   to authenticated
   with check (auth.uid() = user1_id or auth.uid() = user2_id);
+
+-- Required for realtime filters (couple_key is not the PK) and DELETE old-row payloads
+alter table public.chat_messages replica identity full;
+alter table public.couples replica identity full;
+alter table public.profiles replica identity full;

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { useAuth } from "@/src/context/auth-context";
+import { InteractionManager } from "react-native";
+import { useSessionAuth } from "@/src/context/auth-context";
 import { getPartnerId } from "@/src/lib/quiz/pending-sessions";
 import { usePartnerProfile } from "@/src/lib/shared/profileCache";
 import { PARTNER_NOTE_FIELDS } from "@/src/data/partnerNoteFields";
@@ -12,7 +13,7 @@ import {
 } from "@/src/lib/about-them";
 
 export function useAboutThem() {
-  const { user } = useAuth();
+  const { user } = useSessionAuth();
   const [notes, setNotes] = useState<Record<string, unknown>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [savingKey, setSavingKey] = useState<string | null>(null);
@@ -38,13 +39,22 @@ export function useAboutThem() {
     if (!error) {
       setNotes(data);
 
-      // Reschedule reminders on app launch if birthday or anniversary is set
-      if (data.birthday) {
-        scheduleAboutThemReminders("birthday", data.birthday as string, partnerName);
-      }
-      if (data.anniversary) {
-        scheduleAboutThemReminders("anniversary", data.anniversary as string, partnerName);
-      }
+      InteractionManager.runAfterInteractions(() => {
+        if (data.birthday) {
+          scheduleAboutThemReminders(
+            "birthday",
+            data.birthday as string,
+            partnerName,
+          );
+        }
+        if (data.anniversary) {
+          scheduleAboutThemReminders(
+            "anniversary",
+            data.anniversary as string,
+            partnerName,
+          );
+        }
+      });
     }
     setLoading(false);
   }, [partnerName]);

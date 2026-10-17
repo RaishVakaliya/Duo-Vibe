@@ -7,7 +7,7 @@ import {
   AuthPartnerConnectResult,
   RelationshipType,
 } from "@/src/types";
-import { AuthContext } from "./auth-context";
+import { SessionAuthContext, PartnerAuthContext } from "./auth-context";
 import {
   continueWithGoogle as continueWithGoogleLib,
   signOutGoogle,
@@ -56,33 +56,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initAuth = async (): Promise<void> => {
       try {
-        const storedPartner = await AsyncStorage.getItem(HAS_PARTNER_KEY);
-        if (storedPartner !== null) {
-          setHasPartnerState(storedPartner === "true");
-        }
-
-        const storedRelationship = await AsyncStorage.getItem(
-          RELATIONSHIP_TYPE_KEY,
-        );
-        if (
-          storedRelationship === "local" ||
-          storedRelationship === "long_distance"
-        ) {
-          setRelationshipTypeState(storedRelationship as RelationshipType);
-        }
-
-        const storedName = await AsyncStorage.getItem(USER_NAME_KEY);
-        if (storedName) {
-          setUserNameState(storedName);
-        }
-
-        const storedAvatar = await AsyncStorage.getItem(AVATAR_URL_KEY);
-        if (storedAvatar) {
-          setAvatarUrlState(storedAvatar);
-        }
-
-        const getSessionWithTimeout = async () => {
-          return Promise.race([
+        const getSessionWithTimeout = () =>
+          Promise.race([
             supabase.auth.getSession(),
             new Promise<{ data: { session: null }; error: null }>((resolve) =>
               setTimeout(
@@ -91,14 +66,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               ),
             ),
           ]);
-        };
 
-        const { data } = await getSessionWithTimeout();
-        if (data?.session) {
-          setSession(data.session);
-          setUser(data.session.user);
-          // Sync profile non-blockingly so app startup/splash never gets stuck
-          applyProfileSync(data.session.user).catch((syncErr) => {
+        const [
+          storedPartner,
+          storedRelationship,
+          storedName,
+          storedAvatar,
+          sessionResult,
+        ] = await Promise.all([
+          AsyncStorage.getItem(HAS_PARTNER_KEY),
+          AsyncStorage.getItem(RELATIONSHIP_TYPE_KEY),
+          AsyncStorage.getItem(USER_NAME_KEY),
+          AsyncStorage.getItem(AVATAR_URL_KEY),
+          getSessionWithTimeout(),
+        ]);
+
+        if (storedPartner !== null) {
+          setHasPartnerState(storedPartner === "true");
+        }
+        if (
+          storedRelationship === "local" ||
+          storedRelationship === "long_distance"
+        ) {
+          setRelationshipTypeState(storedRelationship as RelationshipType);
+        }
+        if (storedName) {
+          setUserNameState(storedName);
+        }
+        if (storedAvatar) {
+          setAvatarUrlState(storedAvatar);
+        }
+
+        if (sessionResult.data?.session) {
+          setSession(sessionResult.data.session);
+          supabase.realtime.setAuth(sessionResult.data.session.access_token);
+          setUser(sessionResult.data.session.user);
+          applyProfileSync(sessionResult.data.session.user).catch((syncErr) => {
             console.warn("Async profile sync error on init:", syncErr);
           });
         }
@@ -113,6 +116,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const unsubscribe = subscribeToAuthState((currentSession) => {
       setSession(currentSession);
+      if (currentSession?.access_token) {
+        supabase.realtime.setAuth(currentSession.access_token);
+      }
       const currentUser = currentSession?.user ?? null;
       setUser(currentUser);
       if (currentUser) {
@@ -712,49 +718,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const contextValue = useMemo(
+  const sessionValue = useMemo(
     () => ({
       user,
       session,
       isLoading,
+      continueWithGoogle,
+      signInWithGoogle,
+      signInWithEmail,
+      userName,
+      setUserName,
+      avatarUrl,
+      setAvatarUrl,
+      updateProfile,
+      signOut,
+      deleteAccount,
+    }),
+    // Functions close over latest render; value identity follows session/profile fields.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user, session, isLoading, userName, avatarUrl],
+  );
+
+  const partnerValue = useMemo(
+    () => ({
       hasPartner,
       relationshipType,
       inviteCode,
       codeExpiresInSeconds,
       codeExpiresAt,
       refreshInviteCode,
-      continueWithGoogle,
-      signInWithGoogle,
-      signInWithEmail,
-      signOut,
-      deleteAccount,
       setHasPartner,
       setRelationshipType,
-      userName,
-      setUserName,
-      avatarUrl,
-      setAvatarUrl,
-      updateProfile,
       connectPartnerCode,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      user,
-      session,
-      isLoading,
       hasPartner,
       relationshipType,
       inviteCode,
       codeExpiresInSeconds,
       codeExpiresAt,
-      userName,
-      avatarUrl,
     ],
   );
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
+    <SessionAuthContext.Provider value={sessionValue}>
+      <PartnerAuthContext.Provider value={partnerValue}>
+        {children}
+      </PartnerAuthContext.Provider>
+    </SessionAuthContext.Provider>
   );
 }

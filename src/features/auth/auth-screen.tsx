@@ -10,13 +10,13 @@ import { MotiView } from "moti";
 import { authStyles } from "./auth-styles";
 import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
-import { useAuth } from "@/src/context/auth-context";
+import { useSessionAuth } from "@/src/context/auth-context";
 import { useAlert } from "@/src/components/ui/alert-dialog";
 import { GoogleIcon } from "@/src/components/ui/google-icon";
 
 export default function AuthScreen() {
   const router = useRouter();
-  const { continueWithGoogle, isLoading } = useAuth();
+  const { continueWithGoogle, isLoading } = useSessionAuth();
   const { showAlert } = useAlert();
 
   const handleContinueWithGoogle = async (): Promise<void> => {

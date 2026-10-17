@@ -81,6 +81,28 @@ export function useChat(): UseChat {
     saveChatTheme(newTheme);
   }, []);
 
+  const mergeIncoming = useCallback((incoming: ChatMessage) => {
+    const incomingPaths = extractImagePaths([incoming]);
+    if (incomingPaths.length > 0) {
+      getSignedUrlsBatch(incomingPaths, "chat-images").catch(() => {});
+    }
+    setMessages((prev) => {
+      if (prev.some((m) => m.id === incoming.id)) return prev;
+      const optimisticIdx = prev.findIndex(
+        (m) =>
+          m.id.startsWith("temp_") &&
+          m.sender_id === incoming.sender_id &&
+          m.content === incoming.content,
+      );
+      if (optimisticIdx !== -1) {
+        const next = [...prev];
+        next[optimisticIdx] = { ...incoming, status: "sent" };
+        return next;
+      }
+      return [incoming, ...prev];
+    });
+  }, []);
+
   // ─── Load initial data ────────────────────────────────────────────────
   const load = useCallback(async () => {
     if (!user) return;
@@ -117,27 +139,7 @@ export function useChat(): UseChat {
 
       // Subscribe to realtime messages
       if (unsubscribeRef.current) unsubscribeRef.current();
-      unsubscribeRef.current = subscribeToNewMessages(key, (incoming) => {
-        const incomingPaths = extractImagePaths([incoming]);
-        if (incomingPaths.length > 0) {
-          getSignedUrlsBatch(incomingPaths, "chat-images").catch(() => {});
-        }
-        setMessages((prev) => {
-          if (prev.some((m) => m.id === incoming.id)) return prev;
-          const optimisticIdx = prev.findIndex(
-            (m) =>
-              m.id.startsWith("temp_") &&
-              m.sender_id === incoming.sender_id &&
-              m.content === incoming.content,
-          );
-          if (optimisticIdx !== -1) {
-            const next = [...prev];
-            next[optimisticIdx] = { ...incoming, status: "sent" };
-            return next;
-          }
-          return [incoming, ...prev];
-        });
-      });
+      unsubscribeRef.current = subscribeToNewMessages(key, mergeIncoming);
 
       // Subscribe to presence
       if (unsubscribePresenceRef.current) unsubscribePresenceRef.current();
@@ -153,7 +155,7 @@ export function useChat(): UseChat {
       console.error("[useChat] load error:", err);
       setLoadState("error");
     }
-  }, [user, hasPartner]);
+  }, [user, hasPartner, mergeIncoming]);
 
   useEffect(() => {
     load();
@@ -169,10 +171,10 @@ export function useChat(): UseChat {
     };
   }, [load]);
 
-  // ─── Mark read + clear OS badge on focus ─────────────────────────────
+  // ─── Mark read + clear OS badge on focus; poll as realtime backup ─────
   useFocusEffect(
     useCallback(() => {
-      const key = coupleKeyRef.current;
+      const key = coupleKey ?? coupleKeyRef.current;
       const uid = user?.id;
       const now = Date.now();
       if (key && uid && now - lastMarkReadRef.current > 60_000) {
@@ -180,7 +182,21 @@ export function useChat(): UseChat {
         markMessagesRead(key, uid).catch(() => {});
         clearAppBadge().catch(() => {});
       }
-    }, [user?.id]),
+
+      if (!key) return undefined;
+
+      const pollLatest = () => {
+        fetchMessages(key, 20)
+          .then((latest) => {
+            latest.forEach((msg) => mergeIncoming(msg));
+          })
+          .catch(() => {});
+      };
+
+      pollLatest();
+      const interval = setInterval(pollLatest, 2500);
+      return () => clearInterval(interval);
+    }, [user?.id, coupleKey, mergeIncoming]),
   );
 
   // ─── Send message ─────────────────────────────────────────────────────

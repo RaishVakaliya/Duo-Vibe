@@ -2,6 +2,11 @@
 -- Fix: Enable realtime on chat_messages + ensure storage buckets exist
 -- =============================================================================
 
+-- 0. Replica identity FULL so postgres_changes filters on couple_key work
+alter table public.chat_messages replica identity full;
+alter table public.couples replica identity full;
+alter table public.profiles replica identity full;
+
 -- 1. Ensure chat_messages is in the realtime publication
 do $$
 begin

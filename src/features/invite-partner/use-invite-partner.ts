@@ -3,7 +3,7 @@ import { Share, BackHandler } from "react-native";
 import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 import * as Clipboard from "expo-clipboard";
 import { ROUTES } from "@/src/constants/routes";
-import { useAuth } from "@/src/context/auth-context";
+import { usePartnerAuth } from "@/src/context/auth-context";
 import { useAlert } from "@/src/components/ui/alert-dialog";
 import { useCountdown } from "@/src/hooks/use-countdown";
 
@@ -17,7 +17,7 @@ export function useInvitePartner() {
     codeExpiresAt,
     refreshInviteCode,
     connectPartnerCode,
-  } = useAuth();
+  } = usePartnerAuth();
   const { showAlert } = useAlert();
   const [partnerCode, setPartnerCode] = useState<string>("");
   const { timeLeft, reset, formatMinutesSeconds, isFinished } =

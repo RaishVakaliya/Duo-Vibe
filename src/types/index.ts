@@ -66,16 +66,10 @@ export interface AuthPartnerConnectResult {
   message?: string;
 }
 
-export interface AuthContextType {
+export interface SessionAuthContextType {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
-  hasPartner: boolean;
-  relationshipType: RelationshipType | null;
-  inviteCode: string;
-  codeExpiresInSeconds: number;
-  codeExpiresAt: number;
-  refreshInviteCode: () => Promise<string>;
   continueWithGoogle: () => Promise<AuthSignInResult>;
   signInWithGoogle: () => Promise<AuthSignInResult>;
   signInWithEmail: (
@@ -92,10 +86,21 @@ export interface AuthContextType {
   }) => Promise<void>;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<void>;
+}
+
+export interface PartnerAuthContextType {
+  hasPartner: boolean;
+  relationshipType: RelationshipType | null;
+  inviteCode: string;
+  codeExpiresInSeconds: number;
+  codeExpiresAt: number;
+  refreshInviteCode: () => Promise<string>;
   setHasPartner: (status: boolean) => Promise<void>;
   setRelationshipType: (type: RelationshipType) => Promise<void>;
   connectPartnerCode: (code: string) => Promise<AuthPartnerConnectResult>;
 }
+
+export type AuthContextType = SessionAuthContextType & PartnerAuthContextType;
 
 export interface InvitePartnerScreenParams {
   source?: string;

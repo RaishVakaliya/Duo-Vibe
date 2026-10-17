@@ -36,7 +36,7 @@ export default function RootLayout() {
     const timer = setTimeout(() => {
       setFontTimeout(true);
       SplashScreen.hideAsync().catch(() => { });
-    }, 2500);
+    }, 900);
     return () => clearTimeout(timer);
   }, []);
 

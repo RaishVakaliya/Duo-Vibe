@@ -1,8 +1,17 @@
+import { InteractionManager } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/src/lib/supabase";
 import { registerForPushNotificationsAsync } from "@/src/lib/notifications";
 import { RelationshipType } from "@/src/types";
+
+function schedulePushRegistration(userId: string): void {
+  InteractionManager.runAfterInteractions(() => {
+    registerForPushNotificationsAsync(userId).catch((pushErr) => {
+      console.warn("Auto push token registration note:", pushErr);
+    });
+  });
+}
 
 export const HAS_PARTNER_KEY = "@duo_has_partner";
 export const RELATIONSHIP_TYPE_KEY = "@duo_relationship_type";
@@ -74,9 +83,7 @@ export async function syncUserProfile(
         updated_at: nowIso,
       });
 
-      registerForPushNotificationsAsync(currentUser.id).catch((pushErr) => {
-        console.warn("Auto push token registration note:", pushErr);
-      });
+      schedulePushRegistration(currentUser.id);
 
       return {
         hasPartner: false,
@@ -173,9 +180,7 @@ export async function syncUserProfile(
       finalRemaining = INVITE_CODE_VALIDITY_SECONDS;
     }
 
-    registerForPushNotificationsAsync(currentUser.id).catch((pushErr) => {
-      console.warn("Auto push token registration note:", pushErr);
-    });
+    schedulePushRegistration(currentUser.id);
 
     return {
       hasPartner,
