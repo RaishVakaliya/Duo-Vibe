@@ -17,8 +17,11 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.08)",
     maxHeight: "90%",
-    paddingBottom: 28,
+    paddingBottom: 16,
     overflow: "hidden",
+  },
+  scrollView: {
+    flexShrink: 1,
   },
   handleBar: {
     width: 36,
@@ -65,6 +68,7 @@ export const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 16,
+    paddingBottom: 36,
   },
   plainContent: {
     paddingHorizontal: 20,

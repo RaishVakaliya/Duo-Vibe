@@ -6,8 +6,8 @@ import {
   Pressable,
   ScrollView,
   Platform,
-  KeyboardAvoidingView,
 } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/src/constants/colors";
 import { AppBottomSheetProps } from "./types";
@@ -37,9 +37,12 @@ export function AppBottomSheet({
 
   const body = scrollable ? (
     <ScrollView
+      style={styles.scrollView}
       contentContainerStyle={[styles.scrollContent, contentContainerStyle]}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
+      bounces={false}
+      automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
     >
       {children}
     </ScrollView>
@@ -91,8 +94,9 @@ export function AppBottomSheet({
     >
       {avoidKeyboard ? (
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.modalOverlay}
+          keyboardVerticalOffset={0}
         >
           <Pressable
             style={styles.backdropTouchable}

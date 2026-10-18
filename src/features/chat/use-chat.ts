@@ -10,6 +10,7 @@ import {
   fetchMessages,
   sendMessage,
   markMessagesRead,
+  broadcastMessagesRead,
   subscribeToNewMessages,
   subscribeToPartnerPresence,
 } from "@/src/lib/chat";
@@ -58,6 +59,7 @@ export function useChat(): UseChat {
   const [coupleKey, setCoupleKey] = useState<string | null>(null);
   const partnerProfile = usePartnerProfile(partnerId ?? undefined);
   const unreadChatCount = useUnreadBadge(coupleKey, user?.id ?? null);
+  const [isPartnerOnline, setIsPartnerOnline] = useState<boolean>(false);
   const [draftText, setDraftText] = useState<string>("");
   const [isSending, setIsSending] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
@@ -70,7 +72,6 @@ export function useChat(): UseChat {
   const unsubscribePresenceRef = useRef<(() => void) | null>(null);
   const partnerIdRef = useRef<string | null>(null);
   const coupleKeyRef = useRef<string | null>(null);
-  const lastMarkReadRef = useRef<number>(0);
 
   // ─── Load saved theme on mount ─────────────────────────────────────────
   useEffect(() => {
@@ -82,29 +83,57 @@ export function useChat(): UseChat {
     saveChatTheme(newTheme);
   }, []);
 
-  const mergeIncoming = useCallback((incoming: ChatMessage) => {
-    const incomingPaths = extractImagePaths([incoming]);
-    if (incomingPaths.length > 0) {
-      getSignedUrlsBatch(incomingPaths, "chat-images").catch(() => {});
-    }
-    setMessages((prev) => {
-      if (prev.some((m) => m.id === incoming.id)) return prev;
-      const optimisticIdx = prev.findIndex(
-        (m) =>
-          m.id.startsWith("temp_") &&
-          m.sender_id === incoming.sender_id &&
-          m.content === incoming.content,
-      );
-      if (optimisticIdx !== -1) {
-        const next = [...prev];
-        next[optimisticIdx] = { ...incoming, status: "sent" };
-        return next;
-      }
-      return [incoming, ...prev];
-    });
+  const handleMessageUpdated = useCallback((updated: ChatMessage) => {
+    setMessages((prev) =>
+      prev.map((m) => (m.id === updated.id ? { ...m, ...updated } : m)),
+    );
   }, []);
 
-  // ─── Load initial data ────────────────────────────────────────────────
+  const handleMessagesRead = useCallback((readerId: string, readAt: string) => {
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.sender_id !== readerId && !m.read_at
+          ? { ...m, read_at: readAt }
+          : m,
+      ),
+    );
+  }, []);
+
+  const mergeIncoming = useCallback(
+    (incoming: ChatMessage) => {
+      const incomingPaths = extractImagePaths([incoming]);
+      if (incomingPaths.length > 0) {
+        getSignedUrlsBatch(incomingPaths, "chat-images").catch(() => {});
+      }
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === incoming.id)) {
+          return prev.map((m) => (m.id === incoming.id ? { ...m, ...incoming } : m));
+        }
+        const optimisticIdx = prev.findIndex(
+          (m) =>
+            m.id.startsWith("temp_") &&
+            m.sender_id === incoming.sender_id &&
+            m.content === incoming.content,
+        );
+        if (optimisticIdx !== -1) {
+          const next = [...prev];
+          next[optimisticIdx] = { ...incoming, status: "sent" };
+          return next;
+        }
+        return [incoming, ...prev];
+      });
+
+      if (user && incoming.sender_id !== user.id) {
+        const key = coupleKeyRef.current;
+        if (key) {
+          markMessagesRead(key, user.id).catch(() => {});
+          broadcastMessagesRead(key, user.id);
+        }
+      }
+    },
+    [user],
+  );
+
   const load = useCallback(async () => {
     if (!user) return;
     if (!hasPartner) {
@@ -138,9 +167,19 @@ export function useChat(): UseChat {
         getSignedUrlsBatch(imagePaths, "chat-images").catch(() => {});
       }
 
-      // Subscribe to realtime messages
+      // Mark unread messages as read upon entering chat
+      markMessagesRead(key, user.id).catch(() => {});
+      broadcastMessagesRead(key, user.id);
+      clearAppBadge().catch(() => {});
+
+      // Subscribe to realtime messages (inserts, updates, and read receipts)
       if (unsubscribeRef.current) unsubscribeRef.current();
-      unsubscribeRef.current = subscribeToNewMessages(key, mergeIncoming);
+      unsubscribeRef.current = subscribeToNewMessages(
+        key,
+        mergeIncoming,
+        handleMessageUpdated,
+        handleMessagesRead,
+      );
 
       // Subscribe to presence
       if (unsubscribePresenceRef.current) unsubscribePresenceRef.current();
@@ -148,15 +187,15 @@ export function useChat(): UseChat {
         key,
         user.id,
         partnerId,
-        (isOnline, lastSeen) => {
-          // No longer storing locally; UI can read from presence channel if needed
+        (isOnline) => {
+          setIsPartnerOnline(isOnline);
         },
       );
     } catch (err) {
       console.error("[useChat] load error:", err);
       setLoadState("error");
     }
-  }, [user, hasPartner, mergeIncoming]);
+  }, [user, hasPartner, mergeIncoming, handleMessageUpdated, handleMessagesRead]);
 
   useEffect(() => {
     const task = InteractionManager.runAfterInteractions(() => {
@@ -180,10 +219,9 @@ export function useChat(): UseChat {
     useCallback(() => {
       const key = coupleKey ?? coupleKeyRef.current;
       const uid = user?.id;
-      const now = Date.now();
-      if (key && uid && now - lastMarkReadRef.current > 60_000) {
-        lastMarkReadRef.current = now;
+      if (key && uid) {
         markMessagesRead(key, uid).catch(() => {});
+        broadcastMessagesRead(key, uid);
         clearAppBadge().catch(() => {});
       }
 
@@ -368,7 +406,7 @@ export function useChat(): UseChat {
     loadState,
     messages,
     partnerProfile,
-    isPartnerOnline: false,
+    isPartnerOnline,
     draftText,
     isSending,
     isLoadingMore,
