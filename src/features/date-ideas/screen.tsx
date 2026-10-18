@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { View, Text, Pressable, Share } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -10,6 +10,7 @@ import { styles } from "./styles";
 import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
 import { DateCardItem } from "@/src/types";
+import { prefetchOnboardingMemoriesImages } from "@/src/lib/images/prefetch-onboarding";
 
 const DATE_CARDS: DateCardItem[] = [
   {
@@ -47,6 +48,10 @@ const DATE_CARDS: DateCardItem[] = [
 export default function DateIdeasScreen() {
   const router = useRouter();
   const [topIndex, setTopIndex] = useState<number>(0);
+
+  useEffect(() => {
+    prefetchOnboardingMemoriesImages();
+  }, []);
 
   useFocusEffect(
     useCallback(() => {

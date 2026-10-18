@@ -9,7 +9,6 @@ import { useAlert } from "@/src/components/ui/alert-dialog";
 import { getPartnerId } from "@/src/lib/quiz";
 import { usePartnerProfile } from "@/src/lib/shared/profileCache";
 import { registerForPushNotificationsAsync } from "@/src/lib/notifications";
-import { TabItem } from "@/src/components/navigation/bottom-tab-bar";
 
 export function useProfileData() {
   const router = useRouter();
@@ -164,25 +163,6 @@ export function useProfileData() {
     });
   };
 
-  const handleTabPress = (_index: number, item: TabItem): void => {
-    switch (item.id) {
-      case "home":
-        router.replace(ROUTES.HOME);
-        break;
-      case "connect":
-        router.replace(ROUTES.CONNECT);
-        break;
-      case "chat":
-        router.replace(ROUTES.CHAT);
-        break;
-      case "memories":
-        router.replace(ROUTES.MEMORIES);
-        break;
-      case "profile":
-        break;
-    }
-  };
-
   const isLongDistance = relationshipType === "long_distance";
 
   return {
@@ -204,6 +184,5 @@ export function useProfileData() {
     handleSupportEmail,
     handleSignOut,
     handleDeleteAccount,
-    handleTabPress,
   };
 }

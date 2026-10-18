@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { InteractionManager } from "react-native";
 import { useAuth } from "@/src/context/auth-context";
 import { getPartnerId } from "@/src/lib/quiz";
 import { buildCoupleKey } from "@/src/lib/challenge";
@@ -156,7 +157,7 @@ export function useMemoriesData(): UseMemoriesDataResult {
     unsubscribeRealtimeRef.current = unsub;
   }, [user, page]);
 
-  // ─── Mount / Dependency Trigger ───────────────────────────────────────────
+  // ─── First focus / mount: defer network until after transition ────────────
   useEffect(() => {
     let isCancelled = false;
 
@@ -165,14 +166,17 @@ export function useMemoriesData(): UseMemoriesDataResult {
       return;
     }
 
-    initCouple().then((cKey) => {
-      if (isCancelled || !cKey) return;
-      loadInitialMemories(cKey);
-      setupRealtime(cKey);
+    const task = InteractionManager.runAfterInteractions(() => {
+      initCouple().then((cKey) => {
+        if (isCancelled || !cKey) return;
+        loadInitialMemories(cKey);
+        setupRealtime(cKey);
+      });
     });
 
     return () => {
       isCancelled = true;
+      task.cancel();
       if (unsubscribeRealtimeRef.current) {
         unsubscribeRealtimeRef.current();
         unsubscribeRealtimeRef.current = null;

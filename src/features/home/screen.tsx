@@ -12,20 +12,18 @@ import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
 import { styles } from "./styles";
 import { GRADIENTS } from "@/src/constants/colors";
-import { BottomTabBar } from "@/src/components/navigation/bottom-tab-bar";
 import { useHomeData } from "./use-home-data";
 import { RedGreenFlagBanner } from "./components/red-green-flag-banner";
 import { LoveToolsGrid } from "./components/love-tools-grid";
 import { TodaysCard } from "./components/todays-card";
+import { useDeferredReady } from "@/src/hooks/use-deferred-ready";
 
 export default function HomeScreen() {
+  const contentReady = useDeferredReady();
   const {
     hasPartner,
     greetingData,
     pendingReviews,
-    activeTab,
-    unreadChatCount,
-    handleTabPress,
     handleToolPress,
     handleReviewPress,
     handleInvitePress,
@@ -74,9 +72,9 @@ export default function HomeScreen() {
           showsVerticalScrollIndicator={false}
         >
           <MotiView
-            from={{ opacity: 0, translateY: 10 }}
+            from={{ opacity: contentReady ? 0 : 1, translateY: contentReady ? 10 : 0 }}
             animate={{ opacity: 1, translateY: 0 }}
-            transition={{ type: "timing", duration: 400 }}
+            transition={{ type: "timing", duration: contentReady ? 280 : 0 }}
             style={styles.greetingSection}
           >
             <View style={styles.greetingTitleRow}>
@@ -88,11 +86,11 @@ export default function HomeScreen() {
             </Text>
           </MotiView>
 
-          {pendingReviews.length > 0 && (
+          {contentReady && pendingReviews.length > 0 && (
             <MotiView
-              from={{ opacity: 0, translateY: -8 }}
+              from={{ opacity: 0, translateY: 8 }}
               animate={{ opacity: 1, translateY: 0 }}
-              transition={{ type: "timing", duration: 350 }}
+              transition={{ type: "timing", duration: 280 }}
               style={styles.pendingReviewCard}
             >
               <View style={styles.pendingReviewLeft}>
@@ -120,17 +118,21 @@ export default function HomeScreen() {
             </MotiView>
           )}
 
+          {contentReady && (
+            <>
           <RedGreenFlagBanner onPress={handleRedGreenFlagPress} />
 
           <LoveToolsGrid onToolPress={handleToolPress} />
 
           <TodaysCard onPress={handleCardPress} />
+            </>
+          )}
 
-          {!hasPartner && (
+          {contentReady && !hasPartner && (
             <MotiView
-              from={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "timing", duration: 500, delay: 200 }}
+              from={{ opacity: 0, translateY: 8 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ type: "timing", duration: 280 }}
               style={styles.inviteBanner}
             >
               <View style={styles.inviteBannerTextContainer}>
@@ -152,12 +154,6 @@ export default function HomeScreen() {
             </MotiView>
           )}
         </ScrollView>
-
-        <BottomTabBar
-          activeTab={activeTab}
-          onTabPress={handleTabPress}
-          badges={{ chat: unreadChatCount }}
-        />
       </SafeAreaView>
     </View>
   );

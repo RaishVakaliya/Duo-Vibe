@@ -19,7 +19,7 @@ export function TodaysCard({
       <MotiView
         from={{ opacity: 0, translateY: 8 }}
         animate={{ opacity: 1, translateY: 0 }}
-        transition={{ type: "timing", duration: 400, delay: 350 }}
+        transition={{ type: "timing", duration: 280 }}
       >
         <Pressable
           style={styles.todaysCard}

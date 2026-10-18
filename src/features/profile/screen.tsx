@@ -16,9 +16,6 @@ import { MotiView } from "moti";
 import { styles } from "./styles";
 import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
-import {
-  BottomTabBar,
-} from "@/src/components/navigation/bottom-tab-bar";
 import { getInitial } from "@/src/lib/profile";
 import { useProfileData } from "./use-profile-data";
 import { ProfileMenuItem } from "./components/profile-menu-item";
@@ -44,7 +41,6 @@ export default function ProfileScreen() {
     handleSupportEmail,
     handleSignOut,
     handleDeleteAccount,
-    handleTabPress,
   } = useProfileData();
 
   const renderAvatarContent = () => {
@@ -270,8 +266,6 @@ export default function ProfileScreen() {
             </Text>
           </View>
         </ScrollView>
-
-        <BottomTabBar activeTab={4} onTabPress={handleTabPress} />
 
         {isActionLoading && (
           <View style={styles.loadingOverlay}>

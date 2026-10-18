@@ -24,6 +24,7 @@ import { useAlert } from "@/src/components/ui/alert-dialog";
 import { getPartnerId } from "@/src/lib/quiz";
 import { buildCoupleKey } from "@/src/lib/challenge";
 import { createResultMemory } from "@/src/lib/memories";
+import { useDeferredReady } from "@/src/hooks/use-deferred-ready";
 
 function HeartSvg({
   size = 88,
@@ -43,6 +44,7 @@ function HeartSvg({
 }
 
 export default function LoveMatchResultScreen() {
+  const contentReady = useDeferredReady();
   const router = useRouter();
   const { user } = useAuth();
   const { showAlert } = useAlert();
@@ -199,9 +201,9 @@ export default function LoveMatchResultScreen() {
           showsVerticalScrollIndicator={false}
         >
           <MotiView
-            from={{ opacity: 0, scale: 0.94 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "spring", damping: 16 }}
+            from={{ opacity: contentReady ? 0 : 1, translateY: contentReady ? 8 : 0 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: contentReady ? 280 : 0 }}
             style={styles.resultCard}
           >
             <View style={styles.scatterHeart1}>
@@ -219,9 +221,9 @@ export default function LoveMatchResultScreen() {
 
             <View style={styles.scoreCenterSection}>
               <MotiView
-                from={{ scale: 0.7, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", damping: 12, delay: 150 }}
+                from={{ opacity: contentReady ? 0 : 1, translateY: contentReady ? 8 : 0 }}
+                animate={{ opacity: 1, translateY: 0 }}
+                transition={{ type: "timing", duration: contentReady ? 280 : 0 }}
                 style={styles.heartScoreContainer}
               >
                 <HeartSvg size={92} color="#FF2D55" />
@@ -250,12 +252,12 @@ export default function LoveMatchResultScreen() {
                   </View>
                   <View style={styles.barTrack}>
                     <MotiView
-                      from={{ width: "0%" }}
+                      from={{ width: contentReady ? "0%" : `${bar.percentage}%` }}
                       animate={{ width: `${bar.percentage}%` }}
                       transition={{
                         type: "timing",
-                        duration: 800,
-                        delay: bar.delay,
+                        duration: contentReady ? 400 : 0,
+                        delay: contentReady ? Math.min(bar.delay, 120) : 0,
                       }}
                       style={[styles.barFill, { backgroundColor: bar.color }]}
                     />

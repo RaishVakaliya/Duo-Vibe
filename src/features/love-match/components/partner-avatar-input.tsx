@@ -18,9 +18,9 @@ export function PartnerAvatarInput({
 }: PartnerAvatarInputProps) {
   return (
     <MotiView
-      from={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ type: "spring", damping: 15, delay }}
+      from={{ opacity: 0, translateY: 8 }}
+      animate={{ opacity: 1, translateY: 0 }}
+      transition={{ type: "timing", duration: 280, delay: delay > 0 ? 80 : 0 }}
       style={styles.avatarCard}
     >
       <View style={styles.avatarIconCircle}>

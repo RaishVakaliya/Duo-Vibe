@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   Text,
@@ -22,7 +22,6 @@ import * as Haptics from "expo-haptics";
 import { useAuth } from "@/src/context/auth-context";
 import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
-import { BottomTabBar, TabItem } from "@/src/components/navigation/bottom-tab-bar";
 import { ScreenState } from "@/src/components/ui/screen-state";
 import { LinkPartnerPrompt } from "@/src/components/ui/link-partner-prompt";
 import { Memory } from "@/src/types";
@@ -33,6 +32,7 @@ import { ResultCard } from "./components/result-card";
 import { AnniversaryChip } from "./components/anniversary-chip";
 import { AddMemoryBottomSheet } from "./components/add-memory-bottom-sheet";
 import { MemoryDetailModal } from "./components/memory-detail-modal";
+import { useDeferredReady } from "@/src/hooks/use-deferred-ready";
 
 type TimelineItem =
   | { type: "header"; monthKey: string; id: string }
@@ -81,32 +81,11 @@ export default function MemoriesScreen() {
     handleMemoryCreated,
     retry,
   } = useMemoriesData();
-
-  // Bottom tab bar navigation handler
-  const handleTabPress = useCallback(
-    (_index: number, item: TabItem) => {
-      switch (item.id) {
-        case "home":
-          router.replace(ROUTES.HOME);
-          break;
-        case "connect":
-          router.replace(ROUTES.CONNECT);
-          break;
-        case "chat":
-          router.replace(ROUTES.CHAT);
-          break;
-        case "profile":
-          router.replace(ROUTES.PROFILE);
-          break;
-        case "memories":
-          break;
-      }
-    },
-    [router],
-  );
+  const contentReady = useDeferredReady();
 
   // Flatten grouped memories into flat timeline items with month headers
   const timelineItems = useMemo<TimelineItem[]>(() => {
+    if (!contentReady) return [];
     const items: TimelineItem[] = [];
     let globalIndex = 0;
 
@@ -129,7 +108,7 @@ export default function MemoriesScreen() {
     }
 
     return items;
-  }, [groupedMemories]);
+  }, [groupedMemories, contentReady]);
 
   // Handle anniversary date picker change
   const onAnniversaryPickerChange = (
@@ -306,8 +285,6 @@ export default function MemoriesScreen() {
             }
           />
         </SafeAreaView>
-
-        <BottomTabBar activeTab={3} onTabPress={handleTabPress} />
       </View>
     );
   }
@@ -412,6 +389,10 @@ export default function MemoriesScreen() {
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.5}
             showsVerticalScrollIndicator={false}
+            initialNumToRender={8}
+            maxToRenderPerBatch={6}
+            windowSize={7}
+            removeClippedSubviews
             ListFooterComponent={
               isLoadingMore ? (
                 <View style={styles.loadMoreContainer}>
@@ -442,9 +423,6 @@ export default function MemoriesScreen() {
           <Ionicons name="add" size={32} color="#FFFFFF" />
         </LinearGradient>
       </Pressable>
-
-      {/* Bottom Tab Bar */}
-      <BottomTabBar activeTab={3} onTabPress={handleTabPress} />
 
       {/* Add Memory Bottom Sheet */}
       <AddMemoryBottomSheet

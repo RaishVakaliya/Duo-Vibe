@@ -63,36 +63,38 @@ export default function RootLayout() {
                   screenOptions={{
                     headerShown: false,
                     animation: "slide_from_right",
+                    animationDuration: 250,
                     gestureEnabled: true,
                     contentStyle: { backgroundColor: COLORS.darkOverlay },
                   }}
                 >
-                  {/* Entry & Auth Welcome: Soft Crossfade */}
-                  <Stack.Screen name="index" options={{ animation: "fade" }} />
-                  <Stack.Screen name="welcome" options={{ animation: "fade" }} />
+                  <Stack.Screen
+                    name="index"
+                    options={{ animation: "fade", animationDuration: 250 }}
+                  />
+                  <Stack.Screen
+                    name="welcome"
+                    options={{ animation: "fade", animationDuration: 250 }}
+                  />
 
-                  {/* Discovery & Auth Flows */}
                   <Stack.Screen name="date-ideas" />
                   <Stack.Screen name="auth" />
                   <Stack.Screen name="invite-partner" />
 
-                  {/* Main Hubs: Clean crossfade */}
-                  <Stack.Screen name="home" options={{ animation: "fade" }} />
-                  <Stack.Screen name="connect" options={{ animation: "fade" }} />
-                  <Stack.Screen name="profile" options={{ animation: "fade" }} />
-                  <Stack.Screen name="chat" options={{ animation: "fade" }} />
-                  <Stack.Screen name="memories" options={{ animation: "fade" }} />
+                  <Stack.Screen
+                    name="(tabs)"
+                    options={{ animation: "fade", animationDuration: 250 }}
+                  />
 
-                  {/* Connect Hub Sub-screens */}
                   <Stack.Screen name="about-them" />
                   <Stack.Screen name="upcoming-plans" />
 
-                  {/* Modal-style Presentation Screens */}
                   <Stack.Screen
                     name="edit-profile"
                     options={{
                       presentation: "modal",
                       animation: "slide_from_bottom",
+                      animationDuration: 250,
                     }}
                   />
                   <Stack.Screen
@@ -100,15 +102,14 @@ export default function RootLayout() {
                     options={{
                       presentation: "modal",
                       animation: "slide_from_bottom",
+                      animationDuration: 250,
                     }}
                   />
 
-                  {/* Legal & Info Pages */}
                   <Stack.Screen name="about" />
                   <Stack.Screen name="terms" />
                   <Stack.Screen name="privacy" />
 
-                  {/* Feature Action Screens */}
                   <Stack.Screen name="love-match" />
                   <Stack.Screen name="crush-calculator" />
                   <Stack.Screen name="twenty-one-questions" />
@@ -118,24 +119,23 @@ export default function RootLayout() {
                   <Stack.Screen name="secret-crush" />
                   <Stack.Screen
                     name="secret-crush/[id]"
-                    options={{ animation: "fade_from_bottom" }}
+                    options={{ animation: "fade", animationDuration: 250 }}
                   />
                   <Stack.Screen name="couple-challenge" />
                   <Stack.Screen name="couple-challenge-all" />
                   <Stack.Screen name="red-green-flag" />
 
-                  {/* Reveal Result Screens: Fade Transition for Delightful Reveal Moment */}
                   <Stack.Screen
                     name="love-match-result"
-                    options={{ animation: "fade_from_bottom" }}
+                    options={{ animation: "fade", animationDuration: 250 }}
                   />
                   <Stack.Screen
                     name="crush-calculator-result"
-                    options={{ animation: "fade_from_bottom" }}
+                    options={{ animation: "fade", animationDuration: 250 }}
                   />
                   <Stack.Screen
                     name="couple-quiz-result"
-                    options={{ animation: "fade_from_bottom" }}
+                    options={{ animation: "fade", animationDuration: 250 }}
                   />
                 </Stack>
               </AlertProvider>

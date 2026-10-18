@@ -2,31 +2,29 @@ import React, { useEffect } from "react";
 import { View, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { useIsFocused } from "@react-navigation/native";
 import { ROUTES } from "@/src/constants/routes";
-import { BottomTabBar } from "@/src/components/navigation/bottom-tab-bar";
 import { ScreenHeader } from "@/src/components/ui/screen-header";
 import { ConnectGridCard } from "./components/connect-grid-card";
 import { AboutThemCard } from "./components/about-them-card";
 import { useConnectData } from "./use-connect-data";
+import { useDeferredReady } from "@/src/hooks/use-deferred-ready";
 import { styles } from "./styles";
 
 export default function ConnectHubScreen() {
   const router = useRouter();
-  const isFocused = useIsFocused();
+  const contentReady = useDeferredReady();
   const {
     hasPartner,
     filledNotesCount,
     totalNotesCount,
-    handleTabPress,
     reloadStats,
   } = useConnectData();
 
   useEffect(() => {
-    if (isFocused) {
+    if (contentReady) {
       reloadStats();
     }
-  }, [isFocused, reloadStats]);
+  }, [contentReady, reloadStats]);
 
   const handleUpcomingPress = () => {
     router.push(ROUTES.UPCOMING_PLANS);
@@ -56,6 +54,8 @@ export default function ConnectHubScreen() {
             style={{ paddingHorizontal: 0 }}
           />
 
+          {contentReady && (
+          <>
           {/* 2-Column Grid */}
           <View style={styles.gridRow}>
             <View style={styles.gridCardWrapper}>
@@ -103,10 +103,9 @@ export default function ConnectHubScreen() {
               onPress={handleAboutThemPress}
             />
           </View>
+          </>
+          )}
         </ScrollView>
-
-        {/* Tab Bar kept visible on hub */}
-        <BottomTabBar activeTab={1} onTabPress={handleTabPress} />
       </SafeAreaView>
     </View>
   );

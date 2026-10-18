@@ -9,10 +9,15 @@ import { styles } from "./styles";
 import { GRADIENTS, COLORS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
 import { useAuth, resolveInitialRoute } from "@/src/context/auth-context";
+import { prefetchOnboardingMemoriesImages } from "@/src/lib/images/prefetch-onboarding";
 
 export default function WelcomeScreen() {
   const router = useRouter();
   const { user, hasPartner, isLoading } = useAuth();
+
+  useEffect(() => {
+    prefetchOnboardingMemoriesImages();
+  }, []);
 
   useEffect(() => {
     if (!isLoading && user) {

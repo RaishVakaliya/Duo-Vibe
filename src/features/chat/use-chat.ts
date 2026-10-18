@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import { InteractionManager } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { useAuth } from "@/src/context/auth-context";
 import { getPartnerId } from "@/src/lib/quiz";
@@ -158,8 +159,11 @@ export function useChat(): UseChat {
   }, [user, hasPartner, mergeIncoming]);
 
   useEffect(() => {
-    load();
+    const task = InteractionManager.runAfterInteractions(() => {
+      load();
+    });
     return () => {
+      task.cancel();
       if (unsubscribeRef.current) {
         unsubscribeRef.current();
         unsubscribeRef.current = null;

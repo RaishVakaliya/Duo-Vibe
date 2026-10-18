@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { MotiView } from "moti";
 import { styles } from "../styles";
 import { LoveToolItem, LoveToolsGridProps } from "../types";
 import { ROUTES } from "@/src/constants/routes";
@@ -75,16 +74,9 @@ export function LoveToolsGrid({
       </View>
 
       <View style={styles.toolsGrid}>
-        {tools.map((tool, idx) => (
-          <MotiView
+        {tools.map((tool) => (
+          <View
             key={tool.id}
-            from={{ opacity: 0, translateY: 10 }}
-            animate={{ opacity: 1, translateY: 0 }}
-            transition={{
-              type: "timing",
-              duration: 350,
-              delay: 150 + idx * 40,
-            }}
             style={[
               styles.toolCard,
               {
@@ -115,7 +107,7 @@ export function LoveToolsGrid({
                 {tool.title}
               </Text>
             </Pressable>
-          </MotiView>
+          </View>
         ))}
       </View>
     </View>

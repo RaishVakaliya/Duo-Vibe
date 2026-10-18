@@ -1,16 +1,12 @@
-import { useState, useCallback, useMemo, useRef } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import { BackHandler } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { ROUTES } from "@/src/constants/routes";
 import { useAuth } from "@/src/context/auth-context";
-import { getPendingReviewSessions, getPartnerId } from "@/src/lib/quiz";
-import { usePartnerProfile } from "@/src/lib/shared/profileCache";
-import { useUnreadBadge } from "@/src/lib/shared/unreadBadge";
-import { buildCoupleKey } from "@/src/lib/chat";
+import { getPendingReviewSessions } from "@/src/lib/quiz";
 
 import { QuizSession } from "@/src/types";
-import { TabItem } from "@/src/components/navigation/bottom-tab-bar";
 import { LoveToolItem } from "./types";
 
 export function getGreetingData(date: Date = new Date()): {
@@ -32,32 +28,16 @@ export function getGreetingData(date: Date = new Date()): {
 export function useHomeData() {
   const router = useRouter();
   const { user, hasPartner } = useAuth();
-  const [activeTab, setActiveTab] = useState<number>(0);
   const [pendingReviews, setPendingReviews] = useState<QuizSession[]>([]);
-  const [partnerId, setPartnerId] = useState<string | null>(null);
-  const [coupleKey, setCoupleKey] = useState<string | null>(null);
-  const partnerProfile = usePartnerProfile(partnerId ?? undefined);
-  const unreadChatCount = useUnreadBadge(coupleKey, user?.id ?? null);
 
   const greetingData = useMemo(() => getGreetingData(), []);
-  const unsubscribeChatBadgeRef = useRef<(() => void) | null>(null);
 
   useFocusEffect(
     useCallback(() => {
-      setActiveTab(0);
       if (user) {
         getPendingReviewSessions(user.id)
           .then((sessions) => setPendingReviews(sessions))
           .catch((err) => console.warn("Pending reviews note:", err));
-
-        if (hasPartner) {
-            getPartnerId(user.id).then((pid) => {
-              if (!pid) return;
-              setPartnerId(pid);
-              const key = buildCoupleKey(user.id, pid);
-              setCoupleKey(key);
-            });
-          }
       }
 
       const onBackPress = () => {
@@ -73,30 +53,7 @@ export function useHomeData() {
         return () => {
           subscription.remove();
         };
-    }, [user, hasPartner]),
-  );
-
-  const handleTabPress = useCallback(
-    (index: number, item: TabItem): void => {
-      setActiveTab(index);
-      switch (item.id) {
-        case "home":
-          break;
-        case "connect":
-          router.push(ROUTES.CONNECT);
-          break;
-        case "chat":
-          router.push(ROUTES.CHAT);
-          break;
-        case "memories":
-          router.push(ROUTES.MEMORIES);
-          break;
-        case "profile":
-          router.push(ROUTES.PROFILE);
-          break;
-      }
-    },
-    [router],
+    }, [user]),
   );
 
   const handleToolPress = (tool: LoveToolItem): void => {
@@ -134,10 +91,6 @@ export function useHomeData() {
     hasPartner,
     greetingData,
     pendingReviews,
-    activeTab,
-    unreadChatCount,
-    partnerProfile,
-    handleTabPress,
     handleToolPress,
     handleReviewPress,
     handleInvitePress,

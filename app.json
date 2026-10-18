@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "duo-vibe",
-    "slug": "duo-vibe",
+    "slug": "duo-vibe-couples-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -22,6 +22,7 @@
     },
     "android": {
       "package": "com.duovibe.app",
+      "versionCode": 12,
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "backgroundColor": "#0D0B1A",
@@ -68,8 +69,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "e03ddfb4-b07e-49a0-9661-5fbf95d81273"
+        "projectId": "35005c62-545f-4feb-946a-fb99512ee21c"
       }
-    }
+    },
+    "owner": "raish_vakaliya"
   }
 }

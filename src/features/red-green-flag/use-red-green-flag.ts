@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { Share } from "react-native";
+import { InteractionManager, Share } from "react-native";
 import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { usePartnerGuard } from "@/src/hooks/use-partner-guard";
@@ -102,6 +102,10 @@ export function useRedGreenFlag(): UseRedGreenFlagReturn {
 
     let isMounted = true;
 
+    const task = InteractionManager.runAfterInteractions(() => {
+      loadPartnerInfo();
+    });
+
     async function loadPartnerInfo() {
       if (!user) return;
       if (!hasPartner || !cKey || !pId) {
@@ -163,10 +167,9 @@ export function useRedGreenFlag(): UseRedGreenFlagReturn {
       }
     }
 
-    loadPartnerInfo();
-
     return () => {
       isMounted = false;
+      task.cancel();
     };
   }, [user, hasPartner, cKey, pId, partnerLoading]);
 

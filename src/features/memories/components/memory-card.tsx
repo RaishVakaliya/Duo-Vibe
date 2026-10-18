@@ -43,7 +43,9 @@ export const MemoryCard = React.memo(function MemoryCard({
               style={styles.polaroidPhoto}
               contentFit="cover"
               cachePolicy="memory-disk"
-              transition={200}
+              transition={100}
+              recyclingKey={memory.id}
+              placeholder="rgba(255, 255, 255, 0.08)"
             />
           ) : (
             <View
