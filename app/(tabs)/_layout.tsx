@@ -24,3 +24,5 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
+export { RouteErrorBoundary as ErrorBoundary } from "@/src/components/error-boundary";

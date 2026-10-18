@@ -48,9 +48,15 @@ export const styles = StyleSheet.create({
     color: COLORS.primaryLight,
     fontFamily: "monospace",
   },
+  buttonRow: {
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 12,
+    width: "100%",
+  },
   retryButton: {
-    height: 52,
-    width: 200,
+    height: 50,
+    width: 220,
     borderRadius: RADIUS.buttonFooter,
     overflow: "hidden",
     shadowColor: COLORS.primary,
@@ -70,4 +76,20 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.white,
   },
+  homeButton: {
+    height: 48,
+    width: 220,
+    borderRadius: RADIUS.buttonFooter,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  homeButtonText: {
+    fontFamily: "Fredoka_600SemiBold",
+    fontSize: 15,
+    color: COLORS.white,
+  },
 });
+

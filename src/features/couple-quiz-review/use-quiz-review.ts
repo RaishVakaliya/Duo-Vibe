@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { BackHandler, Alert } from "react-native";
 import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { ROUTES } from "@/src/constants/routes";
+import { withTimeout } from "@/src/utils/async";
 import {
   getSessionForReview,
   submitReview,
@@ -12,13 +13,21 @@ import { GradedAnswerMap } from "./types";
 export function useQuizReview() {
   const router = useRouter();
   const params = useLocalSearchParams<{ sessionId?: string }>();
-  const sessionId = params.sessionId ?? "";
+  const sessionId = typeof params.sessionId === "string" ? params.sessionId.trim() : "";
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [sessionData, setSessionData] = useState<ReviewSessionData | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [grades, setGrades] = useState<GradedAnswerMap>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -36,12 +45,13 @@ export function useQuizReview() {
 
   const loadReviewData = useCallback(async () => {
     if (!sessionId) {
-      setIsLoading(false);
+      if (isMountedRef.current) setIsLoading(false);
       return;
     }
     try {
-      setIsLoading(true);
-      const data = await getSessionForReview(sessionId);
+      if (isMountedRef.current) setIsLoading(true);
+      const data = await withTimeout(getSessionForReview(sessionId), 15000);
+      if (!isMountedRef.current) return;
       setSessionData(data);
 
       const initialGrades: GradedAnswerMap = {};
@@ -52,14 +62,16 @@ export function useQuizReview() {
       });
       setGrades(initialGrades);
     } catch (err: unknown) {
+      if (!isMountedRef.current) return;
       const msg = err instanceof Error ? err.message : "Failed to load review.";
       Alert.alert("Error", msg, [
         { text: "OK", onPress: () => router.replace(ROUTES.HOME) },
       ]);
     } finally {
-      setIsLoading(false);
+      if (isMountedRef.current) setIsLoading(false);
     }
   }, [sessionId, router]);
+
 
   useEffect(() => {
     loadReviewData();

@@ -17,7 +17,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
 import { styles } from "./styles";
 import { GRADIENTS } from "@/src/constants/colors";
+import { ROUTES } from "@/src/constants/routes";
 import { useSecretCrushReveal } from "./use-secret-crush-reveal";
+
 import { EnvelopeIllustration } from "@/src/features/secret-crush/components/envelope-illustration";
 
 const MAX_REPLY_CHARS = 400;
@@ -105,10 +107,46 @@ export default function SecretCrushRevealScreen() {
         {mode === "not_found" && (
           <View style={styles.centeredContainer}>
             <Ionicons name="alert-circle-outline" size={60} color="#4A3048" />
-            <Text style={styles.centeredTitle}>Message Not Found</Text>
-            <Text style={styles.centeredSubtitle}>
+            <Text style={styles.centeredTitle} maxFontSizeMultiplier={1.2}>
+              Message Not Found
+            </Text>
+            <Text style={styles.centeredSubtitle} maxFontSizeMultiplier={1.2}>
               This link may be invalid or the message has been removed.
             </Text>
+            <Pressable
+              style={{
+                marginTop: 20,
+                height: 48,
+                width: 200,
+                borderRadius: 24,
+                overflow: "hidden",
+              }}
+              onPress={() => router.replace(ROUTES.HOME)}
+              accessibilityRole="button"
+              accessibilityLabel="Go to Duo Vibe"
+            >
+              <LinearGradient
+                colors={[...GRADIENTS.primary]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "Fredoka_700Bold",
+                    color: "#FFFFFF",
+                    fontSize: 15,
+                  }}
+                  maxFontSizeMultiplier={1.2}
+                >
+                  Go to Duo Vibe
+                </Text>
+              </LinearGradient>
+            </Pressable>
           </View>
         )}
 

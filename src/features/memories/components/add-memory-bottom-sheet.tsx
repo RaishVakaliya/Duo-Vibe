@@ -5,7 +5,6 @@ import {
   Pressable,
   TextInput,
   Platform,
-  Alert,
 } from "react-native";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,7 +17,9 @@ import { AppBottomSheet } from "@/src/components/ui/app-bottom-sheet";
 import { GradientButton } from "@/src/components/ui/gradient-button";
 import { GRADIENTS } from "@/src/constants/colors";
 import { createPhotoMemory } from "@/src/lib/memories";
+import { requestPhotoLibraryPermission } from "@/src/utils/permissions";
 import { AddMemoryBottomSheetProps } from "../types";
+
 import { componentStyles } from "./component-styles";
 
 export function AddMemoryBottomSheet({
@@ -56,16 +57,11 @@ export function AddMemoryBottomSheet({
 
   const handlePickPhoto = async () => {
     try {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Photo Permission Needed",
-          "Duo Vibe needs access to your gallery so you can choose photos for your shared couple memories.",
-          [{ text: "OK" }],
-        );
-        return;
-      }
+      const granted = await requestPhotoLibraryPermission(
+        "Duo Vibe needs access to your gallery so you can choose photos for your shared couple memories.",
+      );
+      if (!granted) return;
+
 
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],

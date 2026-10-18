@@ -67,7 +67,11 @@ export function GradientButton({
           <>
             <ActivityIndicator size="small" color={COLORS.white} />
             {loadingLabel ? (
-              <Text style={[styles.label, labelSizeStyle, labelStyle]}>
+              <Text
+                style={[styles.label, labelSizeStyle, labelStyle]}
+                numberOfLines={1}
+                maxFontSizeMultiplier={1.2}
+              >
                 {loadingLabel}
               </Text>
             ) : null}
@@ -75,12 +79,17 @@ export function GradientButton({
         ) : (
           <>
             {icon}
-            <Text style={[styles.label, labelSizeStyle, labelStyle]}>
+            <Text
+              style={[styles.label, labelSizeStyle, labelStyle]}
+              numberOfLines={1}
+              maxFontSizeMultiplier={1.2}
+            >
               {label}
             </Text>
             {rightIcon}
           </>
         )}
+
       </LinearGradient>
     </Pressable>
   );

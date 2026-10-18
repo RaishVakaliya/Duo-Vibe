@@ -1,6 +1,7 @@
-import { Platform } from "react-native";
+import { Platform, Linking, Alert } from "react-native";
 import Constants from "expo-constants";
 import { supabase } from "@/src/lib/supabase";
+import { withTimeout } from "@/src/utils/async";
 
 const EAS_PROJECT_ID = "e03ddfb4-b07e-49a0-9661-5fbf95d81273";
 
@@ -28,6 +29,47 @@ try {
   Notifications = null;
 }
 
+/**
+ * Checks and requests notification permissions.
+ * Handles denied and blocked states, offering an "Open Settings" action when blocked.
+ */
+export async function requestNotificationPermission(
+  promptIfBlocked = false,
+): Promise<boolean> {
+  if ((Platform.OS as string) === "web" || !Notifications) return false;
+
+  try {
+    const { status: existingStatus, canAskAgain } =
+      await Notifications.getPermissionsAsync();
+
+    if (existingStatus === "granted") return true;
+
+    if (!canAskAgain && (Platform.OS as string) !== "web") {
+
+      if (promptIfBlocked) {
+        Alert.alert(
+          "Notifications Blocked",
+          "Notification permissions are disabled in your system settings. Please enable them to stay connected with your partner in real time.",
+          [
+            { text: "Cancel", style: "cancel" },
+            {
+              text: "Open Settings",
+              onPress: () => Linking.openSettings().catch(() => {}),
+            },
+          ],
+        );
+      }
+      return false;
+    }
+
+    const { status } = await Notifications.requestPermissionsAsync();
+    return status === "granted";
+  } catch (err) {
+    console.warn("[notifications] Permission check error:", err);
+    return false;
+  }
+}
+
 export async function registerForPushNotificationsAsync(
   userId: string,
 ): Promise<string | null> {
@@ -36,7 +78,7 @@ export async function registerForPushNotificationsAsync(
   }
 
   try {
-    // 1. Android Notification Channel configuration
+    // 1. Android Notification Channel configuration (supports Android 8.0 - 14+)
     if (
       Platform.OS === "android" &&
       Notifications.setNotificationChannelAsync
@@ -46,34 +88,31 @@ export async function registerForPushNotificationsAsync(
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
         lightColor: "#FF2D6C",
-        sound: "notification",        // matches assets/sounds/notification.wav
+        sound: "notification", // matches assets/sounds/notification.wav
         showBadge: true,
       });
     }
 
     // 2. Permission check & request
-    const { status: existingStatus } =
-      await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-
-    if (existingStatus !== "granted") {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-
-    if (finalStatus !== "granted") {
+    const granted = await requestNotificationPermission(false);
+    if (!granted) {
       return null;
     }
 
-    // 3. Obtain Expo Push Token using EAS Project ID
+    // 3. Obtain Expo Push Token using EAS Project ID with a 15-second safety timeout
     const projectId =
       Constants?.expoConfig?.extra?.eas?.projectId ??
       Constants?.easConfig?.projectId ??
       EAS_PROJECT_ID;
 
-    const tokenData = await Notifications.getExpoPushTokenAsync({
+    const tokenPromise = Notifications.getExpoPushTokenAsync({
       projectId,
     });
+    const tokenData = await withTimeout(
+      tokenPromise,
+      15000,
+      "Push token request timed out",
+    );
     const token = tokenData.data;
 
     // 4. Save to Supabase profile
@@ -94,6 +133,7 @@ export async function registerForPushNotificationsAsync(
     return null;
   }
 }
+
 
 export interface SendPushNotificationParams {
   to: string;

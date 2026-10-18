@@ -15,6 +15,8 @@ import { GRADIENTS } from "@/src/constants/colors";
 import { useQuizReview } from "./use-quiz-review";
 import { ReviewProgressHeader } from "./components/review-progress-header";
 import { ReviewQuestionCard } from "./components/review-question-card";
+import { ScreenState } from "@/src/components/ui/screen-state";
+
 
 export default function CoupleQuizReviewScreen() {
   const {
@@ -52,6 +54,17 @@ export default function CoupleQuizReviewScreen() {
         {isLoading ? (
           <View style={styles.loadingWrap}>
             <ActivityIndicator size="large" color="#FF2D6C" />
+          </View>
+        ) : !currentAnswer ? (
+          <View style={{ flex: 1, justifyContent: "center", padding: 24 }}>
+            <ScreenState
+              variant="empty"
+              title="No Review Pending"
+              message="This quiz session could not be loaded or has already been reviewed."
+              actionLabel="Go Home"
+              onAction={handleBack}
+              theme="light"
+            />
           </View>
         ) : (
           <>

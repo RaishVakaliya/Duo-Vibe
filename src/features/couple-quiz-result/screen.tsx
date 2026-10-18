@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   View,
   Text,
@@ -13,8 +13,11 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { ScreenHeader } from "@/src/components/ui/screen-header";
+import { ScreenState } from "@/src/components/ui/screen-state";
+import { withTimeout } from "@/src/utils/async";
 import { styles } from "./styles";
 import { ROUTES } from "@/src/constants/routes";
+
 import { GRADIENTS } from "@/src/constants/colors";
 import {
   getSessionForReview,
@@ -56,21 +59,32 @@ export default function CoupleQuizResultScreen() {
     }, [router]),
   );
 
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   const loadData = useCallback(async () => {
-    if (!sessionId) {
-      setIsLoading(false);
+    const cleanId = typeof sessionId === "string" ? sessionId.trim() : "";
+    if (!cleanId) {
+      if (isMountedRef.current) setIsLoading(false);
       return;
     }
     try {
-      setIsLoading(true);
-      const data = await getSessionForReview(sessionId);
-      setSessionData(data);
+      if (isMountedRef.current) setIsLoading(true);
+      const data = await withTimeout(getSessionForReview(cleanId), 15000);
+      if (isMountedRef.current) setSessionData(data);
     } catch (err) {
       console.warn("Error loading result session:", err);
     } finally {
-      setIsLoading(false);
+      if (isMountedRef.current) setIsLoading(false);
     }
   }, [sessionId]);
+
 
   useEffect(() => {
     loadData();
@@ -175,14 +189,25 @@ export default function CoupleQuizResultScreen() {
           >
             <ActivityIndicator size="large" color="#FF2D6C" />
           </View>
+        ) : !sessionId || !sessionData ? (
+          <View style={{ flex: 1, justifyContent: "center", padding: 20 }}>
+            <ScreenState
+              variant="empty"
+              title="Quiz Session Not Found"
+              message="We couldn't find this quiz session. It may have expired or was removed."
+              actionLabel="Go to Home"
+              onAction={() => router.replace(ROUTES.HOME)}
+              theme="light"
+            />
+          </View>
         ) : !isCompleted ? (
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View style={styles.waitingCard}>
               <ActivityIndicator size="large" color="#FF2D6C" />
-              <Text style={styles.waitingTitle}>
+              <Text style={styles.waitingTitle} maxFontSizeMultiplier={1.2}>
                 Waiting for Partner Review 💕
               </Text>
-              <Text style={styles.waitingText}>
+              <Text style={styles.waitingText} maxFontSizeMultiplier={1.2}>
                 Your partner hasn&apos;t graded the quiz yet. This screen will
                 automatically update as soon as they finish!
               </Text>

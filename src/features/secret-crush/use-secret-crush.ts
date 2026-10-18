@@ -102,17 +102,21 @@ export function useSecretCrush(): UseSecretCrushReturn {
     );
     const url = `whatsapp://send?text=${text}`;
     try {
-      const supported = await Linking.canOpenURL(url);
+      const supported = await Linking.canOpenURL(url).catch(() => false);
       if (supported) {
-        await Linking.openURL(url);
+        try {
+          await Linking.openURL(url);
+        } catch {
+          await handleShareNative();
+        }
       } else {
-        // Fallback: native share
         await handleShareNative();
       }
     } catch {
       await handleShareNative();
     }
   }, [shareLink, handleShareNative]);
+
 
   // ─── Reset to compose fresh ───────────────────────────────────────────
   const handleReset = useCallback((): void => {

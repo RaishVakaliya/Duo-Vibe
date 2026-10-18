@@ -60,9 +60,12 @@ export function OutlinedButton({
               { color },
               labelStyle,
             ]}
+            numberOfLines={1}
+            maxFontSizeMultiplier={1.2}
           >
             {label}
           </Text>
+
         </>
       )}
     </Pressable>

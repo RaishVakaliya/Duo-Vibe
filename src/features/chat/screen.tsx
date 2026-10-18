@@ -23,19 +23,18 @@ import { ChatBubble } from "./components/chat-bubble";
 import { ThemeModal } from "./components/theme-modal";
 import { ImageViewerModal } from "./components/image-viewer-modal";
 import { getBgColors, getBubbleColors } from "./chat-themes";
+import { requestPhotoLibraryPermission } from "@/src/utils/permissions";
+
 import { ChatMessage } from "@/src/types";
-import { useAlert } from "@/src/components/ui/alert-dialog";
 import { ScreenState } from "@/src/components/ui/screen-state";
 import { LinkPartnerPrompt } from "@/src/components/ui/link-partner-prompt";
 
 import { isSameDay, formatDateChip } from "@/src/utils/date";
 
-// ─── Screen ────────────────────────────────────────────────────────────────────
 
 export default function ChatScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { showAlert } = useAlert();
 
   const {
     userId,
@@ -86,14 +85,11 @@ export default function ChatScreen() {
   // Launch gallery and send picked image directly
   const handleAttachImage = useCallback(async () => {
     try {
-      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!perm.granted) {
-        showAlert({
-          title: "Permission Required",
-          message: "Please allow photo library access to send images.",
-        });
-        return;
-      }
+      const granted = await requestPhotoLibraryPermission(
+        "Please allow photo library access to send images in chat.",
+      );
+      if (!granted) return;
+
 
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
@@ -109,7 +105,8 @@ export default function ChatScreen() {
     } catch (err) {
       console.warn("Failed to attach image:", err);
     }
-  }, [handleSendImage, showAlert]);
+  }, [handleSendImage]);
+
 
   // Inverted FlatList: message index + 1 is older than index
   const renderBubbleItem = useCallback(
@@ -169,7 +166,6 @@ export default function ChatScreen() {
     <View style={styles.container}>
       <StatusBar style="light" />
 
-      {/* Dynamic Wallpaper Background */}
       <LinearGradient
         colors={[...activeBgColors]}
         start={{ x: 0, y: 0 }}
@@ -178,7 +174,6 @@ export default function ChatScreen() {
       />
 
       <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
-        {/* ── WhatsApp Header ────────────────────────────────────── */}
         <View style={styles.headerContainer}>
           <View style={styles.headerLeft}>
             <Pressable
@@ -191,7 +186,6 @@ export default function ChatScreen() {
               <Ionicons name="arrow-back" size={24} color="#E9EDEF" />
             </Pressable>
 
-            {/* Profile Avatar */}
             <View style={styles.avatarContainer}>
               {partnerAvatarUrl ? (
                 <Image
@@ -207,7 +201,6 @@ export default function ChatScreen() {
               )}
             </View>
 
-            {/* Name + Live Online / Offline Status */}
             <View style={styles.headerTextWrap}>
               <Text style={styles.headerName} numberOfLines={1}>
                 {partnerName ?? "Partner"}
@@ -222,7 +215,6 @@ export default function ChatScreen() {
             </View>
           </View>
 
-          {/* Header Action Icons */}
           <View style={styles.headerRight}>
             <Pressable
               style={styles.headerActionBtn}
@@ -235,7 +227,6 @@ export default function ChatScreen() {
           </View>
         </View>
 
-        {/* ── Content States ──────────────────────────────────────── */}
         {loadState === "loading" && (
           <ScreenState variant="loading" />
         )}
@@ -262,7 +253,6 @@ export default function ChatScreen() {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             keyboardVerticalOffset={0}
           >
-            {/* ── Message List ─── */}
             {messages.length === 0 ? (
               <View style={styles.emptyContainer}>
                 <Text style={styles.emptyEmoji}>👋</Text>
@@ -291,7 +281,6 @@ export default function ChatScreen() {
               />
             )}
 
-            {/* ── WhatsApp Style Floating Input Bar ────────────────── */}
             <View
               style={[
                 styles.inputBarWrapper,
@@ -299,7 +288,6 @@ export default function ChatScreen() {
               ]}
             >
               <View style={styles.inputRow}>
-                {/* Rounded Pill Text Input */}
                 <View style={styles.inputPill}>
                   <TextInput
                     ref={inputRef}
@@ -315,7 +303,6 @@ export default function ChatScreen() {
                     accessibilityLabel="Message input"
                   />
 
-                  {/* Attach Image Button */}
                   <Pressable
                     style={styles.inputIconBtn}
                     onPress={handleAttachImage}
@@ -326,7 +313,6 @@ export default function ChatScreen() {
                   </Pressable>
                 </View>
 
-                {/* Circular Send Button (Always Send Icon) */}
                 <Pressable
                   style={[
                     styles.sendButton,

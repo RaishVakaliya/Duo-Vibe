@@ -18,7 +18,7 @@ export async function getSessionForReview(
     .from("quiz_sessions")
     .select("*")
     .eq("id", sessionId)
-    .single();
+    .maybeSingle();
 
   if (sessionErr || !sessionData) {
     throw new Error(sessionErr?.message || "Quiz session not found.");
@@ -34,11 +34,18 @@ export async function getSessionForReview(
   }
 
   const rawIds = sessionData.question_ids;
-  const qIds: string[] = Array.isArray(rawIds)
-    ? (rawIds as string[])
-    : typeof rawIds === "string"
-      ? JSON.parse(rawIds)
-      : [];
+  let qIds: string[] = [];
+  if (Array.isArray(rawIds)) {
+    qIds = rawIds as string[];
+  } else if (typeof rawIds === "string") {
+    try {
+      const parsed = JSON.parse(rawIds);
+      if (Array.isArray(parsed)) qIds = parsed;
+    } catch {
+      qIds = [];
+    }
+  }
+
 
   const questionsMap = new Map(QUIZ_QUESTION_BANK.map((q) => [q.id, q]));
   const fullQuestions: QuizQuestion[] = qIds
@@ -111,14 +118,15 @@ export async function submitReview(
       .from("quiz_sessions")
       .select("answerer_id")
       .eq("id", sessionId)
-      .single();
+      .maybeSingle();
 
     if (session) {
       const { data: answererProfile } = await supabase
         .from("profiles")
         .select("push_token")
         .eq("id", session.answerer_id)
-        .single();
+        .maybeSingle();
+
 
       if (answererProfile?.push_token) {
         await sendExpoPushNotification({

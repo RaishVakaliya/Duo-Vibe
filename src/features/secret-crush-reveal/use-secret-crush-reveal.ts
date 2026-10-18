@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import * as Clipboard from "expo-clipboard";
-import { supabase } from "@/src/lib/supabase";
+import { supabase, withTimeout } from "@/src/lib/supabase";
 import { useAuth } from "@/src/context/auth-context";
 import { UseSecretCrushRevealReturn, RevealViewMode } from "./types";
 
@@ -22,17 +22,24 @@ export function useSecretCrushReveal(messageId: string): UseSecretCrushRevealRet
     let cancelled = false;
 
     async function load() {
-      if (!messageId) {
+      const cleanId = typeof messageId === "string" ? messageId.trim() : "";
+      if (!cleanId) {
         setMode("not_found");
         return;
       }
 
       try {
-        const { data, error } = await supabase
+        const query = supabase
           .from("secret_crush_messages")
           .select("id, sender_id, message, status, reply_message, opened_at, replied_at")
-          .eq("id", messageId)
+          .eq("id", cleanId)
           .maybeSingle();
+
+        const { data, error } = await withTimeout(
+          Promise.resolve(query),
+          15000,
+        );
+
 
         if (cancelled) return;
 
@@ -43,6 +50,7 @@ export function useSecretCrushReveal(messageId: string): UseSecretCrushRevealRet
 
         setMessage(data.message);
         setStatus(data.status);
+
         setReplyMessage(data.reply_message ?? null);
 
         const isSender = user?.id === data.sender_id;

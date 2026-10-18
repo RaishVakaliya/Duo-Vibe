@@ -32,7 +32,7 @@ export function usePartnerProfile(userId: string | undefined) {
       .from('profiles')
       .select('id, full_name, avatar_url, updated_at')
       .eq('id', userId)
-      .single()
+      .maybeSingle()
       .then(({ data, error }) => {
         if (!error && data) {
           cache.data = data as PartnerProfile;

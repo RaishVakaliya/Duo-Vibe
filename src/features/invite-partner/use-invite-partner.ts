@@ -21,7 +21,8 @@ export function useInvitePartner() {
   const { showAlert } = useAlert();
   const [partnerCode, setPartnerCode] = useState<string>("");
   const { timeLeft, reset, formatMinutesSeconds, isFinished } =
-    useCountdown(codeExpiresAt);
+    useCountdown(codeExpiresAt, 86400);
+
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const selfInitiatedConnectRef = useRef(false);

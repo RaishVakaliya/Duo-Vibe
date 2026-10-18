@@ -9,3 +9,7 @@ export interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
 }
+export interface RouteErrorBoundaryProps {
+  error: Error;
+  retry: () => void;
+}

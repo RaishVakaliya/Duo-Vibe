@@ -35,7 +35,8 @@ export async function getPartnerId(userId: string): Promise<string | null> {
     .from("profiles")
     .select("partner_id")
     .eq("id", userId)
-    .single();
+    .maybeSingle();
+
 
   if (profile?.partner_id) {
     return profile.partner_id;

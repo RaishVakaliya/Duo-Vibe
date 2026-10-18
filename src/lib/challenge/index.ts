@@ -119,7 +119,8 @@ export async function getOrCreateCoupleProgress(
         "id, couple_key, user_a_id, user_b_id, current_day, completed_days, last_completed_at, started_at",
       )
       .eq("couple_key", coupleKey)
-      .single();
+      .maybeSingle();
+
 
     if (fetchError || !existing) {
       throw new Error(fetchError?.message ?? "Failed to load challenge progress.");
@@ -190,7 +191,8 @@ export async function markMyDayComplete(
       .eq("progress_id", progressId)
       .eq("user_id", userId)
       .eq("day", day)
-      .single();
+      .maybeSingle();
+
 
     if (fetchErr || !existing) throw new Error(fetchErr?.message ?? "Failed to mark day complete.");
     return rowToCompletion(existing);

@@ -59,6 +59,8 @@ export function ScreenHeader({
             <Text
               style={[styles.centeredTitle, isLight && styles.titleLight]}
               numberOfLines={1}
+              ellipsizeMode="tail"
+              maxFontSizeMultiplier={1.2}
             >
               {title}
             </Text>
@@ -67,6 +69,8 @@ export function ScreenHeader({
             <Text
               style={[styles.centeredSubtitle, isLight && styles.subtitleLight]}
               numberOfLines={1}
+              ellipsizeMode="tail"
+              maxFontSizeMultiplier={1.2}
             >
               {subtitle}
             </Text>
@@ -86,6 +90,8 @@ export function ScreenHeader({
           <Text
             style={[styles.startTitle, isLight && styles.titleLight]}
             numberOfLines={1}
+            ellipsizeMode="tail"
+            maxFontSizeMultiplier={1.2}
           >
             {title}
           </Text>
@@ -94,6 +100,8 @@ export function ScreenHeader({
           <Text
             style={[styles.startSubtitle, isLight && styles.subtitleLight]}
             numberOfLines={1}
+            ellipsizeMode="tail"
+            maxFontSizeMultiplier={1.2}
           >
             {subtitle}
           </Text>
@@ -102,4 +110,5 @@ export function ScreenHeader({
       {rightElement}
     </View>
   );
+
 }

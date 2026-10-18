@@ -23,6 +23,8 @@ import { useSessionAuth } from "@/src/context/auth-context";
 import { useAlert } from "@/src/components/ui/alert-dialog";
 import { getInitial } from "@/src/lib/profile";
 import { uploadAvatarImage } from "@/src/lib/profile/upload-avatar";
+import { requestPhotoLibraryPermission } from "@/src/utils/permissions";
+
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -37,15 +39,11 @@ export default function EditProfileScreen() {
 
   const handlePickFromGallery = async (): Promise<void> => {
     try {
-      const permissionResult =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!permissionResult.granted) {
-        showAlert({
-          title: "Permission Required",
-          message: "Please allow photo library access to choose your profile picture.",
-        });
-        return;
-      }
+      const hasPermission = await requestPhotoLibraryPermission(
+        "Please allow photo library access to choose your profile picture.",
+      );
+      if (!hasPermission) return;
+
 
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],

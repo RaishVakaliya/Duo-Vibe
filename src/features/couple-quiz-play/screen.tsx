@@ -31,15 +31,19 @@ export default function CoupleQuizPlayScreen() {
   const sessionId = params.sessionId ?? "";
 
   const questions: QuizQuestion[] = useMemo(() => {
-    if (params.questions) {
+    if (typeof params.questions === "string" && params.questions.trim()) {
       try {
-        return JSON.parse(params.questions);
+        const parsed = JSON.parse(params.questions);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
       } catch (e) {
         console.warn("Failed to parse questions param:", e);
       }
     }
     return selectQuizQuestions();
   }, [params.questions]);
+
 
   const total = questions.length || 10;
   const [currentIndex, setCurrentIndex] = useState<number>(0);

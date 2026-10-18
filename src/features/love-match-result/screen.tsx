@@ -76,13 +76,21 @@ export default function LoveMatchResultScreen() {
     }, [router]),
   );
 
-  const name1 = params.name1 || "Partner 1";
-  const name2 = params.name2 || "Partner 2";
-  const overall = parseInt(params.overall || "87", 10);
-  const communication = parseInt(params.communication || "91", 10);
-  const chemistry = parseInt(params.chemistry || "94", 10);
-  const trust = parseInt(params.trust || "82", 10);
-  const longTerm = parseInt(params.longTerm || "79", 10);
+  function parseClamp(val: string | undefined, fallback: number): number {
+    if (!val) return fallback;
+    const parsed = parseInt(val, 10);
+    if (!Number.isFinite(parsed) || Number.isNaN(parsed)) return fallback;
+    return Math.max(0, Math.min(100, parsed));
+  }
+
+  const name1 = (typeof params.name1 === "string" && params.name1.trim()) || "Partner 1";
+  const name2 = (typeof params.name2 === "string" && params.name2.trim()) || "Partner 2";
+  const overall = parseClamp(params.overall, 87);
+  const communication = parseClamp(params.communication, 91);
+  const chemistry = parseClamp(params.chemistry, 94);
+  const trust = parseClamp(params.trust, 82);
+  const longTerm = parseClamp(params.longTerm, 79);
+
 
   const barRows: readonly MatchBarRow[] = [
     {

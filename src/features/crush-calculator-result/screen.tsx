@@ -61,13 +61,22 @@ export default function CrushCalculatorResultScreen() {
     }, [router]),
   );
 
-  const yourName = params.yourName || "You";
-  const crushName = params.crushName || "Crush";
-  const targetPercentage = parseInt(params.percentage || "78", 10);
-  const headline = params.headline || "They definitely notice you!";
+  const yourName =
+    (typeof params.yourName === "string" && params.yourName.trim()) || "You";
+  const crushName =
+    (typeof params.crushName === "string" && params.crushName.trim()) || "Crush";
+  const rawParsed = parseInt(params.percentage || "78", 10);
+  const targetPercentage =
+    Number.isFinite(rawParsed) && !Number.isNaN(rawParsed)
+      ? Math.max(0, Math.min(100, rawParsed))
+      : 78;
+  const headline =
+    (typeof params.headline === "string" && params.headline.trim()) ||
+    "They definitely notice you!";
   const message =
-    params.message ||
+    (typeof params.message === "string" && params.message.trim()) ||
     "Your energy is impossible to ignore. They light up a little when you're around.";
+
 
   const [displayPercentage, setDisplayPercentage] = useState<number>(0);
 
