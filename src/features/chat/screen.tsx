@@ -274,7 +274,7 @@ export default function ChatScreen() {
                 onEndReached={handleLoadMore}
                 onEndReachedThreshold={0.15}
                 ListFooterComponent={listFooter}
-                initialNumToRender={12}
+                 initialNumToRender={12}
                 maxToRenderPerBatch={8}
                 windowSize={7}
                 removeClippedSubviews={true}
@@ -284,7 +284,7 @@ export default function ChatScreen() {
             <View
               style={[
                 styles.inputBarWrapper,
-                { paddingBottom: Math.max(insets.bottom, 8) + 78 },
+                { paddingBottom: Math.max(insets.bottom, 8)},
               ]}
             >
               <View style={styles.inputRow}>

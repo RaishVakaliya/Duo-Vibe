@@ -18,7 +18,12 @@ export default function TabsLayout() {
     >
       <Tabs.Screen name="home" />
       <Tabs.Screen name="connect" />
-      <Tabs.Screen name="chat" />
+      <Tabs.Screen
+        name="chat"
+        options={{
+          tabBarStyle: { display: "none" },
+        }}
+      />
       <Tabs.Screen name="memories" />
       <Tabs.Screen name="profile" />
     </Tabs>

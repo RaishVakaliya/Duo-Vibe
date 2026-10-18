@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/src/lib/supabase";
@@ -23,11 +23,14 @@ import {
   syncUserProfile,
 } from "@/src/lib/auth/profile-fetch";
 import { subscribeToAuthState } from "@/src/lib/auth/auth-state-listener";
+import { getPartnerId } from "@/src/lib/quiz";
+import { getCoupleKey } from "@/src/lib/couple/get-couple-key";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const coupleChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const [hasPartner, setHasPartnerState] = useState<boolean>(false);
   const [userName, setUserNameState] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrlState] = useState<string | null>(null);
@@ -263,6 +266,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   RELATIONSHIP_TYPE_KEY,
                   row.relationship_type,
                 ).catch(() => {});
+                // Keep own profile row in sync in the database
+                Promise.resolve(
+                  supabase
+                    .from("profiles")
+                    .update({
+                      relationship_type: row.relationship_type,
+                      updated_at: new Date().toISOString(),
+                    })
+                    .eq("id", user.id),
+                ).catch(() => {});
               }
             }
           }
@@ -279,6 +292,69 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       supabase.removeChannel(couplesChannel).catch(() => {});
     };
   }, [user]);
+
+  // Realtime couple broadcast channel — instant sync for relationship type and other couple-level events
+  useEffect(() => {
+    if (!user || !hasPartner) {
+      if (coupleChannelRef.current) {
+        supabase.removeChannel(coupleChannelRef.current).catch(() => {});
+        coupleChannelRef.current = null;
+      }
+      return;
+    }
+
+    let isMounted = true;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    getPartnerId(user.id)
+      .then((partnerId) => {
+        if (!isMounted || !partnerId) return;
+        const coupleKey = getCoupleKey(user.id, partnerId);
+        const channelName = `couple_realtime_${coupleKey}`;
+
+        channel = supabase.channel(channelName);
+        coupleChannelRef.current = channel;
+
+        channel
+          .on(
+            "broadcast",
+            { event: "relationship_type_change" },
+            (msg: { payload?: { relationship_type?: RelationshipType } }) => {
+              const newType = msg.payload?.relationship_type;
+              if (newType === "local" || newType === "long_distance") {
+                setRelationshipTypeState(newType);
+                AsyncStorage.setItem(RELATIONSHIP_TYPE_KEY, newType).catch(() => {});
+                // Keep own profile row in sync in the database
+                Promise.resolve(
+                  supabase
+                    .from("profiles")
+                    .update({
+                      relationship_type: newType,
+                      updated_at: new Date().toISOString(),
+                    })
+                    .eq("id", user.id),
+                ).catch(() => {});
+              }
+            },
+          )
+          .subscribe((status) => {
+            if (status === "CHANNEL_ERROR") {
+              console.warn("[realtime] couple broadcast channel error");
+            }
+          });
+      })
+      .catch((err) => {
+        console.warn("[realtime] getPartnerId error:", err);
+      });
+
+    return () => {
+      isMounted = false;
+      if (channel) {
+        supabase.removeChannel(channel).catch(() => {});
+      }
+      coupleChannelRef.current = null;
+    };
+  }, [user, hasPartner]);
 
   // Backup poll while partner is pending — keeps Home + Invite in sync if a realtime event is missed
   useEffect(() => {
@@ -332,6 +408,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user) {
       try {
         const nowIso = new Date().toISOString();
+
+        // 1. Update own profile row in Supabase
         await supabase
           .from("profiles")
           .update({
@@ -340,27 +418,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           })
           .eq("id", user.id);
 
-        const { data: myProfile } = await supabase
-          .from("profiles")
-          .select("partner_id")
-          .eq("id", user.id)
+        // 2. Broadcast immediately over the couple channel so partner receives it live (<100ms)
+        if (coupleChannelRef.current) {
+          coupleChannelRef.current
+            .send({
+              type: "broadcast",
+              event: "relationship_type_change",
+              payload: { relationship_type: type },
+            })
+            .catch(() => {});
+        }
+
+        // 3. Update couples table (single source of truth for both partners)
+        const { data: coupleRow } = await supabase
+          .from("couples")
+          .select("id, user1_id, user2_id")
+          .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
+          .order("created_at", { ascending: false })
+          .limit(1)
           .maybeSingle();
 
-        if (myProfile?.partner_id) {
+        if (coupleRow?.id) {
           await supabase
-            .from("profiles")
+            .from("couples")
             .update({
               relationship_type: type,
-              updated_at: nowIso,
             })
-            .eq("id", myProfile.partner_id);
-
+            .eq("id", coupleRow.id);
+        } else {
           await supabase
             .from("couples")
             .update({
               relationship_type: type,
             })
             .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+        }
+
+        // 4. Fallback broadcast if coupleChannelRef wasn't subscribed yet
+        const partnerId =
+          coupleRow?.user1_id === user.id
+            ? coupleRow?.user2_id
+            : coupleRow?.user1_id;
+
+        if (partnerId && !coupleChannelRef.current) {
+          const coupleKey = getCoupleKey(user.id, partnerId);
+          const fallbackChannel = supabase.channel(`couple_realtime_${coupleKey}`);
+          fallbackChannel.subscribe((status) => {
+            if (status === "SUBSCRIBED") {
+              fallbackChannel
+                .send({
+                  type: "broadcast",
+                  event: "relationship_type_change",
+                  payload: { relationship_type: type },
+                })
+                .then(() => {
+                  supabase.removeChannel(fallbackChannel).catch(() => {});
+                })
+                .catch(() => {});
+            }
+          });
         }
       } catch (err) {
         console.warn("Error updating relationship type:", err);

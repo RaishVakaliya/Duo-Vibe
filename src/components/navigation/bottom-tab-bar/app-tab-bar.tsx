@@ -10,7 +10,7 @@ type AppTabBarProps = Parameters<
   NonNullable<React.ComponentProps<typeof Tabs>["tabBar"]>
 >[0];
 
-export function AppTabBar({ state, navigation }: AppTabBarProps) {
+export function AppTabBar({ state, descriptors, navigation }: AppTabBarProps) {
   const { user, hasPartner } = useAuth();
   const [coupleKey, setCoupleKey] = useState<string | null>(null);
   const unreadChatCount = useUnreadBadge(coupleKey, user?.id ?? null);
@@ -33,6 +33,16 @@ export function AppTabBar({ state, navigation }: AppTabBarProps) {
   }, [user, hasPartner]);
 
   if (!user) {
+    return null;
+  }
+
+  const currentRoute = state.routes[state.index];
+  const currentOptions = currentRoute ? descriptors?.[currentRoute.key]?.options : undefined;
+
+  if (
+    currentRoute?.name === "chat" ||
+    (currentOptions?.tabBarStyle as { display?: string } | undefined)?.display === "none"
+  ) {
     return null;
   }
 
