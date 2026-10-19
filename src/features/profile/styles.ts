@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
   // ── Hero banner ────────────────────────────────────────────────
   heroBanner: {
     width: "100%",
-    height: 220,
+    height: 400,
     overflow: "hidden",
     position: "relative",
     justifyContent: "space-between",
@@ -48,8 +48,11 @@ export const styles = StyleSheet.create({
     borderColor: "rgba(255, 255, 255, 0.2)",
   },
   scrollContent: {
-    paddingHorizontal: 20,
     paddingBottom: 110,
+  },
+  // Padded wrapper used for all content BELOW the hero banner
+  contentPadded: {
+    paddingHorizontal: 20,
   },
 
   // ── Avatar ring (inside hero) ───────────────────────────────────
@@ -90,14 +93,14 @@ export const styles = StyleSheet.create({
   // ── Name / email / status below hero ────────────────────────────
   profileHero: {
     alignItems: "center",
-    marginTop: 14,
+    marginTop: 6,
     marginBottom: 22,
   },
   userName: {
     fontFamily: "Fredoka_700Bold",
     fontSize: 26,
     color: COLORS.white,
-    marginTop: 14,
+    marginTop: 6,
     textAlign: "center",
   },
   userEmail: {

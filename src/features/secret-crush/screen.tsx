@@ -25,7 +25,7 @@ import { SentMessageItem } from "./types";
 
 const MAX_CHARS = 500;
 
-function SentCard({ item }: { item: SentMessageItem }) {
+function SentCard({ item, onCopyLink }: { item: SentMessageItem; onCopyLink: (id: string) => void }) {
   return (
     <MotiView
       from={{ opacity: 0, translateY: 8 }}
@@ -69,6 +69,7 @@ function SentCard({ item }: { item: SentMessageItem }) {
 
       <Pressable
         style={styles.sentCardCopyRow}
+        onPress={() => onCopyLink(item.id)}
         accessibilityRole="button"
         accessibilityLabel="Copy link for this message"
       >
@@ -253,9 +254,18 @@ export default function SecretCrushScreen() {
                         Share this link with your crush. They{"'"}ll see your message when they open it.
                       </Text>
 
-                      <Text style={styles.linkText} numberOfLines={1}>
-                        {shareLink}
-                      </Text>
+                      {/* Tappable link — tap to copy */}
+                      <Pressable
+                        onPress={handleCopyLink}
+                        accessibilityRole="button"
+                        accessibilityLabel="Copy secret crush link"
+                        style={styles.linkTextPressable}
+                      >
+                        <Ionicons name="link-outline" size={13} color="#FF4D6D" />
+                        <Text style={styles.linkText} numberOfLines={1}>
+                          {shareLink}
+                        </Text>
+                      </Pressable>
 
                       <View style={styles.shareRow}>
                         <Pressable
@@ -328,7 +338,10 @@ export default function SecretCrushScreen() {
                 ) : (
                   <View style={styles.sentList}>
                     {sentMessages.map((item) => (
-                      <SentCard key={item.id} item={item} />
+                      <SentCard key={item.id} item={item} onCopyLink={(id) => {
+                        const found = sentMessages.find((m) => m.id === id);
+                        if (found) handleCopyLink();
+                      }} />
                     ))}
                   </View>
                 )}

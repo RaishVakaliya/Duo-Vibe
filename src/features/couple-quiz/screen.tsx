@@ -41,6 +41,11 @@ export default function CoupleQuizStartScreen() {
       setIsLoading(false);
       return;
     }
+    // Only fetch the active session once the partner id is resolved
+    if (!partnerId) {
+      // Still resolving partnerId — wait for the next run (partnerId is a dep)
+      return;
+    }
     try {
       setIsLoading(true);
       const pending = await getActiveAnswererSession(user.id);
@@ -50,7 +55,7 @@ export default function CoupleQuizStartScreen() {
     } finally {
       setIsLoading(false);
     }
-  }, [user, hasPartner]);
+  }, [user, hasPartner, partnerId]);
 
   useEffect(() => {
     loadSessionState();
@@ -139,7 +144,7 @@ export default function CoupleQuizStartScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {isLoading ? (
+          {isLoading && hasPartner ? (
             <View style={[styles.mainCard, { paddingVertical: 48 }]}>
               <ActivityIndicator size="large" color="#FF2D6C" />
             </View>
@@ -173,7 +178,6 @@ export default function CoupleQuizStartScreen() {
                 style={[styles.actionButton, { backgroundColor: "#1E1B26" }]}
                 onPress={() => router.replace(ROUTES.HOME)}
               >
-                <Ionicons name="home-outline" size={18} color="#FFFFFF" />
                 <Text style={styles.actionButtonText}>Return to Home</Text>
               </Pressable>
             </View>

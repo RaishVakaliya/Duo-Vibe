@@ -42,6 +42,7 @@ export function PartnerAvatarInput({
           cursorColor="#FF4D6D"
           selectionColor="rgba(255, 77, 109, 0.35)"
           underlineColorAndroid="transparent"
+          textAlignVertical="center"
           accessibilityLabel={accessibilityLabel}
         />
       </View>

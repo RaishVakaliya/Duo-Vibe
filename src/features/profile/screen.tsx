@@ -21,7 +21,7 @@ import { getInitial } from "@/src/lib/profile";
 import { useProfileData } from "./use-profile-data";
 import { ProfileMenuItem } from "./components/profile-menu-item";
 
-const HERO_HEIGHT = 220;
+const HERO_HEIGHT = 300;
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -57,55 +57,59 @@ export default function ProfileScreen() {
         style={styles.gradientBackground}
       />
 
-      {/* ── Hero banner — covers status bar area too ────────────────── */}
-      <View style={[styles.heroBanner, { paddingTop: insets.top }]}>
-        {avatarUrl ? (
-          <Image
-            source={{ uri: avatarUrl }}
-            style={styles.heroBannerImage}
-            contentFit="cover"
-            cachePolicy="memory-disk"
-            transition={200}
-            placeholder="rgba(255,255,255,0.05)"
-          />
-        ) : (
-          <LinearGradient
-            colors={["#3D1852", "#1C0E2D"]}
-            style={styles.heroBannerFallback}
-          />
-        )}
-        {/* Scrim so icons stay readable regardless of photo brightness */}
-        <View style={styles.heroBannerScrim} />
-
-        {/* Back + Edit row — positioned over the banner */}
-        <View style={[styles.heroActionRow, { marginTop: Platform.OS === "ios" ? 4 : 8 }]}>
-          <Pressable
-            style={styles.heroActionBtn}
-            onPress={() => router.replace(ROUTES.HOME)}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            accessibilityRole="button"
-            accessibilityLabel="Go back to Home"
-          >
-            <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
-          </Pressable>
-
-          <Pressable
-            style={styles.heroActionBtn}
-            onPress={() => router.push(ROUTES.EDIT_PROFILE)}
-            accessibilityRole="button"
-            accessibilityLabel="Edit profile name and picture"
-          >
-            <Ionicons name="pencil" size={18} color="#FFFFFF" />
-          </Pressable>
-        </View>
-      </View>
-
-      {/* ── Safe area wraps only the scrollable content below hero ─── */}
+      {/* ── Safe area wraps the entire screen ───────────────────────── */}
       <SafeAreaView style={styles.safeArea} edges={["left", "right", "bottom"]}>
+
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
+          {/* ── Hero banner scrolls with page ──────────────────────── */}
+          <View style={[styles.heroBanner, { paddingTop: insets.top }]}>
+            {avatarUrl ? (
+              <Image
+                source={{ uri: avatarUrl }}
+                style={styles.heroBannerImage}
+                contentFit="cover"
+                cachePolicy="memory-disk"
+                transition={200}
+                placeholder="rgba(255,255,255,0.05)"
+              />
+            ) : (
+              <LinearGradient
+                colors={["#3D1852", "#1C0E2D"]}
+                style={styles.heroBannerFallback}
+              />
+            )}
+            {/* Scrim so icons stay readable regardless of photo brightness */}
+            <View style={styles.heroBannerScrim} />
+
+            {/* Back + Edit row — positioned over the banner */}
+            <View style={[styles.heroActionRow, { marginTop: Platform.OS === "ios" ? 4 : 8 }]}>
+              <Pressable
+                style={styles.heroActionBtn}
+                onPress={() => router.replace(ROUTES.HOME)}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                accessibilityRole="button"
+                accessibilityLabel="Go back to Home"
+              >
+                <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
+              </Pressable>
+
+              <Pressable
+                style={styles.heroActionBtn}
+                onPress={() => router.push(ROUTES.EDIT_PROFILE)}
+                accessibilityRole="button"
+                accessibilityLabel="Edit profile name and picture"
+              >
+                <Ionicons name="pencil" size={18} color="#FFFFFF" />
+              </Pressable>
+            </View>
+          </View>
+
+          {/* All content below hero gets horizontal padding */}
+          <View style={styles.contentPadded}>
+
           {/* Name + email + partner status */}
           <MotiView
             from={{ opacity: 0, translateY: 8 }}
@@ -270,6 +274,9 @@ export default function ProfileScreen() {
             <Text style={styles.copyrightText}>
               Duo Vibe • Crafted for couples
             </Text>
+          </View>
+          {/* end contentPadded */}
+
           </View>
         </ScrollView>
 
