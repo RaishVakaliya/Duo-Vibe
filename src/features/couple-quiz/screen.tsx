@@ -36,20 +36,6 @@ export default function CoupleQuizStartScreen() {
   const [activeSession, setActiveSession] = useState<QuizSession | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  useFocusEffect(
-    useCallback(() => {
-      const onBackPress = () => {
-        router.replace(ROUTES.HOME);
-        return true;
-      };
-      const sub = BackHandler.addEventListener(
-        "hardwareBackPress",
-        onBackPress,
-      );
-      return () => sub.remove();
-    }, [router]),
-  );
-
   const loadSessionState = useCallback(async () => {
     if (!user || !hasPartner) {
       setIsLoading(false);
@@ -140,7 +126,13 @@ export default function CoupleQuizStartScreen() {
           align="center"
           theme="light"
           titleIcon={<Ionicons name="people" size={22} color="#FF2D6C" />}
-          onBack={() => router.replace(ROUTES.HOME)}
+          onBack={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace(ROUTES.HOME);
+            }
+          }}
         />
 
         <ScrollView

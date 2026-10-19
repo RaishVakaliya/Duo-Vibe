@@ -34,6 +34,8 @@ function RootNavigationStack() {
         animationDuration: 250,
         gestureEnabled: true,
         contentStyle: { backgroundColor: COLORS.darkOverlay },
+        statusBarStyle: "light",
+        statusBarTranslucent: true,
       }}
     >
       <Stack.Screen
@@ -78,20 +80,20 @@ function RootNavigationStack() {
       <Stack.Screen name="terms" />
       <Stack.Screen name="privacy" />
 
-      <Stack.Screen name="love-match" />
-      <Stack.Screen name="crush-calculator" />
-      <Stack.Screen name="twenty-one-questions" />
-      <Stack.Screen name="couple-quiz" />
-      <Stack.Screen name="couple-quiz-play" />
-      <Stack.Screen name="couple-quiz-review" />
-      <Stack.Screen name="secret-crush" />
+      <Stack.Screen name="love-match" options={{ gestureDirection: "horizontal" }} />
+      <Stack.Screen name="crush-calculator" options={{ gestureDirection: "horizontal" }} />
+      <Stack.Screen name="twenty-one-questions" options={{ gestureDirection: "horizontal" }} />
+      <Stack.Screen name="couple-quiz" options={{ gestureDirection: "horizontal" }} />
+      <Stack.Screen name="couple-quiz-play" options={{ gestureDirection: "horizontal" }} />
+      <Stack.Screen name="couple-quiz-review" options={{ gestureDirection: "horizontal" }} />
+      <Stack.Screen name="secret-crush" options={{ gestureDirection: "horizontal" }} />
       <Stack.Screen
         name="secret-crush/[id]"
         options={{ animation: "fade", animationDuration: 250 }}
       />
-      <Stack.Screen name="couple-challenge" />
-      <Stack.Screen name="couple-challenge-all" />
-      <Stack.Screen name="red-green-flag" />
+      <Stack.Screen name="couple-challenge" options={{ gestureDirection: "horizontal" }} />
+      <Stack.Screen name="couple-challenge-all" options={{ gestureDirection: "horizontal" }} />
+      <Stack.Screen name="red-green-flag" options={{ gestureDirection: "horizontal" }} />
 
       <Stack.Screen
         name="love-match-result"

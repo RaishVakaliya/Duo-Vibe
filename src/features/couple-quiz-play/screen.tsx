@@ -62,7 +62,13 @@ export default function CoupleQuizPlayScreen() {
             {
               text: "Leave",
               style: "destructive",
-              onPress: () => router.replace(ROUTES.HOME),
+              onPress: () => {
+                if (router.canGoBack()) {
+                  router.back();
+                } else {
+                  router.replace(ROUTES.HOME);
+                }
+              },
             },
           ],
         );
@@ -148,7 +154,13 @@ export default function CoupleQuizPlayScreen() {
                 {
                   text: "Leave",
                   style: "destructive",
-                  onPress: () => router.replace(ROUTES.HOME),
+                  onPress: () => {
+                if (router.canGoBack()) {
+                  router.back();
+                } else {
+                  router.replace(ROUTES.HOME);
+                }
+              },
                 },
               ],
             );

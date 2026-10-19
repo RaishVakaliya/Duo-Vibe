@@ -207,16 +207,6 @@ export default function CoupleChallengeScreen() {
   const { loadState, challengeState, partnerName, isMarkingDone, handleMarkDone, handleRetry } =
     useCoupleChallenge();
 
-  useFocusEffect(
-    useCallback(() => {
-      const sub = BackHandler.addEventListener("hardwareBackPress", () => {
-        router.replace(ROUTES.HOME);
-        return true;
-      });
-      return () => sub.remove();
-    }, [router]),
-  );
-
   // Upcoming days: next 3 after current_day (capped at 30)
   const upcomingDays = challengeState
     ? [1, 2, 3]
@@ -242,7 +232,13 @@ export default function CoupleChallengeScreen() {
           align="center"
           theme="light"
           titleIcon={<Ionicons name="calendar" size={22} color="#10B981" />}
-          onBack={() => router.replace(ROUTES.HOME)}
+          onBack={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace(ROUTES.HOME);
+            }
+          }}
         />
 
         {/* ── Content ────────────────────────────────────────────────── */}

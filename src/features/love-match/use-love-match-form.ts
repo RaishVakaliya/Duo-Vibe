@@ -24,8 +24,9 @@ export function useLoveMatchForm() {
 
   useFocusEffect(
     useCallback(() => {
+      if (!activePicker) return;
       const onBackPress = () => {
-        router.replace(ROUTES.HOME);
+        setActivePicker(null);
         return true;
       };
 
@@ -35,7 +36,7 @@ export function useLoveMatchForm() {
       );
 
       return () => subscription.remove();
-    }, [router]),
+    }, [activePicker]),
   );
 
   const isFormValid =
@@ -93,7 +94,11 @@ export function useLoveMatchForm() {
   };
 
   const handleBack = (): void => {
-    router.replace(ROUTES.HOME);
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(ROUTES.HOME);
+    }
   };
 
   const currentYear = new Date().getFullYear();

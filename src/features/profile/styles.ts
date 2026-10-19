@@ -12,58 +12,66 @@ export const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
+  // ── Hero banner ────────────────────────────────────────────────
+  heroBanner: {
+    width: "100%",
+    height: 220,
+    overflow: "hidden",
+    position: "relative",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 8,
   },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: RADIUS.circleBack,
-    backgroundColor: "rgba(255, 255, 255, 0.12)",
+  heroBannerImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  heroBannerFallback: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  heroBannerScrim: {
+    ...StyleSheet.absoluteFillObject,
+    // Gradient-like scrim: dark at top and bottom for icon + avatar readability
+    backgroundColor: "rgba(10, 4, 19, 0.45)",
+  },
+  heroActionRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    zIndex: 2,
+  },
+  heroActionBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: "rgba(0, 0, 0, 0.38)",
     justifyContent: "center",
     alignItems: "center",
-  },
-  headerPlaceholder: {
-    width: 40,
-  },
-  topEditButton: {
-    width: 40,
-    height: 40,
-    borderRadius: RADIUS.circleBack,
-    backgroundColor: "rgba(255, 255, 255, 0.12)",
-    justifyContent: "center",
-    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
   },
   scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 110,
   },
 
-  // Profile Hero (Matching Lovio Reference Image 1)
-  profileHero: {
-    alignItems: "center",
-    marginTop: 6,
-    marginBottom: 26,
-  },
+  // ── Avatar ring (inside hero) ───────────────────────────────────
   avatarRing: {
-    width: 114,
-    height: 114,
-    borderRadius: 57,
-    borderWidth: 2.5,
+    width: 98,
+    height: 98,
+    borderRadius: 49,
+    borderWidth: 3,
     borderColor: COLORS.primary,
     padding: 3,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.55,
+    shadowRadius: 10,
+    elevation: 6,
   },
   avatarInner: {
-    width: 104,
-    height: 104,
-    borderRadius: 52,
+    width: 88,
+    height: 88,
+    borderRadius: 44,
     backgroundColor: COLORS.avatarPlaceholderBg,
     justifyContent: "center",
     alignItems: "center",
@@ -71,13 +79,19 @@ export const styles = StyleSheet.create({
   },
   avatarLetter: {
     fontFamily: "Fredoka_700Bold",
-    fontSize: 46,
+    fontSize: 38,
     color: COLORS.white,
   },
   avatarImage: {
-    width: 104,
-    height: 104,
-    borderRadius: 52,
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+  },
+  // ── Name / email / status below hero ────────────────────────────
+  profileHero: {
+    alignItems: "center",
+    marginTop: 14,
+    marginBottom: 22,
   },
   userName: {
     fontFamily: "Fredoka_700Bold",

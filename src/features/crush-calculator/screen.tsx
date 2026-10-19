@@ -27,22 +27,6 @@ export default function CrushCalculatorScreen() {
   const [yourName, setYourName] = useState<string>("");
   const [crushName, setCrushName] = useState<string>("");
 
-  useFocusEffect(
-    useCallback(() => {
-      const onBackPress = () => {
-        router.replace(ROUTES.HOME);
-        return true;
-      };
-
-      const subscription = BackHandler.addEventListener(
-        "hardwareBackPress",
-        onBackPress,
-      );
-
-      return () => subscription.remove();
-    }, [router]),
-  );
-
   const isFormValid = yourName.trim().length > 0 && crushName.trim().length > 0;
 
   const handleCalculate = (): void => {
@@ -75,7 +59,13 @@ export default function CrushCalculatorScreen() {
           <View style={styles.topNavRow}>
             <Pressable
               style={styles.backButton}
-              onPress={() => router.replace(ROUTES.HOME)}
+              onPress={() => {
+                if (router.canGoBack()) {
+                  router.back();
+                } else {
+                  router.replace(ROUTES.HOME);
+                }
+              }}
               accessibilityRole="button"
               accessibilityLabel="Go back"
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}

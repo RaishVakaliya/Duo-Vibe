@@ -84,17 +84,6 @@ export default function TwentyOneQuestionsScreen() {
     handleRetry,
   } = useTwentyOneQuestions();
 
-  useFocusEffect(
-    useCallback(() => {
-      const onBackPress = () => {
-        router.replace(ROUTES.HOME);
-        return true;
-      };
-      const sub = BackHandler.addEventListener("hardwareBackPress", onBackPress);
-      return () => sub.remove();
-    }, [router]),
-  );
-
   const currentReveal = reveals[currentIndex];
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === reveals.length - 1;
@@ -184,7 +173,13 @@ export default function TwentyOneQuestionsScreen() {
             align="center"
             theme="light"
             titleIcon={<Ionicons name="chatbubbles" size={24} color="#FF2D6C" />}
-            onBack={() => router.replace(ROUTES.HOME)}
+            onBack={() => {
+              if (router.canGoBack()) {
+                router.back();
+              } else {
+                router.replace(ROUTES.HOME);
+              }
+            }}
           />
           <LinkPartnerPrompt
             theme="light"
@@ -235,7 +230,13 @@ export default function TwentyOneQuestionsScreen() {
           align="center"
           theme="light"
           titleIcon={<Ionicons name="chatbubbles" size={24} color="#FF2D6C" />}
-          onBack={() => router.replace(ROUTES.HOME)}
+          onBack={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace(ROUTES.HOME);
+            }
+          }}
         />
 
         {/* Progress bar */}

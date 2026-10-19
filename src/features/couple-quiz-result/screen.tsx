@@ -48,7 +48,11 @@ export default function CoupleQuizResultScreen() {
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        router.replace(ROUTES.HOME);
+        if (router.canGoBack()) {
+          router.back();
+        } else {
+          router.replace(ROUTES.HOME);
+        }
         return true;
       };
       const sub = BackHandler.addEventListener(
@@ -180,7 +184,13 @@ export default function CoupleQuizResultScreen() {
           align="center"
           theme="light"
           titleIcon={<Ionicons name="trophy" size={22} color="#FF2D6C" />}
-          onBack={() => router.replace(ROUTES.HOME)}
+          onBack={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace(ROUTES.HOME);
+            }
+          }}
         />
 
         {isLoading ? (

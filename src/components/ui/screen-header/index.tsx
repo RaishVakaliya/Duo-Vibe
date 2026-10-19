@@ -43,11 +43,12 @@ export function ScreenHeader({
         color={isLight ? COLORS.textPrimary : COLORS.white}
       />
     </Pressable>
-  ) : (
+  ) : align === "center" ? (
     <View style={styles.spacer} />
-  );
+  ) : null;
 
-  const right = rightElement ?? <View style={styles.spacer} />;
+  const right =
+    rightElement ?? (align === "center" ? <View style={styles.spacer} /> : null);
 
   if (align === "center") {
     return (
@@ -84,7 +85,12 @@ export function ScreenHeader({
   return (
     <View style={[styles.container, styles.startContainer, style]}>
       {backButton}
-      <View style={styles.startTitlesWrapper}>
+      <View
+        style={[
+          styles.startTitlesWrapper,
+          hideBackButton && styles.startTitlesWrapperNoBack,
+        ]}
+      >
         <View style={styles.startTitleRow}>
           {titleIcon}
           <Text

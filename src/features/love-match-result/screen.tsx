@@ -63,7 +63,11 @@ export default function LoveMatchResultScreen() {
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        router.replace(ROUTES.HOME);
+        if (router.canGoBack()) {
+          router.back();
+        } else {
+          router.replace(ROUTES.HOME);
+        }
         return true;
       };
 
@@ -201,7 +205,13 @@ export default function LoveMatchResultScreen() {
               style={styles.headerHeartIcon}
             />
           }
-          onBack={() => router.replace(ROUTES.HOME)}
+          onBack={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace(ROUTES.HOME);
+            }
+          }}
         />
 
         <ScrollView

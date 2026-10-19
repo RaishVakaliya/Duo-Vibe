@@ -115,7 +115,13 @@ export default function SecretCrushScreen() {
           <View style={styles.topNavRow}>
             <Pressable
               style={styles.backButton}
-              onPress={() => router.replace(ROUTES.HOME)}
+              onPress={() => {
+                if (router.canGoBack()) {
+                  router.back();
+                } else {
+                  router.replace(ROUTES.HOME);
+                }
+              }}
               accessibilityRole="button"
               accessibilityLabel="Go back"
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}

@@ -48,7 +48,11 @@ export default function CrushCalculatorResultScreen() {
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        router.replace(ROUTES.HOME);
+        if (router.canGoBack()) {
+          router.back();
+        } else {
+          router.replace(ROUTES.HOME);
+        }
         return true;
       };
 
@@ -137,7 +141,13 @@ export default function CrushCalculatorResultScreen() {
               style={styles.headerHeartIcon}
             />
           }
-          onBack={() => router.replace(ROUTES.HOME)}
+          onBack={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace(ROUTES.HOME);
+            }
+          }}
         />
 
         <ScrollView

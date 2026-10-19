@@ -49,7 +49,11 @@ export default function RedGreenFlagScreen() {
     useCallback(() => {
       const onBackPress = () => {
         if (step === "mode_select") {
-          router.replace(ROUTES.HOME);
+          if (router.canGoBack()) {
+            router.back();
+          } else {
+            router.replace(ROUTES.HOME);
+          }
           return true;
         }
         if (step === "swiping") {
@@ -57,7 +61,11 @@ export default function RedGreenFlagScreen() {
           return true;
         }
         if (step === "waiting" || step === "solo_result" || step === "partner_result") {
-          router.replace(ROUTES.HOME);
+          if (router.canGoBack()) {
+            router.back();
+          } else {
+            router.replace(ROUTES.HOME);
+          }
           return true;
         }
         return false;
@@ -135,7 +143,13 @@ export default function RedGreenFlagScreen() {
             onSelectSolo={() => handleSelectMode("solo")}
             onSelectPartner={() => handleSelectMode("partner")}
             onInvitePartner={handleInvitePartner}
-            onBack={() => router.replace(ROUTES.HOME)}
+            onBack={() => {
+              if (router.canGoBack()) {
+                router.back();
+              } else {
+                router.replace(ROUTES.HOME);
+              }
+            }}
           />
         )}
 

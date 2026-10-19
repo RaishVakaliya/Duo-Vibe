@@ -5,12 +5,13 @@ import {
   Pressable,
   Switch,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
 import { styles } from "./styles";
@@ -20,8 +21,11 @@ import { getInitial } from "@/src/lib/profile";
 import { useProfileData } from "./use-profile-data";
 import { ProfileMenuItem } from "./components/profile-menu-item";
 
+const HERO_HEIGHT = 220;
+
 export default function ProfileScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const {
     user,
     userName,
@@ -43,22 +47,6 @@ export default function ProfileScreen() {
     handleDeleteAccount,
   } = useProfileData();
 
-  const renderAvatarContent = () => {
-    if (avatarUrl) {
-      return (
-        <Image
-          source={{ uri: avatarUrl }}
-          style={styles.avatarImage}
-          contentFit="cover"
-          cachePolicy="memory-disk"
-          transition={150}
-          placeholder="rgba(255, 255, 255, 0.1)"
-        />
-      );
-    }
-    return <Text style={styles.avatarLetter}>{getInitial(userName)}</Text>;
-  };
-
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -69,10 +57,30 @@ export default function ProfileScreen() {
         style={styles.gradientBackground}
       />
 
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.header}>
+      {/* ── Hero banner — covers status bar area too ────────────────── */}
+      <View style={[styles.heroBanner, { paddingTop: insets.top }]}>
+        {avatarUrl ? (
+          <Image
+            source={{ uri: avatarUrl }}
+            style={styles.heroBannerImage}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            transition={200}
+            placeholder="rgba(255,255,255,0.05)"
+          />
+        ) : (
+          <LinearGradient
+            colors={["#3D1852", "#1C0E2D"]}
+            style={styles.heroBannerFallback}
+          />
+        )}
+        {/* Scrim so icons stay readable regardless of photo brightness */}
+        <View style={styles.heroBannerScrim} />
+
+        {/* Back + Edit row — positioned over the banner */}
+        <View style={[styles.heroActionRow, { marginTop: Platform.OS === "ios" ? 4 : 8 }]}>
           <Pressable
-            style={styles.backButton}
+            style={styles.heroActionBtn}
             onPress={() => router.replace(ROUTES.HOME)}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             accessibilityRole="button"
@@ -81,10 +89,8 @@ export default function ProfileScreen() {
             <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
           </Pressable>
 
-          <View style={styles.headerPlaceholder} />
-
           <Pressable
-            style={styles.topEditButton}
+            style={styles.heroActionBtn}
             onPress={() => router.push(ROUTES.EDIT_PROFILE)}
             accessibilityRole="button"
             accessibilityLabel="Edit profile name and picture"
@@ -92,21 +98,21 @@ export default function ProfileScreen() {
             <Ionicons name="pencil" size={18} color="#FFFFFF" />
           </Pressable>
         </View>
+      </View>
 
+      {/* ── Safe area wraps only the scrollable content below hero ─── */}
+      <SafeAreaView style={styles.safeArea} edges={["left", "right", "bottom"]}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
+          {/* Name + email + partner status */}
           <MotiView
             from={{ opacity: 0, translateY: 8 }}
             animate={{ opacity: 1, translateY: 0 }}
             transition={{ type: "timing", duration: 350 }}
             style={styles.profileHero}
           >
-            <View style={styles.avatarRing}>
-              <View style={styles.avatarInner}>{renderAvatarContent()}</View>
-            </View>
-
             <Text style={styles.userName}>
               {userName?.trim() || "Duo Partner"}
             </Text>

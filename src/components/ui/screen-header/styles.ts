@@ -60,6 +60,9 @@ export const styles = StyleSheet.create({
     marginLeft: 14,
     justifyContent: "center",
   },
+  startTitlesWrapperNoBack: {
+    marginLeft: 0,
+  },
   startTitleRow: {
     flexDirection: "row",
     alignItems: "center",

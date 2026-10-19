@@ -32,7 +32,11 @@ export function useQuizReview() {
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        router.replace(ROUTES.HOME);
+        if (router.canGoBack()) {
+          router.back();
+        } else {
+          router.replace(ROUTES.HOME);
+        }
         return true;
       };
       const sub = BackHandler.addEventListener(
@@ -128,7 +132,11 @@ export function useQuizReview() {
   const progressFraction = total > 0 ? (currentIndex + 1) / total : 0;
 
   const handleBack = () => {
-    router.replace(ROUTES.HOME);
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(ROUTES.HOME);
+    }
   };
 
   return {

@@ -278,7 +278,7 @@ export default function ChatScreen() {
                   Say hi to {partnerName ?? "your partner"}!
                 </Text>
                 <Text style={styles.emptySubtext}>
-                  Messages are end-to-end between the two of you.
+                  Only the two of you can see this chat.
                 </Text>
               </View>
             ) : (
