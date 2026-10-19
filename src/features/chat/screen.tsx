@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useMemo } from "react";
+import React, { useRef, useCallback, useMemo, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Pressable,
   ActivityIndicator,
   Platform,
+  Keyboard,
 } from "react-native";
 import { Image } from "expo-image";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
@@ -59,6 +60,23 @@ export default function ChatScreen() {
     handleLoadMore,
     handleRetryMessage,
   } = useChat();
+
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      () => setIsKeyboardOpen(true),
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => setIsKeyboardOpen(false),
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const partnerName = partnerProfile?.full_name ?? null;
   const partnerAvatarUrl = partnerProfile?.avatar_url ?? null;
@@ -284,7 +302,11 @@ export default function ChatScreen() {
             <View
               style={[
                 styles.inputBarWrapper,
-                { paddingBottom: Math.max(insets.bottom, 8)},
+                {
+                  paddingBottom: isKeyboardOpen
+                    ? 6
+                    : Math.max(insets.bottom, Platform.OS === "android" ? 18 : 10),
+                },
               ]}
             >
               <View style={styles.inputRow}>

@@ -216,8 +216,7 @@ export const styles = StyleSheet.create({
   actionsRow: {
     flexDirection: "row",
     gap: 12,
-    marginTop: 20,
-    paddingHorizontal: 20,
+    marginTop: 0,
   },
   clearButton: {
     flex: 1,

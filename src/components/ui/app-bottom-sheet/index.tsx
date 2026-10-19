@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   View,
@@ -6,7 +6,9 @@ import {
   Pressable,
   ScrollView,
   Platform,
+  Keyboard,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/src/constants/colors";
@@ -29,6 +31,28 @@ export function AppBottomSheet({
   contentContainerStyle,
   disabled = false,
 }: AppBottomSheetProps) {
+  const insets = useSafeAreaInsets();
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      () => setIsKeyboardVisible(true),
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => setIsKeyboardVisible(false),
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  const safeBottomPadding = isKeyboardVisible
+    ? 16
+    : Math.max(insets.bottom, Platform.OS === "android" ? 44 : 20);
+
   const handleBackdropPress = () => {
     if (!disabled) {
       onClose();
@@ -51,7 +75,13 @@ export function AppBottomSheet({
   );
 
   const container = (
-    <View style={[styles.sheetContainer, sheetStyle]}>
+    <View
+      style={[
+        styles.sheetContainer,
+        { paddingBottom: footer ? 0 : safeBottomPadding },
+        sheetStyle,
+      ]}
+    >
       {showHandleBar && <View style={styles.handleBar} />}
 
       {(title || subtitle || showCloseButton || headerRight) && (
@@ -80,7 +110,16 @@ export function AppBottomSheet({
 
       {body}
 
-      {footer && <View style={styles.footerContainer}>{footer}</View>}
+      {footer && (
+        <View
+          style={[
+            styles.footerContainer,
+            { paddingBottom: safeBottomPadding },
+          ]}
+        >
+          {footer}
+        </View>
+      )}
     </View>
   );
 
