@@ -25,6 +25,11 @@ import {
 import { subscribeToAuthState } from "@/src/lib/auth/auth-state-listener";
 import { getPartnerId } from "@/src/lib/quiz";
 import { getCoupleKey } from "@/src/lib/couple/get-couple-key";
+import {
+  getCachedHasPartner,
+  setCachedHasPartner,
+  clearCachedHasPartner,
+} from "@/src/lib/cache/partner-status";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -56,6 +61,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Track the previous user id so we can clear cache when the account changes.
+  const prevUserIdRef = useRef<string | null>(null);
+
   useEffect(() => {
     const initAuth = async (): Promise<void> => {
       try {
@@ -70,23 +78,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             ),
           ]);
 
+        // Load the legacy (non-user-scoped) keys and session in parallel.
+        // The user-scoped cache requires the user id, so we read it after we
+        // know the session.
         const [
-          storedPartner,
           storedRelationship,
           storedName,
           storedAvatar,
           sessionResult,
         ] = await Promise.all([
-          AsyncStorage.getItem(HAS_PARTNER_KEY),
           AsyncStorage.getItem(RELATIONSHIP_TYPE_KEY),
           AsyncStorage.getItem(USER_NAME_KEY),
           AsyncStorage.getItem(AVATAR_URL_KEY),
           getSessionWithTimeout(),
         ]);
 
-        if (storedPartner !== null) {
-          setHasPartnerState(storedPartner === "true");
-        }
         if (
           storedRelationship === "local" ||
           storedRelationship === "long_distance"
@@ -100,17 +106,82 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setAvatarUrlState(storedAvatar);
         }
 
-        if (sessionResult.data?.session) {
-          setSession(sessionResult.data.session);
-          supabase.realtime.setAuth(sessionResult.data.session.access_token);
-          setUser(sessionResult.data.session.user);
-          applyProfileSync(sessionResult.data.session.user).catch((syncErr) => {
-            console.warn("Async profile sync error on init:", syncErr);
-          });
+        const currentSession = sessionResult.data?.session ?? null;
+
+        if (!currentSession) {
+          // No session — go to welcome, no cache to read.
+          setIsLoading(false);
+          return;
+        }
+
+        const currentUser = currentSession.user;
+        prevUserIdRef.current = currentUser.id;
+
+        setSession(currentSession);
+        supabase.realtime.setAuth(currentSession.access_token);
+        setUser(currentUser);
+
+        // Read the user-scoped cache NOW that we have the user id.
+        const cached = await getCachedHasPartner(currentUser.id);
+
+        if (cached !== null) {
+          // Cache hit: route immediately without waiting for the network.
+          setHasPartnerState(cached);
+          setIsLoading(false);
+
+          // Background verification — always confirm with the server.
+          void (async () => {
+            try {
+              const synced = await syncUserProfile(currentUser);
+              if (synced) {
+                const serverValue = synced.hasPartner;
+                // Apply all synced fields to state (mirrors applyProfileSync).
+                if (synced.userName) setUserNameState(synced.userName);
+                if (synced.avatarUrl) setAvatarUrlState(synced.avatarUrl);
+                if (synced.relationshipType) setRelationshipTypeState(synced.relationshipType);
+                setInviteCode(synced.inviteCode);
+                setCodeExpiresAt(synced.codeExpiresAt);
+                setCodeExpiresInSeconds(synced.codeExpiresInSeconds);
+                // Only update hasPartner state + cache when the server disagrees.
+                setHasPartnerState((prev) => {
+                  if (prev !== serverValue) {
+                    setCachedHasPartner(currentUser.id, serverValue).catch(() => {});
+                    return serverValue;
+                  }
+                  return prev;
+                });
+              }
+            } catch (syncErr) {
+              // Network failure: keep the cached value, do not sign the user out.
+              console.warn("Background profile sync error:", syncErr);
+            }
+          })();
+        } else {
+          // Cache miss: use the existing loading behaviour — wait for the server.
+          void (async () => {
+            try {
+              const synced = await syncUserProfile(currentUser);
+              if (synced) {
+                // Apply all synced fields (mirrors applyProfileSync).
+                setHasPartnerState(synced.hasPartner);
+                if (synced.userName) setUserNameState(synced.userName);
+                if (synced.avatarUrl) setAvatarUrlState(synced.avatarUrl);
+                if (synced.relationshipType) setRelationshipTypeState(synced.relationshipType);
+                setInviteCode(synced.inviteCode);
+                setCodeExpiresAt(synced.codeExpiresAt);
+                setCodeExpiresInSeconds(synced.codeExpiresInSeconds);
+                // Persist to user-scoped cache for next launch.
+                await setCachedHasPartner(currentUser.id, synced.hasPartner);
+              }
+            } catch (syncErr) {
+              console.warn("Async profile sync error on init:", syncErr);
+            } finally {
+              setIsLoading(false);
+            }
+          })();
         }
       } catch (err: unknown) {
         console.warn("Error initializing auth:", err);
-      } finally {
         setIsLoading(false);
       }
     };
@@ -118,11 +189,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initAuth();
 
     const unsubscribe = subscribeToAuthState((currentSession) => {
+      const currentUser = currentSession?.user ?? null;
+
+      // If the signed-in account changed, evict the previous user's cache.
+      if (
+        prevUserIdRef.current &&
+        currentUser?.id !== prevUserIdRef.current
+      ) {
+        clearCachedHasPartner(prevUserIdRef.current).catch(() => {});
+      }
+      prevUserIdRef.current = currentUser?.id ?? null;
+
       setSession(currentSession);
       if (currentSession?.access_token) {
         supabase.realtime.setAuth(currentSession.access_token);
       }
-      const currentUser = currentSession?.user ?? null;
       setUser(currentUser);
       if (currentUser) {
         // Run outside the auth state listener stack to prevent Supabase mutex deadlock
@@ -161,6 +242,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setHasPartner = async (status: boolean): Promise<void> => {
     setHasPartnerState(status);
     await AsyncStorage.setItem(HAS_PARTNER_KEY, status ? "true" : "false");
+    // Also write to user-scoped cache when we have a user id.
+    if (user) {
+      await setCachedHasPartner(user.id, status);
+    }
   };
 
   useEffect(() => {
@@ -172,6 +257,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         HAS_PARTNER_KEY,
         connected ? "true" : "false",
       ).catch(() => {});
+      // Keep user-scoped cache in sync.
+      setCachedHasPartner(user.id, connected).catch(() => {});
     };
 
     // 1. Own profile changes (partner_id set/cleared on BOTH devices via connect_partner_code)
@@ -536,6 +623,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async (): Promise<void> => {
     try {
+      const signingOutUserId = user?.id ?? null;
       await signOutGoogle();
       await supabase.auth.signOut();
       setUser(null);
@@ -543,6 +631,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setHasPartnerState(false);
       setAvatarUrlState(null);
       await AsyncStorage.multiRemove([HAS_PARTNER_KEY, AVATAR_URL_KEY]);
+      // Clear user-scoped cache so the next user cannot inherit this data.
+      if (signingOutUserId) {
+        await clearCachedHasPartner(signingOutUserId);
+      }
     } catch (err: unknown) {
       console.warn("Error signing out:", err);
     }
@@ -611,6 +703,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       console.warn("Error during deleteAccount cleanup:", err);
     } finally {
+      const deletingUserId = user?.id ?? null;
       await signOut();
       await AsyncStorage.multiRemove([
         HAS_PARTNER_KEY,
@@ -618,6 +711,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         USER_NAME_KEY,
         AVATAR_URL_KEY,
       ]);
+      if (deletingUserId) {
+        await clearCachedHasPartner(deletingUserId);
+      }
       setUserNameState(null);
       setAvatarUrlState(null);
       setHasPartnerState(false);
