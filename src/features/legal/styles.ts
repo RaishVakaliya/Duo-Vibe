@@ -62,6 +62,13 @@ export const styles = StyleSheet.create({
     marginTop: 14,
     marginBottom: 8,
   },
+  subSectionTitle: {
+    fontFamily: "Fredoka_600SemiBold",
+    fontSize: 14,
+    color: "rgba(255, 255, 255, 0.85)",
+    marginTop: 10,
+    marginBottom: 4,
+  },
   paragraph: {
     fontFamily: "Fredoka_400Regular",
     fontSize: 14,
