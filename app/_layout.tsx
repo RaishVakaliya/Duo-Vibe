@@ -49,7 +49,7 @@ function RootNavigationStack() {
 
       <Stack.Screen name="date-ideas" />
       <Stack.Screen name="auth" />
-      <Stack.Screen name="invite-partner" />
+      <Stack.Screen name="invite-partner" options={{ gestureDirection: "horizontal" }} />
 
       <Stack.Screen
         name="(tabs)"

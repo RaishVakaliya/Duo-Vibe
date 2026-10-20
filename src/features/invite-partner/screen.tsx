@@ -20,7 +20,7 @@ import { PartnerCodeInput } from "./components/partner-code-input";
 
 export default function InvitePartnerScreen() {
   const {
-    isFromHome,
+    canGoBack,
     inviteCode,
     partnerCode,
     setPartnerCode,
@@ -48,7 +48,7 @@ export default function InvitePartnerScreen() {
       />
 
       <SafeAreaView style={styles.safeArea}>
-        {isFromHome ? (
+        {canGoBack ? (
           <View style={styles.headerRow}>
             <Pressable
               style={styles.backButton}
@@ -115,7 +115,8 @@ export default function InvitePartnerScreen() {
           </ScrollView>
         </KeyboardAvoidingView>
 
-        {!isFromHome && (
+        {/* "Do it later" only shown in onboarding (no back stack) */}
+        {!canGoBack && (
           <View style={styles.footer}>
             <Pressable
               style={styles.laterButton}

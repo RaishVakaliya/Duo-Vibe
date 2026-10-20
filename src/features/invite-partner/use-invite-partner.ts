@@ -10,7 +10,8 @@ import { useCountdown } from "@/src/hooks/use-countdown";
 export function useInvitePartner() {
   const router = useRouter();
   const params = useLocalSearchParams<{ source?: string }>();
-  const isFromHome = params.source === "home";
+  // True when there is a screen to go back to (any source except cold onboarding)
+  const canGoBack = router.canGoBack();
   const {
     hasPartner,
     inviteCode,
@@ -49,7 +50,11 @@ export function useInvitePartner() {
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        router.replace(ROUTES.HOME);
+        if (router.canGoBack()) {
+          router.back();
+        } else {
+          router.replace(ROUTES.HOME);
+        }
         return true;
       };
 
@@ -149,15 +154,20 @@ export function useInvitePartner() {
   };
 
   const handleDoItLater = (): void => {
+    // "Do it later" is always the onboarding skip — always go home.
     router.replace(ROUTES.HOME);
   };
 
   const handleBack = (): void => {
-    router.replace(ROUTES.HOME);
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(ROUTES.HOME);
+    }
   };
 
   return {
-    isFromHome,
+    canGoBack,
     inviteCode,
     partnerCode,
     setPartnerCode,
