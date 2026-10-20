@@ -6,6 +6,9 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bgDark,
   },
+  gradientBackground: {
+    ...StyleSheet.absoluteFillObject,
+  },
   safeArea: {
     flex: 1,
   },
@@ -15,7 +18,6 @@ export const styles = StyleSheet.create({
     paddingBottom: 110, // clearance for bottom tab bar
   },
 
-  // ─── Header ──────────────────────────────────────────────────
   headerContainer: {
     marginBottom: 20,
   },
@@ -33,7 +35,6 @@ export const styles = StyleSheet.create({
     marginTop: 4,
   },
 
-  // ─── 2-Column Grid ───────────────────────────────────────────
   gridRow: {
     flexDirection: "row",
     gap: 14,
@@ -43,7 +44,6 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
 
-  // ─── Full-width Section Below Grid ───────────────────────────
   fullWidthSection: {
     marginTop: 4,
   },

@@ -57,14 +57,12 @@ export default function ProfileScreen() {
         style={styles.gradientBackground}
       />
 
-      {/* ── Safe area wraps the entire screen ───────────────────────── */}
       <SafeAreaView style={styles.safeArea} edges={["left", "right", "bottom"]}>
 
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* ── Hero banner scrolls with page ──────────────────────── */}
           <View style={[styles.heroBanner, { paddingTop: insets.top }]}>
             {avatarUrl ? (
               <Image
@@ -81,10 +79,8 @@ export default function ProfileScreen() {
                 style={styles.heroBannerFallback}
               />
             )}
-            {/* Scrim so icons stay readable regardless of photo brightness */}
             <View style={styles.heroBannerScrim} />
 
-            {/* Back + Edit row — positioned over the banner */}
             <View style={[styles.heroActionRow, { marginTop: Platform.OS === "ios" ? 4 : 8 }]}>
               <Pressable
                 style={styles.heroActionBtn}
@@ -107,10 +103,8 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* All content below hero gets horizontal padding */}
           <View style={styles.contentPadded}>
 
-          {/* Name + email + partner status */}
           <MotiView
             from={{ opacity: 0, translateY: 8 }}
             animate={{ opacity: 1, translateY: 0 }}
@@ -269,13 +263,12 @@ export default function ProfileScreen() {
 
           <View style={styles.footer}>
             <Text style={styles.versionText}>
-              Version {appVersion} • Build {appBuildNumber}
+              Version {appVersion}
             </Text>
             <Text style={styles.copyrightText}>
               Duo Vibe • Crafted for couples
             </Text>
           </View>
-          {/* end contentPadded */}
 
           </View>
         </ScrollView>

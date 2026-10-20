@@ -28,7 +28,7 @@ export default function AboutScreen() {
         style={styles.gradientBackground}
       />
 
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
         <View style={styles.header}>
           <Pressable
             style={styles.backButton}
@@ -61,7 +61,7 @@ export default function AboutScreen() {
             <Text style={styles.tagline}>Better Connections, Bigger Smiles</Text>
             <View style={styles.versionBadge}>
               <Text style={styles.versionText}>
-                Version {appVersion} (Build {appBuildNumber})
+                Version {appVersion}
               </Text>
             </View>
           </View>

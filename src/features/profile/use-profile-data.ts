@@ -136,7 +136,7 @@ export function useProfileData() {
     showAlert({
       title: "Delete Account",
       message:
-        "Are you sure you want to permanently delete your Duo Vibe account? This will disconnect your partner and erase your private data.",
+        "Are you sure you want to permanently delete your account? This will unlink your partner and permanently delete all shared memories, chat messages, quizzes, challenges, plans, and relationship data.",
       buttons: [
         { text: "Cancel", style: "cancel" },
         {

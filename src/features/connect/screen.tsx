@@ -1,4 +1,4 @@
-﻿import React, { useEffect } from "react";
+import React, { useEffect } from "react";
 import { View, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -9,6 +9,9 @@ import { AboutThemCard } from "./components/about-them-card";
 import { CoupleBadge } from "./components/couple-badge";
 import { useConnectData } from "./use-connect-data";
 import { useDeferredReady } from "@/src/hooks/use-deferred-ready";
+import { StatusBar } from "expo-status-bar";
+import { LinearGradient } from "expo-linear-gradient";
+import { GRADIENTS } from "@/src/constants/colors";
 import { styles } from "./styles";
 
 export default function ConnectHubScreen() {
@@ -34,7 +37,15 @@ export default function ConnectHubScreen() {
 
   return (
     <View style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      <StatusBar style="light" />
+
+      <LinearGradient
+        colors={[...GRADIENTS.background]}
+        locations={[...GRADIENTS.backgroundLocations]}
+        style={styles.gradientBackground}
+      />
+
+      <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}

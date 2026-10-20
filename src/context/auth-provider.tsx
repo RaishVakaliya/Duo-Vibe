@@ -641,69 +641,290 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteAccount = async (): Promise<void> => {
+    let deletingPartnerId: string | null = null;
+    const deletingUserId = user?.id ?? null;
+
     try {
       if (user) {
-        // 1. Try atomic security definer RPC
-        const { data: rpcRes, error: rpcErr } = await supabase.rpc(
-          "delete_user_account",
-        );
+        // 1. Fetch current profile to get partner_id and avatar
+        let partnerId: string | null = null;
+        let avatarUrl: string | null = null;
 
-        if (rpcErr || (rpcRes && !(rpcRes as { success: boolean }).success)) {
-          console.warn(
-            "delete_user_account RPC failed, running fallback cleanup:",
-            rpcErr,
-          );
+        try {
+          const { data: myProfile } = await supabase
+            .from("profiles")
+            .select("partner_id, avatar_url")
+            .eq("id", user.id)
+            .maybeSingle();
 
-          // 2. Comprehensive client-side fallback cleanup
+          partnerId = myProfile?.partner_id ?? null;
+          avatarUrl = myProfile?.avatar_url ?? null;
+          deletingPartnerId = partnerId;
+        } catch (fetchErr) {
+          console.warn("Failed to fetch profile before deletion:", fetchErr);
+        }
+
+        // Also check couples table to find partner if partner_id wasn't set on profile
+        if (!partnerId) {
+          try {
+            const { data: coupleRow } = await supabase
+              .from("couples")
+              .select("user1_id, user2_id")
+              .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
+              .maybeSingle();
+
+            if (coupleRow) {
+              partnerId =
+                coupleRow.user1_id === user.id
+                  ? coupleRow.user2_id
+                  : coupleRow.user1_id;
+              deletingPartnerId = partnerId;
+            }
+          } catch (coupleErr) {
+            console.warn("Failed to fetch couple record:", coupleErr);
+          }
+        }
+
+        const coupleKey = partnerId ? getCoupleKey(user.id, partnerId) : null;
+
+        // 2. Unlink partner: clear partner_id and relationship_type from partner's profile
+        if (partnerId) {
+          try {
+            await supabase
+              .from("profiles")
+              .update({
+                partner_id: null,
+                relationship_type: null,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", partnerId);
+          } catch (pErr) {
+            console.warn("Failed to unlink partner profile:", pErr);
+          }
+        }
+
+        // Also clear any other profiles pointing to user.id
+        try {
           await supabase
             .from("profiles")
-            .update({ partner_id: null, updated_at: new Date().toISOString() })
+            .update({
+              partner_id: null,
+              relationship_type: null,
+              updated_at: new Date().toISOString(),
+            })
             .eq("partner_id", user.id);
+        } catch (unlinkErr) {
+          console.warn("Failed to clear partner references:", unlinkErr);
+        }
 
+        // 3. Delete from couples table
+        try {
           await supabase
             .from("couples")
             .delete()
             .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+        } catch (cErr) {
+          console.warn("Failed to delete couple row:", cErr);
+        }
 
-          await supabase
-            .from("memory_reactions")
-            .delete()
-            .eq("user_id", user.id);
-          await supabase.from("memories").delete().eq("created_by", user.id);
-          await supabase.from("flag_answers").delete().eq("user_id", user.id);
-          await supabase.from("flag_votes").delete().eq("user_id", user.id);
-          await supabase
-            .from("flag_sessions")
-            .delete()
-            .or(`user_id.eq.${user.id},partner_id.eq.${user.id}`);
+        // 4. Delete shared chat messages
+        try {
+          if (coupleKey) {
+            await supabase
+              .from("chat_messages")
+              .delete()
+              .eq("couple_key", coupleKey);
+          }
           await supabase
             .from("chat_messages")
             .delete()
             .eq("sender_id", user.id);
+        } catch (chatErr) {
+          console.warn("Failed to delete chat messages:", chatErr);
+        }
+
+        // 5. Delete shared memories & reactions
+        try {
+          await supabase
+            .from("memory_reactions")
+            .delete()
+            .eq("user_id", user.id);
+
+          if (coupleKey) {
+            await supabase
+              .from("memories")
+              .delete()
+              .eq("couple_key", coupleKey);
+          }
+          await supabase
+            .from("memories")
+            .delete()
+            .eq("created_by", user.id);
+        } catch (memErr) {
+          console.warn("Failed to delete memories:", memErr);
+        }
+
+        // 6. Delete Couple Quiz (quiz_sessions & quiz_answers)
+        try {
+          const { data: userQuizSessions } = await supabase
+            .from("quiz_sessions")
+            .select("id")
+            .or(`answerer_id.eq.${user.id},reviewer_id.eq.${user.id}`);
+
+          if (userQuizSessions && userQuizSessions.length > 0) {
+            const sessionIds = userQuizSessions.map((s) => s.id);
+            await supabase
+              .from("quiz_answers")
+              .delete()
+              .in("session_id", sessionIds);
+            await supabase
+              .from("quiz_sessions")
+              .delete()
+              .in("id", sessionIds);
+          }
+        } catch (quizErr) {
+          console.warn("Failed to delete quiz data:", quizErr);
+        }
+
+        // 7. Delete Couple Challenge progress & completions
+        try {
+          await supabase
+            .from("couple_challenge_completions")
+            .delete()
+            .eq("user_id", user.id);
+
+          if (coupleKey) {
+            await supabase
+              .from("couple_challenge_progress")
+              .delete()
+              .eq("couple_key", coupleKey);
+          }
+          await supabase
+            .from("couple_challenge_progress")
+            .delete()
+            .or(`user_a_id.eq.${user.id},user_b_id.eq.${user.id}`);
+        } catch (chalErr) {
+          console.warn("Failed to delete couple challenge:", chalErr);
+        }
+
+        // 8. Delete 21 Questions sessions & answers
+        try {
+          await supabase
+            .from("twenty_one_questions_answers")
+            .delete()
+            .eq("user_id", user.id);
+
+          if (coupleKey) {
+            const { data: qSessions } = await supabase
+              .from("twenty_one_questions_sessions")
+              .select("id")
+              .eq("couple_key", coupleKey);
+
+            if (qSessions && qSessions.length > 0) {
+              const qIds = qSessions.map((s) => s.id);
+              await supabase
+                .from("twenty_one_questions_answers")
+                .delete()
+                .in("session_id", qIds);
+            }
+
+            await supabase
+              .from("twenty_one_questions_sessions")
+              .delete()
+              .eq("couple_key", coupleKey);
+          }
+        } catch (qErr) {
+          console.warn("Failed to delete 21 questions data:", qErr);
+        }
+
+        // 9. Delete Red/Green Flag sessions, answers & votes
+        try {
+          await supabase.from("flag_answers").delete().eq("user_id", user.id);
+          await supabase.from("flag_votes").delete().eq("user_id", user.id);
+          if (coupleKey) {
+            await supabase
+              .from("flag_sessions")
+              .delete()
+              .eq("couple_key", coupleKey);
+          }
+          await supabase
+            .from("flag_sessions")
+            .delete()
+            .eq("created_by", user.id);
+        } catch (flagErr) {
+          console.warn("Failed to delete flag data:", flagErr);
+        }
+
+        // 10. Delete Couple Plans
+        try {
+          if (coupleKey) {
+            await supabase
+              .from("couple_plans")
+              .delete()
+              .eq("couple_key", coupleKey);
+          }
+          await supabase
+            .from("couple_plans")
+            .delete()
+            .eq("created_by", user.id);
+        } catch (planErr) {
+          console.warn("Failed to delete couple plans:", planErr);
+        }
+
+        // 11. Delete Partner Notes
+        try {
+          await supabase
+            .from("partner_notes")
+            .delete()
+            .eq("owner_id", user.id);
+        } catch (noteErr) {
+          console.warn("Failed to delete partner notes:", noteErr);
+        }
+
+        // 12. Delete Secret Crush & Spark answers
+        try {
           await supabase
             .from("secret_crush_messages")
             .delete()
             .eq("sender_id", user.id);
           await supabase
-            .from("twenty_one_questions_answers")
+            .from("spark_answers")
             .delete()
             .eq("user_id", user.id);
-          await supabase
-            .from("couple_challenge_completions")
-            .delete()
-            .eq("user_id", user.id);
-          await supabase
-            .from("couple_challenge_progress")
-            .delete()
-            .or(`user_a_id.eq.${user.id},user_b_id.eq.${user.id}`);
-          await supabase.from("spark_answers").delete().eq("user_id", user.id);
+        } catch (scErr) {
+          console.warn("Failed to delete secret crush/sparks:", scErr);
+        }
+
+        // 13. Clean storage avatar if present
+        if (avatarUrl) {
+          try {
+            const parts = avatarUrl.split("/");
+            const fileName = parts[parts.length - 1];
+            if (fileName && fileName.length > 0) {
+              await supabase.storage.from("avatars").remove([fileName]);
+            }
+          } catch {
+            // Non-critical
+          }
+        }
+
+        // 14. Delete user profile row
+        try {
           await supabase.from("profiles").delete().eq("id", user.id);
+        } catch (profErr) {
+          console.warn("Failed to delete profile row:", profErr);
+        }
+
+        // 15. Attempt server-side auth RPC deletion
+        try {
+          await supabase.rpc("delete_user_account");
+        } catch (rpcErr) {
+          console.warn("delete_user_account RPC failed (non-critical):", rpcErr);
         }
       }
     } catch (err) {
       console.warn("Error during deleteAccount cleanup:", err);
     } finally {
-      const deletingUserId = user?.id ?? null;
       await signOut();
       await AsyncStorage.multiRemove([
         HAS_PARTNER_KEY,
@@ -713,6 +934,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       ]);
       if (deletingUserId) {
         await clearCachedHasPartner(deletingUserId);
+      }
+      if (deletingPartnerId) {
+        await clearCachedHasPartner(deletingPartnerId);
       }
       setUserNameState(null);
       setAvatarUrlState(null);
