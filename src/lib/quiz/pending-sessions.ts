@@ -1,9 +1,20 @@
 import { supabase } from "@/src/lib/supabase";
 import { QuizSession } from "@/src/types";
+import { getCache, setCache, invalidateCache, TTL } from "@/src/lib/cache";
+
+const PENDING_SESSIONS_CACHE_KEY = (userId: string) =>
+  `quiz_sessions:pending:${userId}`;
 
 export async function getPendingReviewSessions(
   userId: string,
 ): Promise<QuizSession[]> {
+  const cacheKey = PENDING_SESSIONS_CACHE_KEY(userId);
+
+  const cached = await getCache<QuizSession[]>(cacheKey);
+  if (cached !== null) {
+    return cached;
+  }
+
   const { data, error } = await supabase
     .from("quiz_sessions")
     .select("id, answerer_id, reviewer_id, question_ids, status, score, created_at, completed_at")
@@ -16,7 +27,7 @@ export async function getPendingReviewSessions(
     return [];
   }
 
-  return data.map((row) => ({
+  const sessions = data.map((row) => ({
     id: row.id,
     answerer_id: row.answerer_id,
     reviewer_id: row.reviewer_id,
@@ -28,17 +39,33 @@ export async function getPendingReviewSessions(
     created_at: row.created_at,
     completed_at: row.completed_at,
   }));
+
+  await setCache(cacheKey, sessions, TTL.QUIZ_SESSIONS);
+  return sessions;
 }
 
+export function invalidatePendingSessionsCache(userId: string): Promise<void> {
+  return invalidateCache(PENDING_SESSIONS_CACHE_KEY(userId));
+}
+
+const PARTNER_ID_CACHE_KEY = (userId: string) => `partner_id:${userId}`;
+
 export async function getPartnerId(userId: string): Promise<string | null> {
+  const cacheKey = PARTNER_ID_CACHE_KEY(userId);
+
+  const cached = await getCache<string | null>(cacheKey);
+  if (cached !== null) {
+    return cached;
+  }
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("partner_id")
     .eq("id", userId)
     .maybeSingle();
 
-
   if (profile?.partner_id) {
+    await setCache(cacheKey, profile.partner_id, TTL.COUPLE);
     return profile.partner_id;
   }
 
@@ -50,10 +77,17 @@ export async function getPartnerId(userId: string): Promise<string | null> {
     .maybeSingle();
 
   if (couple) {
-    return couple.user1_id === userId ? couple.user2_id : couple.user1_id;
+    const partnerId =
+      couple.user1_id === userId ? couple.user2_id : couple.user1_id;
+    await setCache(cacheKey, partnerId, TTL.COUPLE);
+    return partnerId;
   }
 
   return null;
+}
+
+export function invalidatePartnerIdCache(userId: string): Promise<void> {
+  return invalidateCache(PARTNER_ID_CACHE_KEY(userId));
 }
 
 export async function getActiveAnswererSession(

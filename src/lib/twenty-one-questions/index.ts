@@ -6,8 +6,8 @@ import {
   TwentyOneQuestionsReveal,
 } from "@/src/types";
 import { QUESTION_BANK, Question } from "@/src/data/questions";
+import { getCache, setCache, invalidateCache, TTL } from "@/src/lib/cache";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function rowToSession(row: {
   id: string;
@@ -46,12 +46,21 @@ function rowToAnswer(row: {
   };
 }
 
-// ─── Public API ───────────────────────────────────────────────────────────────
+
+const TQS_CACHE_KEY = (coupleKey: string) =>
+  `tqs_session:${coupleKey}`;
 
 export async function getOrCreateSession(
   coupleKey: string,
   questionIds: string[],
 ): Promise<TwentyOneQuestionsSession> {
+  const cacheKey = TQS_CACHE_KEY(coupleKey);
+
+  const cached = await getCache<TwentyOneQuestionsSession>(cacheKey);
+  if (cached !== null) {
+    return cached;
+  }
+
   // Try to fetch existing first
   const { data: existing } = await supabase
     .from("twenty_one_questions_sessions")
@@ -59,7 +68,11 @@ export async function getOrCreateSession(
     .eq("couple_key", coupleKey)
     .maybeSingle();
 
-  if (existing) return rowToSession(existing);
+  if (existing) {
+    const session = rowToSession(existing);
+    await setCache(cacheKey, session, TTL.TQS_SESSION);
+    return session;
+  }
 
   // Create new session
   const { data, error } = await supabase
@@ -69,7 +82,13 @@ export async function getOrCreateSession(
     .single();
 
   if (error || !data) throw new Error(error?.message ?? "Failed to create 21Q session.");
-  return rowToSession(data);
+  const session = rowToSession(data);
+  await setCache(cacheKey, session, TTL.TQS_SESSION);
+  return session;
+}
+
+export function invalidateTqsSessionCache(coupleKey: string): Promise<void> {
+  return invalidateCache(TQS_CACHE_KEY(coupleKey));
 }
 
 export async function submitAnswer(

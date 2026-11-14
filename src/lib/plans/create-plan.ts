@@ -2,6 +2,7 @@ import { supabase } from "@/src/lib/supabase";
 import { getErrorMessage } from "@/src/utils/error-message";
 import { CouplePlan } from "@/src/types";
 import { CreatePlanInput, PlanOperationResult } from "./types";
+import { invalidatePlansCache } from "./fetch-plans";
 
 export async function createPlan(
   input: CreatePlanInput,
@@ -24,6 +25,9 @@ export async function createPlan(
     if (error) {
       return { data: null, error: getErrorMessage(error) };
     }
+
+    // Invalidate the plans cache so the next fetchPlans fetches fresh data
+    await invalidatePlansCache(input.coupleKey);
 
     return { data: data as CouplePlan, error: null };
   } catch (err) {

@@ -1,8 +1,20 @@
 import { supabase } from "@/src/lib/supabase";
+import { getCache, setCache, invalidateCache, TTL } from "@/src/lib/cache";
+
+const ANNIVERSARY_CACHE_KEY = (userId: string) =>
+  `couple_anniversary:${userId}`;
 
 export async function getAnniversaryDate(
   userId: string,
 ): Promise<string | null> {
+  const cacheKey = ANNIVERSARY_CACHE_KEY(userId);
+
+  // Cache hit: anniversary date changes extremely rarely, 15-min TTL
+  const cached = await getCache<string | null>(cacheKey);
+  if (cached !== null) {
+    return cached;
+  }
+
   const { data, error } = await supabase
     .from("couples")
     .select("anniversary_date")
@@ -14,6 +26,8 @@ export async function getAnniversaryDate(
     return null;
   }
 
+  // Cache even null so we don't re-query on every mount if no date is set yet
+  await setCache(cacheKey, data.anniversary_date ?? null, TTL.COUPLE);
   return data.anniversary_date;
 }
 
@@ -30,12 +44,11 @@ export async function setAnniversaryDate(
   if (error) {
     throw new Error(`Failed to update anniversary date: ${error.message}`);
   }
+
+  // Invalidate cache so next getAnniversaryDate returns the new value
+  await invalidateCache(ANNIVERSARY_CACHE_KEY(userId));
 }
 
-/**
- * Compute the number of days together from an anniversary date (YYYY-MM-DD).
- * Day 1 is the anniversary date itself.
- */
 export function computeDaysTogether(anniversaryDate: string): number {
   if (!anniversaryDate) return 0;
   try {
