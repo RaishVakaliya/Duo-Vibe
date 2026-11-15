@@ -18,10 +18,7 @@ import { AppBottomSheet } from "@/src/components/ui/app-bottom-sheet";
 import { GradientButton } from "@/src/components/ui/gradient-button";
 import { GRADIENTS } from "@/src/constants/colors";
 import { createPhotoMemory } from "@/src/lib/memories";
-import {
-  requestPhotoLibraryPermission,
-  requestCameraPermission,
-} from "@/src/utils/permissions";
+import { requestPhotoLibraryPermission } from "@/src/utils/permissions";
 import { AddMemoryBottomSheetProps } from "../types";
 
 import { componentStyles } from "./component-styles";
@@ -83,53 +80,6 @@ export function AddMemoryBottomSheet({
       console.warn("[memories] Library pick error:", err);
       setErrorMessage("Could not open photo library. Please try again.");
     }
-  };
-
-  const handleTakePhoto = async () => {
-    try {
-      const granted = await requestCameraPermission(
-        "Duo Vibe needs access to your camera so you can take photos for your shared couple memories.",
-      );
-      if (!granted) return;
-
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ["images"],
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.7,
-        base64: true,
-      });
-
-      if (!result.canceled && result.assets[0]?.uri) {
-        setPhotoUri(result.assets[0].uri);
-        setPhotoBase64(result.assets[0].base64 ?? null);
-        setErrorMessage(null);
-      }
-    } catch (err) {
-      console.warn("[memories] Camera error:", err);
-      setErrorMessage("Could not open camera. Please try again.");
-    }
-  };
-
-  const handleChoosePhotoSource = () => {
-    Alert.alert(
-      "Add Couple Photo",
-      "Choose a photo source for this memory",
-      [
-        {
-          text: "Take Photo",
-          onPress: handleTakePhoto,
-        },
-        {
-          text: "Choose from Library",
-          onPress: handlePickFromLibrary,
-        },
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-      ],
-    );
   };
 
   const handleDateChange = (
@@ -226,7 +176,7 @@ export function AddMemoryBottomSheet({
                 componentStyles.photoPickerBox,
                 photoUri ? componentStyles.photoPickerBoxActive : null,
               ]}
-              onPress={handleChoosePhotoSource}
+              onPress={handlePickFromLibrary}
               disabled={isUploading}
               accessibilityRole="button"
               accessibilityLabel="Pick photo"

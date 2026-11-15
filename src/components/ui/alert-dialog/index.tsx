@@ -42,11 +42,20 @@ export function AlertProvider({ children }: { children: ReactNode }) {
                 <Text style={styles.message}>{alertConfig.message}</Text>
               ) : null}
 
-              <View style={styles.buttonRow}>
+              <View
+                style={[
+                  styles.buttonRow,
+                  alertConfig.buttons && alertConfig.buttons.length > 2
+                    ? styles.buttonColumn
+                    : null,
+                ]}
+              >
                 {alertConfig.buttons && alertConfig.buttons.length > 0 ? (
                   alertConfig.buttons.map((btn, idx) => {
                     const isCancel = btn.style === "cancel";
                     const isDestructive = btn.style === "destructive";
+                    const isVertical =
+                      alertConfig.buttons && alertConfig.buttons.length > 2;
 
                     const buttonStyle = isCancel
                       ? styles.cancelButton
@@ -63,7 +72,11 @@ export function AlertProvider({ children }: { children: ReactNode }) {
                     return (
                       <Pressable
                         key={idx}
-                        style={[styles.button, buttonStyle]}
+                        style={[
+                          styles.button,
+                          buttonStyle,
+                          isVertical ? styles.buttonVertical : null,
+                        ]}
                         accessibilityRole="button"
                         accessibilityLabel={btn.text}
                         onPress={() => {

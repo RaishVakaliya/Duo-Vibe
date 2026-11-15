@@ -104,7 +104,6 @@ export default function ChatScreen() {
     }
   }, [router]);
 
-  // Launch camera or gallery and send picked image directly
   const handleAttachImage = useCallback(async () => {
     Alert.alert(
       "Send Photo",

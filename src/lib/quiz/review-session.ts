@@ -131,7 +131,7 @@ export async function submitReview(
       if (answererProfile?.push_token) {
         await sendExpoPushNotification({
           to: answererProfile.push_token,
-          title: "Quiz Reviewed! 🎉",
+          title: "Quiz Reviewed!",
           body: `Your partner graded your quiz! You scored ${correctCount}/${gradedAnswers.length} 💕`,
           data: { sessionId, type: "quiz_result" },
         });

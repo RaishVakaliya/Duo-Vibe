@@ -30,10 +30,14 @@ export {
   setCachedSignedUrl,
 } from "./signed-url-cache";
 
-export { notifyPartnerOfMemory } from "./notify-partner";
+export {
+  notifyPartnerOfMemory,
+  notifyPartnerOfAnniversary,
+} from "./notify-partner";
 
 export {
   getAnniversaryDate,
   setAnniversaryDate,
+  invalidateAnniversaryCache,
   computeDaysTogether,
 } from "./anniversary";

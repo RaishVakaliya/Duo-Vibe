@@ -46,12 +46,20 @@ export const styles = StyleSheet.create({
     gap: 10,
     width: "100%",
   },
+  buttonColumn: {
+    flexDirection: "column",
+    gap: 8,
+  },
   button: {
     flex: 1,
     height: 44,
     borderRadius: 22,
     justifyContent: "center",
     alignItems: "center",
+  },
+  buttonVertical: {
+    flex: 0,
+    width: "100%",
   },
   primaryButton: {
     backgroundColor: COLORS.primary,

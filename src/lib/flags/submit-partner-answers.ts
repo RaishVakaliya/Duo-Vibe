@@ -97,7 +97,7 @@ async function notifyPartnerFinishedFlags(
     if (partnerProfile?.push_token) {
       await sendExpoPushNotification({
         to: partnerProfile.push_token,
-        title: "Red Flag or Green Flag 🚩",
+        title: "Red Flag or Green Flag",
         body: `${userName} finished Red Flag or Green Flag. Your turn!`,
         data: { type: "red_green_flag", sessionId },
       });

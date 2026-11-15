@@ -7,6 +7,7 @@ import {
   TextInput,
   ActivityIndicator,
   Platform,
+  Alert,
 } from "react-native";
 import { Image } from "expo-image";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
@@ -101,10 +102,10 @@ export default function EditProfileScreen() {
   };
 
   const handleChooseSource = (): void => {
-    showAlert({
-      title: "Update Profile Photo",
-      message: "Choose how you'd like to set your avatar",
-      buttons: [
+    Alert.alert(
+      "Update Profile Photo",
+      "Choose how you'd like to set your avatar",
+      [
         {
           text: "Take Photo",
           onPress: handleTakePhoto,
@@ -118,7 +119,7 @@ export default function EditProfileScreen() {
           style: "cancel",
         },
       ],
-    });
+    );
   };
 
   const handleSave = async (): Promise<void> => {

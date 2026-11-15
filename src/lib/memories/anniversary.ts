@@ -33,19 +33,32 @@ export async function getAnniversaryDate(
 
 export async function setAnniversaryDate(
   userId: string,
-  anniversaryDate: string, // YYYY-MM-DD
+  anniversaryDate: string,
 ): Promise<void> {
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("couples")
     .update({ anniversary_date: anniversaryDate })
     .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
-    .eq("status", "connected");
+    .eq("status", "connected")
+    .select("user1_id, user2_id")
+    .maybeSingle();
 
   if (error) {
     throw new Error(`Failed to update anniversary date: ${error.message}`);
   }
 
-  // Invalidate cache so next getAnniversaryDate returns the new value
+  await invalidateCache(ANNIVERSARY_CACHE_KEY(userId));
+  if (data?.user1_id) {
+    await invalidateCache(ANNIVERSARY_CACHE_KEY(data.user1_id));
+  }
+  if (data?.user2_id) {
+    await invalidateCache(ANNIVERSARY_CACHE_KEY(data.user2_id));
+  }
+}
+
+export async function invalidateAnniversaryCache(
+  userId: string,
+): Promise<void> {
   await invalidateCache(ANNIVERSARY_CACHE_KEY(userId));
 }
 

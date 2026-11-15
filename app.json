@@ -21,7 +21,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.duovibe.app",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Allow Duo Vibe to access your camera to capture shared moments with your partner."
       }
     },
     "android": {
@@ -38,7 +39,8 @@
       "predictiveBackGestureEnabled": false,
       "googleServicesFile": "./google-services.json",
       "permissions": [
-        "android.permission.POST_NOTIFICATIONS"
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.CAMERA"
       ],
       "blockedPermissions": [
         "android.permission.RECORD_AUDIO",
@@ -77,7 +79,7 @@
         "expo-image-picker",
         {
           "photosPermission": "Allow Duo Vibe to access your photos to share memories and profile pictures.",
-          "cameraPermission": false,
+          "cameraPermission": "Allow Duo Vibe to access your camera to capture shared moments with your partner.",
           "microphonePermission": false
         }
       ],

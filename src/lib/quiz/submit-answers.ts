@@ -35,7 +35,7 @@ export async function submitAnswers(
       if (reviewerProfile?.push_token) {
         await sendExpoPushNotification({
           to: reviewerProfile.push_token,
-          title: "Couple Quiz 💕",
+          title: "Couple Quiz",
           body: "Your partner finished a Couple Quiz — come review their answers!",
           data: { sessionId, type: "quiz_review" },
         });

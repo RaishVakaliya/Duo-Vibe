@@ -38,7 +38,7 @@ export async function sendMessage(
           const pushBody = content.startsWith("[image]") ? "📷 Photo" : content;
           await sendExpoPushNotification({
             to: pProfile.push_token,
-            title: senderName || "New Message 💕",
+            title: senderName || "New Message",
             body: pushBody,
             data: { route: "/chat", coupleKey },
           });

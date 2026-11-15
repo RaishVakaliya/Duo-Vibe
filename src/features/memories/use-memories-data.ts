@@ -11,7 +11,9 @@ import {
   subscribeToMemories,
   getAnniversaryDate,
   setAnniversaryDate,
+  invalidateAnniversaryCache,
   computeDaysTogether,
+  notifyPartnerOfAnniversary,
 } from "@/src/lib/memories";
 import { Memory } from "@/src/types";
 import {
@@ -45,7 +47,6 @@ export function useMemoriesData(): UseMemoriesDataResult {
   const coupleKeyRef = useRef<string | null>(null);
   const unsubscribeRealtimeRef = useRef<(() => void) | null>(null);
 
-  // ─── Initialize Couple Key & Anniversary ───────────────────────────────────
   const initCouple = useCallback(async () => {
     if (!user || !hasPartner) {
       setLoadState("no_partner");
@@ -82,7 +83,6 @@ export function useMemoriesData(): UseMemoriesDataResult {
     }
   }, [user, hasPartner]);
 
-  // ─── Fetch Initial Page ───────────────────────────────────────────────────
   const loadInitialMemories = useCallback(async (cKey: string) => {
     if (!user) return;
     try {
@@ -109,7 +109,6 @@ export function useMemoriesData(): UseMemoriesDataResult {
     }
   }, [user]);
 
-  // ─── Realtime Sync ────────────────────────────────────────────────────────
   const setupRealtime = useCallback((cKey: string) => {
     if (unsubscribeRealtimeRef.current) {
       unsubscribeRealtimeRef.current();
@@ -117,6 +116,7 @@ export function useMemoriesData(): UseMemoriesDataResult {
 
     const unsub = subscribeToMemories({
       coupleKey: cKey,
+      userId: user?.id,
       onMemoryChange: () => {
         // Silently reload top page when memories change
         if (user) {
@@ -152,12 +152,18 @@ export function useMemoriesData(): UseMemoriesDataResult {
             .catch(() => {});
         }
       },
+      onAnniversaryChange: (newDate: string | null) => {
+        if (user) {
+          invalidateAnniversaryCache(user.id).catch(() => {});
+        }
+        setAnniversaryDateState(newDate);
+        setDaysTogether(newDate ? computeDaysTogether(newDate) : null);
+      },
     });
 
     unsubscribeRealtimeRef.current = unsub;
   }, [user, page]);
 
-  // ─── First focus / mount: defer network until after transition ────────────
   useEffect(() => {
     let isCancelled = false;
 
@@ -184,22 +190,28 @@ export function useMemoriesData(): UseMemoriesDataResult {
     };
   }, [user, hasPartner, initCouple, loadInitialMemories, setupRealtime]);
 
-  // ─── Refresh (Pull-to-refresh) ─────────────────────────────────────────────
   const handleRefresh = useCallback(async () => {
     if (!coupleKeyRef.current || !user) return;
     setIsRefreshing(true);
     try {
-      const result = await fetchMemories({
-        coupleKey: coupleKeyRef.current,
-        userId: user.id,
-        page: 0,
-        pageSize: MEMORIES_PAGE_SIZE,
-      });
+      const [result, freshAnni] = await Promise.all([
+        fetchMemories({
+          coupleKey: coupleKeyRef.current,
+          userId: user.id,
+          page: 0,
+          pageSize: MEMORIES_PAGE_SIZE,
+        }),
+        getAnniversaryDate(user.id),
+      ]);
       setMemories(result.memories);
       setHasMore(result.hasMore);
       setPage(0);
       setLoadState("ready");
       setErrorMessage(null);
+      if (freshAnni) {
+        setAnniversaryDateState(freshAnni);
+        setDaysTogether(computeDaysTogether(freshAnni));
+      }
     } catch (err: unknown) {
       console.warn("[memories] Refresh error:", err);
     } finally {
@@ -207,7 +219,6 @@ export function useMemoriesData(): UseMemoriesDataResult {
     }
   }, [user]);
 
-  // ─── Load More (Pagination) ───────────────────────────────────────────────
   const handleLoadMore = useCallback(async () => {
     if (
       !hasMore ||
@@ -245,7 +256,6 @@ export function useMemoriesData(): UseMemoriesDataResult {
     }
   }, [hasMore, isLoadingMore, isRefreshing, page, user]);
 
-  // ─── Group Memories by Month ───────────────────────────────────────────────
   const groupedMemories = useMemo<MonthGroup[]>(() => {
     const groups: Map<string, Memory[]> = new Map();
 
@@ -266,7 +276,6 @@ export function useMemoriesData(): UseMemoriesDataResult {
     }));
   }, [memories]);
 
-  // ─── Toggle Reaction ───────────────────────────────────────────────────────
   const handleToggleReaction = useCallback(
     async (memory: Memory) => {
       if (!user) return;
@@ -323,7 +332,6 @@ export function useMemoriesData(): UseMemoriesDataResult {
     [user, selectedMemory],
   );
 
-  // ─── Delete Memory ─────────────────────────────────────────────────────────
   const handleDeleteMemory = useCallback(
     async (memory: Memory) => {
       // Optimistic removal
@@ -343,7 +351,6 @@ export function useMemoriesData(): UseMemoriesDataResult {
     [handleRefresh],
   );
 
-  // ─── Anniversary Date ──────────────────────────────────────────────────────
   const handleSaveAnniversaryDate = useCallback(
     async (dateStr: string) => {
       if (!user) return;
@@ -352,6 +359,7 @@ export function useMemoriesData(): UseMemoriesDataResult {
         setAnniversaryDateState(dateStr);
         setDaysTogether(computeDaysTogether(dateStr));
         setIsAnniversaryPickerOpen(false);
+        notifyPartnerOfAnniversary(user.id, dateStr).catch(() => {});
       } catch (err) {
         console.warn("[memories] Save anniversary error:", err);
       }
@@ -359,7 +367,6 @@ export function useMemoriesData(): UseMemoriesDataResult {
     [user],
   );
 
-  // ─── Memory Created ────────────────────────────────────────────────────────
   const handleMemoryCreated = useCallback((newMemory: Memory) => {
     setMemories((prev) => [newMemory, ...prev]);
   }, []);
