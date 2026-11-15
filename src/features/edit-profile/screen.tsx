@@ -23,7 +23,10 @@ import { useSessionAuth } from "@/src/context/auth-context";
 import { useAlert } from "@/src/components/ui/alert-dialog";
 import { getInitial } from "@/src/lib/profile";
 import { uploadAvatarImage } from "@/src/lib/profile/upload-avatar";
-import { requestPhotoLibraryPermission } from "@/src/utils/permissions";
+import {
+  requestPhotoLibraryPermission,
+  requestCameraPermission,
+} from "@/src/utils/permissions";
 
 
 export default function EditProfileScreen() {
@@ -37,13 +40,42 @@ export default function EditProfileScreen() {
   );
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
+  const handleTakePhoto = async (): Promise<void> => {
+    try {
+      const hasPermission = await requestCameraPermission(
+        "Please allow camera access to take your profile picture.",
+      );
+      if (!hasPermission) return;
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const uri = result.assets[0]?.uri;
+        if (uri) {
+          setPickedImageUri(uri);
+          Haptics.selectionAsync();
+        }
+      }
+    } catch (err) {
+      console.warn("Error taking photo with camera:", err);
+      showAlert({
+        title: "Camera Error",
+        message: "Failed to take photo with camera. Please try again.",
+      });
+    }
+  };
+
   const handlePickFromGallery = async (): Promise<void> => {
     try {
       const hasPermission = await requestPhotoLibraryPermission(
         "Please allow photo library access to choose your profile picture.",
       );
       if (!hasPermission) return;
-
 
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
@@ -66,6 +98,27 @@ export default function EditProfileScreen() {
         message: "Failed to pick image from gallery. Please try again.",
       });
     }
+  };
+
+  const handleChooseSource = (): void => {
+    showAlert({
+      title: "Update Profile Photo",
+      message: "Choose how you'd like to set your avatar",
+      buttons: [
+        {
+          text: "Take Photo",
+          onPress: handleTakePhoto,
+        },
+        {
+          text: "Choose from Library",
+          onPress: handlePickFromGallery,
+        },
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+      ],
+    });
   };
 
   const handleSave = async (): Promise<void> => {
@@ -152,9 +205,9 @@ export default function EditProfileScreen() {
             <View style={styles.avatarWrapper}>
               <Pressable
                 style={styles.avatarRing}
-                onPress={handlePickFromGallery}
+                onPress={handleChooseSource}
                 accessibilityRole="button"
-                accessibilityLabel="Upload profile picture from gallery"
+                accessibilityLabel="Upload profile picture"
               >
                 <View style={styles.avatarInner}>
                   {pickedImageUri ? (
@@ -177,7 +230,7 @@ export default function EditProfileScreen() {
               </Pressable>
 
               <Pressable
-                onPress={handlePickFromGallery}
+                onPress={handleChooseSource}
                 accessibilityRole="button"
                 accessibilityLabel="Change photo text button"
               >

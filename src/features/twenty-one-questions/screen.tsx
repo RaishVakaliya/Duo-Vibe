@@ -204,7 +204,8 @@ export default function TwentyOneQuestionsScreen() {
         <ScreenState
           variant="error"
           theme="light"
-          message="Couldn't load your session. Check your connection and try again."
+          title="Could Not Load Session"
+          message="Couldn't load your shared session. Check your connection and try again."
           onRetry={handleRetry}
         />
       </View>

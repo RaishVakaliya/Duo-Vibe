@@ -18,6 +18,12 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 20,
   },
+  iconWrapperPermission: {
+    backgroundColor: "rgba(255, 179, 0, 0.14)",
+  },
+  iconWrapperOffline: {
+    backgroundColor: "rgba(56, 189, 248, 0.14)",
+  },
   title: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 20,
@@ -40,6 +46,13 @@ export const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: 24,
   },
+  buttonRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flexWrap: "wrap",
+    justifyContent: "center",
+  },
   retryButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -51,6 +64,21 @@ export const styles = StyleSheet.create({
     marginTop: 4,
   },
   retryText: {
+    fontFamily: "Fredoka_600SemiBold",
+    fontSize: 15,
+    color: COLORS.white,
+  },
+  primaryButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: COLORS.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 22,
+    marginTop: 4,
+  },
+  primaryButtonText: {
     fontFamily: "Fredoka_600SemiBold",
     fontSize: 15,
     color: COLORS.white,
@@ -89,6 +117,17 @@ export const styles = StyleSheet.create({
   },
   retryTextLight: {
     color: "#FF2D55",
+  },
+  primaryButtonLight: {
+    backgroundColor: "#FF2D55",
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  primaryButtonTextLight: {
+    color: COLORS.white,
   },
   actionTextLight: {
     color: COLORS.textSecondary,

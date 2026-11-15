@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Platform,
   Keyboard,
+  Alert,
 } from "react-native";
 import { Image } from "expo-image";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
@@ -24,7 +25,10 @@ import { ChatBubble } from "./components/chat-bubble";
 import { ThemeModal } from "./components/theme-modal";
 import { ImageViewerModal } from "./components/image-viewer-modal";
 import { getBgColors, getBubbleColors } from "./chat-themes";
-import { requestPhotoLibraryPermission } from "@/src/utils/permissions";
+import {
+  requestPhotoLibraryPermission,
+  requestCameraPermission,
+} from "@/src/utils/permissions";
 
 import { ChatMessage } from "@/src/types";
 import { ScreenState } from "@/src/components/ui/screen-state";
@@ -100,29 +104,65 @@ export default function ChatScreen() {
     }
   }, [router]);
 
-  // Launch gallery and send picked image directly
+  // Launch camera or gallery and send picked image directly
   const handleAttachImage = useCallback(async () => {
-    try {
-      const granted = await requestPhotoLibraryPermission(
-        "Please allow photo library access to send images in chat.",
-      );
-      if (!granted) return;
+    Alert.alert(
+      "Send Photo",
+      "Choose a photo to send to your partner",
+      [
+        {
+          text: "Take Photo",
+          onPress: async () => {
+            try {
+              const granted = await requestCameraPermission(
+                "Please allow camera access to take and send photos in chat.",
+              );
+              if (!granted) return;
 
+              const result = await ImagePicker.launchCameraAsync({
+                mediaTypes: ["images"],
+                quality: 0.8,
+              });
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images"],
-        quality: 0.8,
-      });
+              if (!result.canceled && result.assets && result.assets.length > 0) {
+                const asset = result.assets[0];
+                if (asset && asset.uri) {
+                  await handleSendImage(asset.uri);
+                }
+              }
+            } catch (err) {
+              console.warn("Failed to take photo in chat:", err);
+            }
+          },
+        },
+        {
+          text: "Choose from Library",
+          onPress: async () => {
+            try {
+              const granted = await requestPhotoLibraryPermission(
+                "Please allow photo library access to send images in chat.",
+              );
+              if (!granted) return;
 
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const asset = result.assets[0];
-        if (asset && asset.uri) {
-          await handleSendImage(asset.uri);
-        }
-      }
-    } catch (err) {
-      console.warn("Failed to attach image:", err);
-    }
+              const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ["images"],
+                quality: 0.8,
+              });
+
+              if (!result.canceled && result.assets && result.assets.length > 0) {
+                const asset = result.assets[0];
+                if (asset && asset.uri) {
+                  await handleSendImage(asset.uri);
+                }
+              }
+            } catch (err) {
+              console.warn("Failed to attach image from library:", err);
+            }
+          },
+        },
+        { text: "Cancel", style: "cancel" },
+      ],
+    );
   }, [handleSendImage]);
 
 
@@ -246,13 +286,17 @@ export default function ChatScreen() {
         </View>
 
         {loadState === "loading" && (
-          <ScreenState variant="loading" />
+          <ScreenState
+            variant="loading"
+            message="Connecting to private chat…"
+          />
         )}
 
         {loadState === "error" && (
           <ScreenState
-            variant="error"
-            message="Couldn't connect to chat. Check your connection."
+            variant="offline"
+            title="Couldn't Connect to Chat"
+            message="Check your internet connection and try again."
             onRetry={handleRetry}
           />
         )}

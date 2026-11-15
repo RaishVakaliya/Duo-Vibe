@@ -364,11 +364,12 @@ export default function MemoriesScreen() {
 
         {/* Timeline Content */}
         {loadState === "loading" && memories.length === 0 ? (
-          <ScreenState variant="loading" />
+          <ScreenState variant="loading" message="Loading your memories…" />
         ) : loadState === "error" && memories.length === 0 ? (
           <ScreenState
             variant="error"
-            message={errorMessage || "Unable to load memories."}
+            title="Couldn't Load Memories"
+            message={errorMessage || "Unable to load memories. Check your connection."}
             onRetry={retry}
           />
         ) : memories.length === 0 ? (
@@ -377,6 +378,8 @@ export default function MemoriesScreen() {
             title="A moment worth keeping?"
             message="Capture your first shared memory together"
             icon="heart-outline"
+            actionLabel="Add First Memory"
+            onAction={handleOpenAddModal}
           />
         ) : (
           <FlatList

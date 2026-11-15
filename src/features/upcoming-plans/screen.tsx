@@ -20,9 +20,11 @@ import { styles } from "./styles";
 export default function UpcomingPlansScreen() {
   const {
     loading,
+    errorMessage,
     hasPartner,
     user,
     grouped,
+    retry,
     handleAddPlan,
     handleToggleDone,
     handleDeletePlan,
@@ -61,7 +63,14 @@ export default function UpcomingPlansScreen() {
         />
 
         {loading ? (
-          <ScreenState variant="loading" />
+          <ScreenState variant="loading" message="Loading your upcoming plans…" />
+        ) : errorMessage ? (
+          <ScreenState
+            variant="error"
+            title="Couldn't Load Plans"
+            message={errorMessage}
+            onRetry={retry}
+          />
         ) : !hasPartner ? (
           <LinkPartnerPrompt
             description="Connect with your partner to plan dates, trips, and romantic adventures together."

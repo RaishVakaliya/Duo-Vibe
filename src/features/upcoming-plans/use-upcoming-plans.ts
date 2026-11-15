@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Alert } from "react-native";
 import { usePartnerGuard } from "@/src/hooks/use-partner-guard";
 import { fetchPartnerNotes } from "@/src/lib/about-them";
@@ -21,64 +21,67 @@ export function useUpcomingPlans() {
   const [plans, setPlans] = useState<CouplePlan[]>([]);
   const [localNotes, setLocalNotes] = useState<Record<string, unknown>>({});
   const [loading, setLoading] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const unsubRef = useRef<(() => void) | null>(null);
 
-  // 1. Load plans and subscribe once coupleKey is available
-  useEffect(() => {
-    let isMounted = true;
-
-    if (partnerLoading) return;
-
+  const init = useCallback(async () => {
     if (!user || !hasPartner || !coupleKey) {
       setLoading(false);
       return;
     }
 
-    async function init() {
-      try {
-        setLoading(true);
+    try {
+      setLoading(true);
+      setErrorMessage(null);
 
-        // Load plans
-        const res = await fetchPlans(coupleKey!);
-        if (res.data && isMounted) {
-          setPlans(res.data);
-          reconcilePlanReminders(res.data);
-        }
-
-        // Load local About Them notes
-        const notesRes = await fetchPartnerNotes();
-        if (notesRes.data && isMounted) {
-          setLocalNotes(notesRes.data);
-        }
-
-        // Realtime subscribe
-        if (unsubRef.current) unsubRef.current();
-        unsubRef.current = subscribeToPlans({
-          coupleKey: coupleKey!,
-          onPlanChange: async () => {
-            const updated = await fetchPlans(coupleKey!);
-            if (updated.data && isMounted) {
-              setPlans(updated.data);
-              reconcilePlanReminders(updated.data);
-            }
-          },
-        });
-      } catch (err) {
-        console.warn("Error initializing upcoming plans:", err);
-      } finally {
-        if (isMounted) setLoading(false);
+      // Load plans
+      const res = await fetchPlans(coupleKey);
+      if (res.error) {
+        setErrorMessage(res.error);
+      } else if (res.data) {
+        setPlans(res.data);
+        reconcilePlanReminders(res.data);
       }
-    }
 
+      // Load local About Them notes
+      const notesRes = await fetchPartnerNotes();
+      if (notesRes.data) {
+        setLocalNotes(notesRes.data);
+      }
+
+      // Realtime subscribe
+      if (unsubRef.current) unsubRef.current();
+      unsubRef.current = subscribeToPlans({
+        coupleKey,
+        onPlanChange: async () => {
+          const updated = await fetchPlans(coupleKey);
+          if (updated.data) {
+            setPlans(updated.data);
+            reconcilePlanReminders(updated.data);
+          }
+        },
+      });
+    } catch (err) {
+      console.warn("Error initializing upcoming plans:", err);
+      setErrorMessage(
+        err instanceof Error ? err.message : "Failed to load upcoming plans.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [user, hasPartner, coupleKey]);
+
+  // 1. Load plans and subscribe once coupleKey is available
+  useEffect(() => {
+    if (partnerLoading) return;
     init();
 
     return () => {
-      isMounted = false;
       if (unsubRef.current) {
         unsubRef.current();
       }
     };
-  }, [user, hasPartner, coupleKey, partnerLoading]);
+  }, [partnerLoading, init]);
 
   // 2. Generate local-only birthday & anniversary plans
   const localPlans = useMemo<PlanItem[]>(() => {
@@ -324,9 +327,11 @@ export function useUpcomingPlans() {
 
   return {
     loading,
+    errorMessage,
     hasPartner,
     user,
     grouped,
+    retry: init,
     handleAddPlan,
     handleToggleDone,
     handleDeletePlan,

@@ -17,6 +17,7 @@ import { ROUTES } from "@/src/constants/routes";
 import { usePartnerGuard } from "@/src/hooks/use-partner-guard";
 import { ScreenHeader } from "@/src/components/ui/screen-header";
 import { LinkPartnerPrompt } from "@/src/components/ui/link-partner-prompt";
+import { ScreenState } from "@/src/components/ui/screen-state";
 import { GradientButton } from "@/src/components/ui/gradient-button";
 import { CoupleIllustration } from "@/src/components/couple-illustration";
 import {
@@ -35,6 +36,7 @@ export default function CoupleQuizStartScreen() {
   const [isStarting, setIsStarting] = useState<boolean>(false);
   const [activeSession, setActiveSession] = useState<QuizSession | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   const loadSessionState = useCallback(async () => {
     if (!user || !hasPartner) {
@@ -48,10 +50,12 @@ export default function CoupleQuizStartScreen() {
     }
     try {
       setIsLoading(true);
+      setFetchError(null);
       const pending = await getActiveAnswererSession(user.id);
       setActiveSession(pending);
     } catch (err: unknown) {
       console.warn("Failed to check active quiz session:", err);
+      setFetchError("Couldn't check quiz status. Check your connection.");
     } finally {
       setIsLoading(false);
     }
@@ -145,9 +149,18 @@ export default function CoupleQuizStartScreen() {
           showsVerticalScrollIndicator={false}
         >
           {isLoading && hasPartner ? (
-            <View style={[styles.mainCard, { paddingVertical: 48 }]}>
-              <ActivityIndicator size="large" color="#FF2D6C" />
-            </View>
+            <ScreenState
+              variant="loading"
+              theme="light"
+              message="Checking quiz status…"
+            />
+          ) : fetchError ? (
+            <ScreenState
+              variant="error"
+              theme="light"
+              message={fetchError}
+              onRetry={loadSessionState}
+            />
           ) : !hasPartner ? (
             <LinkPartnerPrompt
               theme="light"

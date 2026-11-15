@@ -19,6 +19,7 @@ import { formatRelativeTime } from "@/src/utils/date";
 import { styles } from "./styles";
 import { GRADIENTS } from "@/src/constants/colors";
 import { ROUTES } from "@/src/constants/routes";
+import { ScreenState } from "@/src/components/ui/screen-state";
 import { useSecretCrush } from "./use-secret-crush";
 import { EnvelopeIllustration } from "./components/envelope-illustration";
 import { SentMessageItem } from "./types";
@@ -317,10 +318,9 @@ export default function SecretCrushScreen() {
             {activeTab === "sent" && (
               <>
                 {isLoadingSent ? (
-                  <ActivityIndicator
-                    color="#FF4D6D"
-                    size="large"
-                    style={{ marginTop: 48 }}
+                  <ScreenState
+                    variant="loading"
+                    message="Loading your secret messages…"
                   />
                 ) : sentMessages.length === 0 ? (
                   <MotiView

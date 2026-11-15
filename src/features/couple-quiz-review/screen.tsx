@@ -21,6 +21,8 @@ import { ScreenState } from "@/src/components/ui/screen-state";
 export default function CoupleQuizReviewScreen() {
   const {
     isLoading,
+    errorMessage,
+    retry,
     isSubmitting,
     currentIndex,
     total,
@@ -52,9 +54,19 @@ export default function CoupleQuizReviewScreen() {
         />
 
         {isLoading ? (
-          <View style={styles.loadingWrap}>
-            <ActivityIndicator size="large" color="#FF2D6C" />
-          </View>
+          <ScreenState
+            variant="loading"
+            theme="light"
+            message="Loading quiz answers for review…"
+          />
+        ) : errorMessage ? (
+          <ScreenState
+            variant="error"
+            theme="light"
+            title="Could Not Load Review"
+            message={errorMessage}
+            onRetry={retry}
+          />
         ) : !currentAnswer ? (
           <View style={{ flex: 1, justifyContent: "center", padding: 24 }}>
             <ScreenState

@@ -8,6 +8,10 @@ export interface PermissionAlertAction {
   cancelButtonText?: string;
 }
 
+export function openAppSettings(): void {
+  Linking.openSettings().catch(() => {});
+}
+
 export async function requestPhotoLibraryPermission(
   customMessage?: string,
 ): Promise<boolean> {
@@ -19,7 +23,7 @@ export async function requestPhotoLibraryPermission(
       return true;
     }
 
-    if (!canAskAgain && (Platform.OS as string) !== "web") {
+    if (!canAskAgain && Platform.OS !== "web") {
       Alert.alert(
         "Permission Blocked",
         customMessage ??
@@ -29,7 +33,7 @@ export async function requestPhotoLibraryPermission(
           {
             text: "Open Settings",
             onPress: () => {
-              Linking.openSettings().catch(() => {});
+              openAppSettings();
             },
           },
         ],
@@ -46,6 +50,48 @@ export async function requestPhotoLibraryPermission(
     return false;
   } catch (err) {
     console.warn("[permissions] Failed to request photo permission:", err);
+    return false;
+  }
+}
+
+export async function requestCameraPermission(
+  customMessage?: string,
+): Promise<boolean> {
+  try {
+    const { status, canAskAgain } =
+      await ImagePicker.requestCameraPermissionsAsync();
+
+    if (status === "granted") {
+      return true;
+    }
+
+    if (!canAskAgain && Platform.OS !== "web") {
+      Alert.alert(
+        "Camera Blocked",
+        customMessage ??
+          "Camera access is blocked. Please enable it in Settings to take photos for Duo Vibe.",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Open Settings",
+            onPress: () => {
+              openAppSettings();
+            },
+          },
+        ],
+      );
+    } else {
+      Alert.alert(
+        "Camera Needed",
+        customMessage ??
+          "Duo Vibe needs camera access so you can capture real-time moments with your partner.",
+        [{ text: "OK", style: "default" }],
+      );
+    }
+
+    return false;
+  } catch (err) {
+    console.warn("[permissions] Failed to request camera permission:", err);
     return false;
   }
 }

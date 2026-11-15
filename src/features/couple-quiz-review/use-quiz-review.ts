@@ -16,6 +16,7 @@ export function useQuizReview() {
   const sessionId = typeof params.sessionId === "string" ? params.sessionId.trim() : "";
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [sessionData, setSessionData] = useState<ReviewSessionData | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [grades, setGrades] = useState<GradedAnswerMap>({});
@@ -49,11 +50,17 @@ export function useQuizReview() {
 
   const loadReviewData = useCallback(async () => {
     if (!sessionId) {
-      if (isMountedRef.current) setIsLoading(false);
+      if (isMountedRef.current) {
+        setErrorMessage("Invalid quiz session ID.");
+        setIsLoading(false);
+      }
       return;
     }
     try {
-      if (isMountedRef.current) setIsLoading(true);
+      if (isMountedRef.current) {
+        setIsLoading(true);
+        setErrorMessage(null);
+      }
       const data = await withTimeout(getSessionForReview(sessionId), 15000);
       if (!isMountedRef.current) return;
       setSessionData(data);
@@ -68,13 +75,11 @@ export function useQuizReview() {
     } catch (err: unknown) {
       if (!isMountedRef.current) return;
       const msg = err instanceof Error ? err.message : "Failed to load review.";
-      Alert.alert("Error", msg, [
-        { text: "OK", onPress: () => router.replace(ROUTES.HOME) },
-      ]);
+      setErrorMessage(msg);
     } finally {
       if (isMountedRef.current) setIsLoading(false);
     }
-  }, [sessionId, router]);
+  }, [sessionId]);
 
 
   useEffect(() => {
@@ -141,6 +146,8 @@ export function useQuizReview() {
 
   return {
     isLoading,
+    errorMessage,
+    retry: loadReviewData,
     isSubmitting,
     currentIndex,
     total,
